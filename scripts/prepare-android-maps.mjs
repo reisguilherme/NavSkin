@@ -7,7 +7,8 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import { buildStyle } from '../src/style.js';
-import { prepareWorldMaps, WORLD_VARIANTS } from './prepare-world-maps.mjs';
+import { prepareWorldMaps, WORLD_VARIANTS, roadDirectionLayer, poiIconExpression } from './prepare-world-maps.mjs';
+import { applyGameTypography, copyGameAssetFiles } from './game-asset-typography.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = path.join(root, 'android/app/src/main/assets/maps');
@@ -35,6 +36,9 @@ const categories = [
   { id: 'parking', label: 'Estacionamentos', maki: 'parking', color: '#8BC6FF', minzoom: 15 },
   { id: 'health', label: 'Hospitais e serviços de saúde', maki: 'hospital', color: '#FF5F72', minzoom: 13.2 },
   { id: 'shops', label: 'Mercados e lojas de conveniência', maki: 'grocery', color: '#E6A3FB', minzoom: 14.5 },
+  { id: 'education', label: 'Escolas e universidades', maki: 'college', color: '#20486B', minzoom: 13.5 },
+  { id: 'culture', label: 'Museus, teatros e cultura', maki: 'museum', color: '#E2CF91', minzoom: 14 },
+  { id: 'religion', label: 'Locais de culto', maki: 'religious-christian', color: '#FFD450', minzoom: 14.2 },
 ];
 const nightPalettes = {
   'gta-night': {
@@ -114,6 +118,7 @@ function nativeStyle(mode, tokens) {
   const definition = themes[theme];
   if (!definition || !p) throw new Error(`Unknown native map variant: ${mode}`);
   const night = mode.endsWith('-night');
+  const gta = theme === 'gta' ? tokens.labels.gta : null;
   style.name = `Goiânia · ${definition.title}${night ? ' · Noite' : ''}`;
   style.sprite = `asset://maps/sprites/${theme}`;
   style.glyphs = 'asset://maps/glyphs/{fontstack}/{range}.pbf';
@@ -130,9 +135,9 @@ function nativeStyle(mode, tokens) {
     if (name === 'buildings') definition.attribution = attribution;
   }
   // Base area/line geometry and physical grade filters come directly from the approved PoC.
-  // Rebuild every native marker from the six semantic categories. Strip inherited
+  // Rebuild every native marker from the semantic categories. Strip inherited
   // circle/icon layers by their rendering role so renamed/new web anchors cannot
-  // survive when all six category layers are hidden. Geographic text stays intact.
+  // survive when all category layers are hidden. Geographic text stays intact.
   style.layers = style.layers.filter(layer => layer.source !== 'pois'
     && layer.type !== 'circle'
     && !(layer.type === 'symbol' && Object.hasOwn(layer.layout ?? {}, 'icon-image')));
@@ -164,12 +169,23 @@ function nativeStyle(mode, tokens) {
       layer.layout['text-font'] = [definition.font];
       layer.paint['text-color'] = p.label;
       layer.paint['text-halo-color'] = p.labelHalo;
-      layer.paint['text-halo-width'] = tokens.labels.haloWidth;
+      layer.paint['text-halo-width'] = gta?.haloWidth ?? tokens.labels.haloWidth;
       if (layer.id === 'road-labels') layer.layout['text-size'] = tokens.labels.roadSize;
+      if (gta && layer.id === 'road-labels') {
+        layer.minzoom = gta.roadMinzoom;
+        layer.filter = ['all', ['has', 'name'], ['!=', ['get', 'name'], ''],
+          ['in', ['get', 'kind'], ['literal', tokens.roads.flatMap(road => road.kinds)]]];
+        Object.assign(layer.layout, { 'text-transform': 'uppercase', 'text-letter-spacing': gta.roadLetterSpacing,
+          'text-size': gta.roadSize, 'symbol-spacing': gta.roadSpacing });
+        layer.paint['text-halo-width'] = gta.roadHaloWidth;
+      }
       if (layer.id === 'district-labels') layer.layout['text-size'] = tokens.labels.districtSize;
       if (layer.id === 'place-labels') layer.layout['text-size'] = ['interpolate', ['linear'], ['zoom'], 11, tokens.labels.placeSizes[0], 14, tokens.labels.placeSizes[1], 17, tokens.labels.placeSizes[2]];
     }
   }
+  const roadLabelsIndex = style.layers.findIndex(layer => layer.id === 'road-labels');
+  style.layers.splice(roadLabelsIndex, 0, roadDirectionLayer({ source: 'roads', roadProperty: 'kind',
+    roadValues: tokens.roads.flatMap(road => road.kinds), rawOsm: true }));
   // Single symbol layer per semantic group: one visibility switch hides icon and name together.
   // Keep verified geographic place labels topmost for collision priority.
   const placeIndex = style.layers.findIndex(l => l.id === 'place-labels');
@@ -179,18 +195,21 @@ function nativeStyle(mode, tokens) {
     filter: ['==', ['get', 'kind'], category.id],
     metadata: { gamemap: { category: category.id, label: category.label } },
     layout: {
-      visibility: 'visible', 'icon-image': `poi-${category.id}`,
+      visibility: 'visible', 'icon-image': poiIconExpression(category.id,
+        category.id === 'religion' ? ['coalesce', ['get', 'religion'], '']
+          : ['coalesce', ['get', 'amenity'], ['get', 'tourism'], ['get', 'subclass'], ['get', 'class'], '']),
       'icon-size': ['interpolate', ['linear'], ['zoom'], 12, 0.76, 15, 0.9, 18, 1.05],
       'icon-padding': 5, 'icon-allow-overlap': false, 'icon-ignore-placement': false,
       'symbol-sort-key': ['case', ['==', ['get', 'name'], ''], 1, 0],
       'text-field': ['get', 'name'], 'text-font': [definition.font],
-      'text-size': ['step', ['zoom'], 0, tokens.visibility.poiNamesMinzoom, 11.5],
-      'text-optional': true, 'text-offset': [0, 1.9], 'text-anchor': 'top',
+      'text-size': ['step', ['zoom'], 0, gta?.poiNamesMinzoom ?? tokens.visibility.poiNamesMinzoom, gta?.poiSize ?? 11.5],
+      'text-optional': true, 'text-offset': [0, gta ? 1.65 : 1.9], 'text-anchor': 'top',
       'text-padding': 4, 'text-max-width': 13, 'text-allow-overlap': false,
     },
-    paint: { 'text-color': p.label, 'text-halo-color': p.labelHalo, 'text-halo-width': 1.5 },
+    paint: { 'text-color': p.label, 'text-halo-color': p.labelHalo, 'text-halo-width': gta?.poiHaloWidth ?? 1.5 },
   });
   style.layers.push(placeLabels);
+  applyGameTypography(style, theme, true);
   const errors = validateStyleMin(style);
   if (errors.length) throw new Error(errors.map(e => e.message).join('\n'));
   return style;
@@ -248,18 +267,22 @@ async function ensureEditableIcons() {
 async function buildSprites() {
   await mkdir(path.join(output, 'sprites'), { recursive: true });
   for (const mode of Object.keys(themes)) {
+    const iconNames = (await readdir(path.join(source, 'icons', mode)))
+      .filter(name => /^[a-z0-9-]+\.svg$/.test(name)).sort().map(name => name.slice(0, -4));
+    const columns = 8;
+    const rows = Math.max(1, Math.ceil(iconNames.length / columns));
     for (const ratio of [1, 2]) {
       const index = {};
       const composites = [];
-      for (let i = 0; i < categories.length; i++) {
-        const id = `poi-${categories[i].id}`;
-        const x = (i * 36 + 2) * ratio;
-        const y = 2 * ratio;
+      for (let i = 0; i < iconNames.length; i++) {
+        const id = iconNames[i];
+        const x = ((i % columns) * 36 + 2) * ratio;
+        const y = (Math.floor(i / columns) * 36 + 2) * ratio;
         index[id] = { width: 32 * ratio, height: 32 * ratio, x, y, pixelRatio: ratio };
         composites.push({ input: await sharp(await readFile(path.join(source, 'icons', mode, `${id}.svg`)), { density: 72 * ratio }).resize(32 * ratio, 32 * ratio).png().toBuffer(), left: x, top: y });
       }
       const suffix = ratio === 2 ? '@2x' : '';
-      await sharp({ create: { width: 216 * ratio, height: 36 * ratio, channels: 4, background: '#00000000' } }).composite(composites).png().toFile(path.join(output, 'sprites', `${mode}${suffix}.png`));
+      await sharp({ create: { width: columns * 36 * ratio, height: rows * 36 * ratio, channels: 4, background: '#00000000' } }).composite(composites).png().toFile(path.join(output, 'sprites', `${mode}${suffix}.png`));
       await writeJson(path.join(output, 'sprites', `${mode}${suffix}.json`), index);
     }
   }
@@ -288,6 +311,7 @@ async function prepare() {
     origins.set(relative.replaceAll('\\', '/'), input.replaceAll('\\', '/'));
   };
   for (const folder of ['styles', 'data', 'sprites', 'glyphs', 'tiles', 'credits']) await mkdir(path.join(output, folder), { recursive: true });
+  await copyGameAssetFiles(output);
   for (const name of ['areas', 'roads', 'waterways', 'places', 'pois']) {
     await add(name === 'pois' ? 'android/maps/pois.geojson' : `public/data/${name}.geojson`, `data/${name}.geojson`);
   }
@@ -326,18 +350,19 @@ async function prepare() {
       { name: 'Overture Maps Foundation', license: 'ODbL-1.0', url: 'https://docs.overturemaps.org/attribution/' },
       { name: 'Google Open Buildings', license: 'CC-BY-4.0', url: 'https://sites.research.google/open-buildings/' },
       { name: 'Microsoft Global ML Building Footprints', license: 'ODbL-1.0', url: 'https://github.com/microsoft/GlobalMLBuildingFootprints' },
-      { name: 'Maki 8.2.0 / Mapbox', license: 'CC0-1.0', url: 'https://github.com/mapbox/maki' },
-      { name: 'Rosa Pop original GameMap geometric artwork', license: 'CC0-1.0' },
-      { name: 'RDR2-inspired original GameMap pen artwork', license: 'CC0-1.0' },
-      { name: 'Noto Sans Bold (unmodified PBFs, local GameMapSans URL alias)', license: 'SIL-OFL-1.1', url: 'https://github.com/maplibre/demotiles/tree/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold' },
-      { name: 'Noto Serif Bold (unmodified OSM US PBFs, local GameMapSerif URL alias)', license: 'SIL-OFL-1.1', url: 'https://tiles.openstreetmap.us/fonts/' },
+      { name: 'Maki 8.2.0 / Mapbox fallback symbols', license: 'CC0-1.0', url: 'https://github.com/mapbox/maki' },
+      { name: 'Rosa Pop original NavSkin geometric artwork', license: 'CC0-1.0; excludes imported game assets' },
+      { name: 'Original NavSkin pen/vector adaptations', license: 'CC0-1.0; excludes imported game assets' },
+      { name: 'Imported GTA SA / RDR2 symbols and selected game fonts', license: 'Original rights retained by their respective holders; see game-assets-provenance.json for individual notices' },
+      { name: 'Noto Sans Bold Unicode fallback (local GameMapSans URL alias)', license: 'SIL-OFL-1.1', url: 'https://github.com/maplibre/demotiles/tree/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold' },
+      { name: 'Noto Serif Bold fallback (local GameMapSerif URL alias)', license: 'SIL-OFL-1.1', url: 'https://tiles.openstreetmap.us/fonts/' },
     ],
     fonts: {
       alias: 'GameMapSans', upstream: 'Noto Sans Bold',
       repository: 'https://github.com/maplibre/demotiles', commit: '601ae60796ceceda2cbd2ed3d2ea92d17a84be4b',
       downloadTemplate: 'https://raw.githubusercontent.com/maplibre/demotiles/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold/{range}.pbf',
       ranges: glyphRanges, codepoints: [...needed].sort((a, b) => a - b),
-      coverage: 'All road/place/POI names in bundled source plus uppercase variants. Re-run after data changes; missing input ranges fail the build.',
+      coverage: 'Fallback glyph blocks cover all road/place/POI names in bundled source plus uppercase variants. Theme role fonts and their individual notices are recorded in game-assets/catalog.json and game-assets-provenance.json.',
     },
     serifFont: {
       alias: 'GameMapSerif', upstream: 'Noto Serif Bold', provider: 'OpenStreetMap US',
@@ -348,12 +373,12 @@ async function prepare() {
       inputs: await Promise.all(glyphRanges.map(async range => ({ range, sha256: sha256(await readFile(path.join(source, `fonts/GameMapSerif/${range}.pbf`))) }))),
       coverage: 'Unmodified MapLibre-compatible glyph blocks; all bundled road/place/POI codepoints including uppercase verified by tests. Local inputs make preparation fully offline.',
     },
-    designReferences: [{ theme: 'rdr2', title: 'Red Dead Redemption 2 — The Complete Official Guide / Charting the Wilds', url: 'https://www.piggyback.com/us/guide/red-dead-redemption-2/', usage: 'Visual inspiration only: parchment palette, dark ink and selective red. No downloaded game art, map geometry, contours or extracted symbols are bundled.' }],
+    designReferences: [{ theme: 'rdr2', title: 'Red Dead Redemption 2 — The Complete Official Guide / Charting the Wilds', url: 'https://www.piggyback.com/us/guide/red-dead-redemption-2/', usage: 'Reference for parchment palette, dark ink and selective red. Imported game symbols and fonts have separate provenance and original copyright notices in game-assets-provenance.json. Geography is actual OSM/Overture data.' }],
     pois: { count: poiMetadata.counts.total, byCategory: poiMetadata.counts.byKind, mappings: poiMetadata.categoryMappings },
   };
   await writeJson(path.join(output, 'credits', 'sources.json'), creditData);
   await writeFile(path.join(output, 'credits', 'Rosa-Pop-CC0.txt'), 'Rosa Pop icons are original GameMap geometric artwork, dedicated to the public domain under CC0 1.0. No characters, logos, or official brand assets are included.\nhttps://creativecommons.org/publicdomain/zero/1.0/\n');
-  await writeFile(path.join(output, 'credits', 'RDR2-Inspired-CC0.txt'), 'RDR2-inspired icons are original GameMap geometric pen artwork, dedicated to the public domain under CC0 1.0. The theme uses only real Goiânia geodata. No game artwork, copied legend, invented topography or fictional POIs are included.\nhttps://creativecommons.org/publicdomain/zero/1.0/\n');
+  await writeFile(path.join(output, 'credits', 'RDR2-Inspired-CC0.txt'), 'CC0 1.0 applies only to original NavSkin pen/vector adaptations. Imported GTA SA/RDR2 icons and font files are excluded: original copyrights and individual notices remain with their respective holders. See game-assets-provenance.json and game-assets/catalog.json for origins and the selected legacy Pricedown, Hapna and RDR Lino font notices. Real geography is OSM/Overture data; no invented POIs are added.\nhttps://creativecommons.org/publicdomain/zero/1.0/\n');
   await writeFile(path.join(output, 'credits', 'attribution.html'), `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Créditos do mapa</title><style>body{font:18px sans-serif;color:#252025;background:#fff8fc;padding:24px;line-height:1.5}a{color:#8b2058}</style><h1>Créditos do mapa de Goiânia</h1><p>${attribution}</p><ul>${creditData.sources.map(s => `<li>${s.url ? `<a href="${s.url}">${s.name}</a>` : s.name}: ${s.license}</li>`).join('')}</ul><p>Dados, sprites e fontes deste mapa estão incluídos no APK. Os links são referências de atribuição; o mapa funciona sem rede. Fontes Noto: <a href="Noto-OFL-1.1.md">SIL Open Font License 1.1</a>.</p></html>\n`);
   // Prepare all online styles before hashing so each repeat includes the same
   // complete resource package. Goiânia source bytes and offline styles stay local.

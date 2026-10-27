@@ -1,9 +1,11 @@
 import SwiftUI
 
 @main
+@MainActor
 struct NavSkinApp: App {
     @StateObject private var store = AppStore()
     @Environment(\.scenePhase) private var scenePhase
+    init() { GameTypography.installGlyphRouting() }
     var body: some Scene {
         WindowGroup {
             NavSkinRootView(store: store)

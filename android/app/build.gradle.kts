@@ -9,8 +9,8 @@ android {
         applicationId = "br.com.gamemap.goiania"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.5.0"
+        versionCode = 5
+        versionName = "0.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { buildConfig = true }
@@ -33,6 +33,7 @@ dependencies {
     implementation("androidx.car.app:app:1.7.0")
     implementation("androidx.car.app:app-projected:1.7.0")
     implementation("org.maplibre.gl:android-sdk-opengl:13.7.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.16")
     testImplementation("androidx.car.app:app-testing:1.7.0")
@@ -41,3 +42,25 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
 }
+
+val verifyGameAssets by tasks.registering {
+    group = "verification"
+    description = "Checks that the separately supplied original game asset pack is prepared."
+    doLast {
+        val required = listOf(
+            "game-assets/catalog.json",
+            "game-assets/gta/fonts/pricedow.ttf",
+            "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf",
+            "game-assets/rdr2/fonts/RDRLino-Regular.ttf",
+            "maps/glyphs/NavSkinGtaRoad/0-255.pbf",
+            "maps/glyphs/NavSkinRdrMap/0-255.pbf",
+            "maps/sprites/gta.png", "maps/sprites/rdr2.png",
+        )
+        val missing = required.filterNot { file("src/main/assets/$it").isFile }
+        check(missing.isEmpty()) {
+            "Original game asset pack is missing: ${missing.joinToString()}. " +
+                "Use the prepared local package or follow docs/game-assets-provenance.md before building."
+        }
+    }
+}
+tasks.named("preBuild").configure { dependsOn(verifyGameAssets) }

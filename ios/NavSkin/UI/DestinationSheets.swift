@@ -22,7 +22,7 @@ struct DestinationSearchSheet: View {
                         Button("Configurar chave") { settings = true }.buttonStyle(.borderedProminent)
                     }
                     if store.snapshot.searching {
-                        HStack { ProgressView(); Text("Buscando lugares…").font(.subheadline) }.padding(.vertical, 12)
+                        HStack { ProgressView(); Text("Buscando lugares…").gameFont(.subheadline) }.padding(.vertical, 12)
                     }
                     if let error = store.snapshot.searchError {
                         MessageCard(text: error, symbol: "exclamationmark.triangle", palette: palette)
@@ -31,13 +31,13 @@ struct DestinationSearchSheet: View {
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         quickDestinations
                         Text("Dica: mantenha pressionado um ponto no mapa para escolher um destino pelas coordenadas.")
-                            .font(.footnote).foregroundStyle(palette.muted)
+                            .gameFont(.footnote).foregroundStyle(palette.muted)
                     }
                 }.padding(20)
             }
             .background(palette.surface).foregroundStyle(palette.text)
-            .navigationTitle("Buscar").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() } } }
+            .gameNavigationTitle("Buscar").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
             .sheet(isPresented: $settings) { APIKeySheet(store: store) }
         }
     }
@@ -54,7 +54,7 @@ struct DestinationSearchSheet: View {
                     .accessibilityLabel("Limpar busca")
             }
             Button("Buscar") { focused = false; store.search(query) }
-                .font(.subheadline.bold()).disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || store.snapshot.searching)
+                .gameFont(.subheadline, weight: .bold).disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || store.snapshot.searching)
         }
         .padding(14).background(palette.soft, in: RoundedRectangle(cornerRadius: 16))
     }
@@ -77,7 +77,7 @@ struct DestinationSearchSheet: View {
                 DestinationRow(destination: work.asDestination(), palette: palette, symbol: "briefcase.fill") { select(work.asDestination()) }
             }
             if !store.places.recents.isEmpty {
-                Text("RECENTES").font(.caption.weight(.bold)).foregroundStyle(palette.muted)
+                Text("RECENTES").gameFont(.caption, weight: .bold).foregroundStyle(palette.muted)
                 ForEach(store.places.recents, id: \.destination.id) { recent in
                     DestinationRow(destination: recent.destination, palette: palette, symbol: "clock") { select(recent.destination) }
                 }
@@ -98,9 +98,9 @@ struct DestinationRow: View {
             HStack(spacing: 12) {
                 Image(systemName: symbol).font(.title2).foregroundStyle(palette.accent).frame(width: 32)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(destination.name).font(.headline).foregroundStyle(palette.text).multilineTextAlignment(.leading)
+                    Text(destination.name).gameFont(.headline).foregroundStyle(palette.text).multilineTextAlignment(.leading)
                     Text(destination.address.isEmpty ? NavSkinFormat.coordinates(destination.point) : destination.address)
-                        .font(.caption).foregroundStyle(palette.muted).lineLimit(2).multilineTextAlignment(.leading)
+                        .gameFont(.caption).foregroundStyle(palette.muted).lineLimit(2).multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 6)
                 Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(palette.muted)
@@ -124,17 +124,17 @@ struct SelectedDestinationSheet: View {
             VStack(alignment: .leading, spacing: 20) {
                 SheetHeading(title: destination.name, subtitle: destination.address.isEmpty ? "Ponto selecionado no mapa" : destination.address, palette: palette)
                 Label(NavSkinFormat.coordinates(destination.point), systemImage: "mappin.and.ellipse")
-                    .font(.subheadline.monospacedDigit()).foregroundStyle(palette.muted)
+                    .gameFont(.subheadline).monospacedDigit().foregroundStyle(palette.muted)
                 Button(action: navigate) { Label("Calcular rota", systemImage: "arrow.triangle.turn.up.right.diamond.fill").frame(maxWidth: .infinity) }
                     .buttonStyle(.borderedProminent).controlSize(.large)
                 Button { saving = true } label: { Label("Salvar nos favoritos", systemImage: "bookmark").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered).controlSize(.large)
-                Text("A rota de carro pode terminar no acesso viário mais próximo do destino.").font(.footnote).foregroundStyle(palette.muted)
+                Text("A rota de carro pode terminar no acesso viário mais próximo do destino.").gameFont(.footnote).foregroundStyle(palette.muted)
                 Spacer(minLength: 0)
             }
             .padding(20).background(palette.surface).foregroundStyle(palette.text)
-            .navigationTitle("Local").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() } } }
+            .gameNavigationTitle("Local").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
             .sheet(isPresented: $saving) { SavedPlaceEditor(store: store, destination: destination) }
         }
     }

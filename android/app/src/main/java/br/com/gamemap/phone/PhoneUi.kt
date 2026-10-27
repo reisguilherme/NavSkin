@@ -145,4 +145,7 @@ internal fun categoryIcon(category: PoiCategory) = when (category) {
     PoiCategory.PARKING -> R.drawable.phone_parking
     PoiCategory.HEALTH -> R.drawable.phone_health
     PoiCategory.SHOPS -> R.drawable.phone_shop
+    PoiCategory.EDUCATION -> R.drawable.phone_education
+    PoiCategory.CULTURE -> R.drawable.phone_culture
+    PoiCategory.RELIGION -> R.drawable.phone_religion
 }

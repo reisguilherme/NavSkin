@@ -27,7 +27,7 @@ test('iOS bundle retains original geographic bytes and all local map variants', 
     const style = JSON.parse(await fs.readFile(path.join(root, 'maps/styles', `${theme}${night}.json`)));
     assert.equal(style.version, 8);
     assert.equal(style.sources.buildings.type, 'vector');
-    assert.equal(style.layers.filter(layer => layer.id.startsWith('poi-')).length, 6);
+    assert.equal(style.layers.filter(layer => layer.id.startsWith('poi-')).length, 9);
     assert.ok(style.glyphs.includes('{fontstack}/{range}.pbf'));
     assert.ok(style.sources.buildings.tiles[0].includes('{z}/{x}/{y}.pbf'));
     assert.equal((await sharp(path.join(root, 'maps/previews', `${theme}.png`)).metadata()).format, 'png');

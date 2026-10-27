@@ -93,8 +93,12 @@ struct NavSkinRootView: View {
             .padding(.bottom, 4)
         }
         .tint(palette.accent)
+        .environment(\.gameTheme, store.theme)
+        .font(GameTypography.font(.body, theme: store.theme))
         .sheet(item: $sheet, onDismiss: { store.mapSelection = nil }) { item in
             sheetContent(item)
+                .environment(\.gameTheme, store.theme)
+                .font(GameTypography.font(.body, theme: store.theme))
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .presentationCornerRadius(28)
@@ -115,9 +119,9 @@ struct NavSkinRootView: View {
     private var topBar: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 1) {
-                Text("NavSkin").font(.system(size: compact ? 22 : 27, weight: .black, design: .rounded))
-                if !compact { Text(store.theme.title).font(.caption.weight(.semibold)).foregroundStyle(palette.muted) }
-                else if showsGPSStatus { Text(gpsText).font(.caption2).foregroundStyle(palette.muted).lineLimit(1) }
+                Text("NavSkin").gameFont(size: compact ? 22 : 27, weight: .black)
+                if !compact { Text(store.theme.title).gameFont(.caption, weight: .semibold).foregroundStyle(palette.muted) }
+                else if showsGPSStatus { Text(gpsText).gameFont(.caption2).foregroundStyle(palette.muted).lineLimit(1) }
             }
             .foregroundStyle(palette.text).padding(.horizontal, 14).padding(.vertical, 8)
             .background(palette.surface.opacity(0.96), in: RoundedRectangle(cornerRadius: 18))
@@ -130,9 +134,9 @@ struct NavSkinRootView: View {
 
     private var simulationBanner: some View {
         HStack {
-            Label(store.snapshot.simulation ? "SIMULAÇÃO · replay de teste" : "SIMULAÇÃO · posição simulada pelo sistema", systemImage: "testtube.2").font(.caption.bold())
+            Label(store.snapshot.simulation ? "SIMULAÇÃO · replay de teste" : "SIMULAÇÃO · posição simulada pelo sistema", systemImage: "testtube.2").gameFont(.caption, weight: .bold)
             Spacer()
-            if store.snapshot.simulation { Button("Encerrar") { store.stopSimulation() }.font(.caption.bold()) }
+            if store.snapshot.simulation { Button("Encerrar") { store.stopSimulation() }.gameFont(.caption, weight: .bold) }
         }
         .padding(10).foregroundStyle(Color.black).background(Color.yellow, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal, 16).accessibilityElement(children: .combine)
@@ -141,7 +145,7 @@ struct NavSkinRootView: View {
     private var gpsStatus: some View {
         Button { sheet = .settings } label: {
             Label(gpsText, systemImage: store.snapshot.location.quality == .good ? "location.fill" : "location.slash")
-                .font(.caption.weight(.semibold)).foregroundStyle(palette.text)
+                .gameFont(.caption, weight: .semibold).foregroundStyle(palette.text)
                 .padding(.horizontal, 12).padding(.vertical, 8)
                 .background(palette.surface.opacity(0.96), in: Capsule())
         }.buttonStyle(.plain).accessibilityHint("Abrir configurações de localização")
@@ -165,9 +169,9 @@ struct NavSkinRootView: View {
     private var coverageBadge: some View {
         Button { store.showOfflineCoverage() } label: {
             VStack(alignment: .leading, spacing: 5) {
-                Label("Goiânia · recorte local", systemImage: "map").font(.caption.weight(.semibold))
-                Text("Busca e rotas usam internet").font(.caption2)
-                Label("Ver região offline", systemImage: "viewfinder").font(.caption.weight(.semibold))
+                Label("Goiânia · recorte local", systemImage: "map").gameFont(.caption, weight: .semibold)
+                Text("Busca e rotas usam internet").gameFont(.caption2)
+                Label("Ver região offline", systemImage: "viewfinder").gameFont(.caption, weight: .semibold)
             }
             .foregroundStyle(palette.text).padding(10)
             .background(palette.surface.opacity(0.95), in: RoundedRectangle(cornerRadius: 13))
@@ -180,7 +184,7 @@ struct NavSkinRootView: View {
         HStack(spacing: 12) {
             Button { sheet = .search } label: {
                 Label("Para onde vamos?", systemImage: "magnifyingglass")
-                    .font(.headline).frame(maxWidth: .infinity, minHeight: 48)
+                    .gameFont(.headline).frame(maxWidth: .infinity, minHeight: 48)
             }
             .foregroundStyle(palette.surface).background(palette.accent, in: Capsule())
             if store.snapshot.locationAccess != .available {
@@ -215,7 +219,7 @@ struct NavSkinRootView: View {
             }
             Link("Busca e rotas: Geoapify", destination: URL(string: "https://www.geoapify.com/")!)
         }
-        .font(.system(size: 10)).foregroundStyle(palette.text)
+        .gameFont(size: 10).foregroundStyle(palette.text)
         .padding(.horizontal, 8).padding(.vertical, 3)
         .background(palette.surface.opacity(0.95), in: Capsule())
     }

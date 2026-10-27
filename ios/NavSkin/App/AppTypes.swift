@@ -51,10 +51,17 @@ extension Color {
 #endif
 
 enum PoiCategory: String, CaseIterable, Identifiable {
-    case parks, fuel, food, parking, health, shops
+    case parks, fuel, food, parking, health, shops, education, culture, religion
     var id: String { rawValue }
-    var title: String { switch self { case .parks: return "Parques"; case .fuel: return "Combustível"; case .food: return "Alimentação"; case .parking: return "Estacionamento"; case .health: return "Saúde"; case .shops: return "Mercados e conveniências" } }
-    var symbol: String { switch self { case .parks: return "tree"; case .fuel: return "fuelpump"; case .food: return "fork.knife"; case .parking: return "parkingsign.circle"; case .health: return "cross.case"; case .shops: return "basket" } }
+    var title: String { switch self { case .parks: return "Parques"; case .fuel: return "Combustível"; case .food: return "Restaurantes, cafés e bares"; case .parking: return "Estacionamento"; case .health: return "Saúde"; case .shops: return "Mercados e conveniências"; case .education: return "Escolas e universidades"; case .culture: return "Museus, teatros e cultura"; case .religion: return "Locais de culto" } }
+    var symbol: String { switch self { case .parks: return "tree"; case .fuel: return "fuelpump"; case .food: return "fork.knife"; case .parking: return "parkingsign.circle"; case .health: return "cross.case"; case .shops: return "basket"; case .education: return "graduationcap"; case .culture: return "theatermasks"; case .religion: return "building.2" } }
+    static func migratedSelection(_ stored: [String]?, schemaVersion: Int) -> Set<String> {
+        let all = Set(allCases.map(\.rawValue))
+        guard let stored else { return all }
+        var selected = Set(stored).intersection(all)
+        if schemaVersion < 2 && !stored.isEmpty { selected.formUnion([education.rawValue, culture.rawValue, religion.rawValue]) }
+        return selected
+    }
 }
 
 enum MapCommandKind { case recenter, overview, offlineCoverage, zoom(Double) }

@@ -1,44 +1,149 @@
 {
-  "poi-parks": {
+  "poi-bar": {
     "width": 32,
     "height": 32,
     "x": 2,
     "y": 2,
     "pixelRatio": 1
   },
-  "poi-fuel": {
+  "poi-cafe": {
     "width": 32,
     "height": 32,
     "x": 38,
     "y": 2,
     "pixelRatio": 1
   },
-  "poi-food": {
+  "poi-clinic": {
     "width": 32,
     "height": 32,
     "x": 74,
     "y": 2,
     "pixelRatio": 1
   },
-  "poi-parking": {
+  "poi-culture": {
     "width": 32,
     "height": 32,
     "x": 110,
     "y": 2,
     "pixelRatio": 1
   },
-  "poi-health": {
+  "poi-education": {
     "width": 32,
     "height": 32,
     "x": 146,
     "y": 2,
     "pixelRatio": 1
   },
-  "poi-shops": {
+  "poi-fast-food": {
     "width": 32,
     "height": 32,
     "x": 182,
     "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-food": {
+    "width": 32,
+    "height": 32,
+    "x": 218,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-fuel": {
+    "width": 32,
+    "height": 32,
+    "x": 254,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-health": {
+    "width": 32,
+    "height": 32,
+    "x": 2,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-hospital": {
+    "width": 32,
+    "height": 32,
+    "x": 38,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-museum": {
+    "width": 32,
+    "height": 32,
+    "x": 74,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-parking": {
+    "width": 32,
+    "height": 32,
+    "x": 110,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-parks": {
+    "width": 32,
+    "height": 32,
+    "x": 146,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-pharmacy": {
+    "width": 32,
+    "height": 32,
+    "x": 182,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-religion": {
+    "width": 32,
+    "height": 32,
+    "x": 218,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-restaurant": {
+    "width": 32,
+    "height": 32,
+    "x": 254,
+    "y": 38,
+    "pixelRatio": 1
+  },
+  "poi-school": {
+    "width": 32,
+    "height": 32,
+    "x": 2,
+    "y": 74,
+    "pixelRatio": 1
+  },
+  "poi-shops": {
+    "width": 32,
+    "height": 32,
+    "x": 38,
+    "y": 74,
+    "pixelRatio": 1
+  },
+  "poi-theatre": {
+    "width": 32,
+    "height": 32,
+    "x": 74,
+    "y": 74,
+    "pixelRatio": 1
+  },
+  "poi-worship": {
+    "width": 32,
+    "height": 32,
+    "x": 110,
+    "y": 74,
+    "pixelRatio": 1
+  },
+  "road-oneway-forward": {
+    "width": 32,
+    "height": 32,
+    "x": 146,
+    "y": 74,
     "pixelRatio": 1
   }
 }

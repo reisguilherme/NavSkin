@@ -22,25 +22,29 @@
       "url": "https://github.com/microsoft/GlobalMLBuildingFootprints"
     },
     {
-      "name": "Maki 8.2.0 / Mapbox",
+      "name": "Maki 8.2.0 / Mapbox fallback symbols",
       "license": "CC0-1.0",
       "url": "https://github.com/mapbox/maki"
     },
     {
-      "name": "Rosa Pop original GameMap geometric artwork",
-      "license": "CC0-1.0"
+      "name": "Rosa Pop original NavSkin geometric artwork",
+      "license": "CC0-1.0; excludes imported game assets"
     },
     {
-      "name": "RDR2-inspired original GameMap pen artwork",
-      "license": "CC0-1.0"
+      "name": "Original NavSkin pen/vector adaptations",
+      "license": "CC0-1.0; excludes imported game assets"
     },
     {
-      "name": "Noto Sans Bold (unmodified PBFs, local GameMapSans URL alias)",
+      "name": "Imported GTA SA / RDR2 symbols and selected game fonts",
+      "license": "Original rights retained by their respective holders; see game-assets-provenance.json for individual notices"
+    },
+    {
+      "name": "Noto Sans Bold Unicode fallback (local GameMapSans URL alias)",
       "license": "SIL-OFL-1.1",
       "url": "https://github.com/maplibre/demotiles/tree/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold"
     },
     {
-      "name": "Noto Serif Bold (unmodified OSM US PBFs, local GameMapSerif URL alias)",
+      "name": "Noto Serif Bold fallback (local GameMapSerif URL alias)",
       "license": "SIL-OFL-1.1",
       "url": "https://tiles.openstreetmap.us/fonts/"
     }
@@ -164,7 +168,7 @@
       250,
       8217
     ],
-    "coverage": "All road/place/POI names in bundled source plus uppercase variants. Re-run after data changes; missing input ranges fail the build."
+    "coverage": "Fallback glyph blocks cover all road/place/POI names in bundled source plus uppercase variants. Theme role fonts and their individual notices are recorded in game-assets/catalog.json and game-assets-provenance.json."
   },
   "serifFont": {
     "alias": "GameMapSerif",
@@ -191,7 +195,7 @@
       "theme": "rdr2",
       "title": "Red Dead Redemption 2 — The Complete Official Guide / Charting the Wilds",
       "url": "https://www.piggyback.com/us/guide/red-dead-redemption-2/",
-      "usage": "Visual inspiration only: parchment palette, dark ink and selective red. No downloaded game art, map geometry, contours or extracted symbols are bundled."
+      "usage": "Reference for parchment palette, dark ink and selective red. Imported game symbols and fonts have separate provenance and original copyright notices in game-assets-provenance.json. Geography is actual OSM/Overture data."
     }
   ],
   "pois": {
@@ -202,7 +206,10 @@
       "food": 308,
       "parking": 152,
       "health": 245,
-      "shops": 94
+      "shops": 94,
+      "education": 0,
+      "culture": 0,
+      "religion": 0
     },
     "mappings": {
       "parks": {
@@ -220,7 +227,9 @@
         "amenity": [
           "restaurant",
           "cafe",
-          "fast_food"
+          "fast_food",
+          "bar",
+          "pub"
         ]
       },
       "parking": {
@@ -240,6 +249,29 @@
         "shop": [
           "supermarket",
           "convenience"
+        ]
+      },
+      "education": {
+        "amenity": [
+          "school",
+          "university",
+          "college",
+          "kindergarten"
+        ]
+      },
+      "culture": {
+        "amenity": [
+          "theatre",
+          "cinema",
+          "arts_centre"
+        ],
+        "tourism": [
+          "museum"
+        ]
+      },
+      "religion": {
+        "amenity": [
+          "place_of_worship"
         ]
       }
     }

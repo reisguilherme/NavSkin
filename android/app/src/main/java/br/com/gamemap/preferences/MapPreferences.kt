@@ -13,10 +13,13 @@ enum class MapBaseMode(val id: String, val label: String) {
 enum class PoiCategory(val id: String, val label: String) {
     PARKS("parks", "Parques"),
     FUEL("fuel", "Postos de combustível"),
-    FOOD("food", "Restaurantes e cafés"),
+    FOOD("food", "Restaurantes, cafés e bares"),
     PARKING("parking", "Estacionamentos"),
     HEALTH("health", "Hospitais e saúde"),
-    SHOPS("shops", "Mercados e conveniência");
+    SHOPS("shops", "Mercados e conveniência"),
+    EDUCATION("education", "Escolas e universidades"),
+    CULTURE("culture", "Museus, teatros e cultura"),
+    RELIGION("religion", "Locais de culto");
     companion object { fun fromId(id: String) = entries.firstOrNull { it.id == id } }
 }
 

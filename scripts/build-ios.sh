@@ -7,6 +7,9 @@ if [[ "$(uname -s)" != Darwin ]] || ! command -v xcodebuild >/dev/null 2>&1; the
   exit 2
 fi
 project="$taskRoot/ios/NavSkin.xcodeproj"
+if [[ "$action" != doctor ]]; then
+  python3 -B "$taskRoot/scripts/check-ios-game-assets.py"
+fi
 derived="$taskRoot/ios/DerivedData"
 output="$taskRoot/ios/artifacts"
 mkdir -p "$output"

@@ -5,7 +5,7 @@ import json
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-output = root / "ios" / "artifacts" / "NavSkin-ios-0.5.0-source.zip"
+output = root / "ios" / "artifacts" / "NavSkin-ios-0.6.0-source.zip"
 output.parent.mkdir(parents=True, exist_ok=True)
 excluded_dirs = {".build", ".swiftpm", "DerivedData", "xcuserdata", "artifacts", "__pycache__"}
 files = []
@@ -18,11 +18,12 @@ for file in (root / "ios").rglob("*"):
     if file.name == "Local.xcconfig" or file.suffix in {".p12", ".mobileprovision", ".p8", ".ipa", ".zip"}:
         continue
     files.append(file)
-for name in ["scripts/build-ios.sh", "scripts/check-ios-source.sh", "scripts/package-ios.py",
+for name in ["scripts/build-ios.sh", "scripts/check-ios-source.sh", "scripts/check-ios-game-assets.py", "scripts/package-ios.py",
              "scripts/build-ios-cloud.sh", "scripts/package-ios-unsigned.py",
              ".github/workflows/ios-cloud.yml", "docs/ios-cloud-research.md",
              "docs/ios-platform-research.md", "docs/navigation-provider-decision.md",
-             "docs/world-maps.md", "tests/test_ios_unsigned_package.py"]:
+             "docs/world-maps.md", "docs/game-assets-provenance.md",
+             "tests/test_ios_unsigned_package.py"]:
     files.append(root / name)
 with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
     for file in sorted(files):

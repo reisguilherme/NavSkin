@@ -1,0 +1,98 @@
+{
+  "fonts": {
+    "gta": {
+      "path": "local-game-assets/pricedow-prince-2004.ttf",
+      "postScriptName": "Pricedown",
+      "name": "Pricedown",
+      "version": "3.200 2004",
+      "sourceUrl": "https://www.princexml.com/fonts/larabie2/pricedow.ttf",
+      "sha256": "973c5294ea6e0fe07e58b986b38c0393244bc835cc65889ca9f7b39b8c89ba1e",
+      "licenseFiles": [
+        "local-game-assets/pricedown-prince-2004-LICENSE.html",
+        "local-game-assets/prince-host-permission.html",
+        "local-game-assets/ttf-larabie-20011216/READ_ME.TXT",
+        "local-game-assets/debian/copyright"
+      ],
+      "copyrightStatus": "Ray Larabie. Historical author EULA accompanies exact copy; preserve notices and agreement. EULA grants distribution in any medium with conditions on conversions; FAQ asks contact before selling software. Not CC0 and not governed by current 2026 desktop-only copy."
+    },
+    "rdr2ui": {
+      "path": "local-game-assets/rdr2-fonts-peter1501/TTF/HapnaSlabSerif-DemiBold.ttf",
+      "postScriptName": "HapnaSlabSerif-DemiBold",
+      "name": "Hapna Slab Serif DemiBold",
+      "sourceUrl": "https://www.worldofmods.com/rdr-2/tools/56923-rdr-2-font-russian-cyrillic-latin.html",
+      "sha256": "468a87efc589dc45ab1142b28083d8a109192d53af619a7598921e861157ff64",
+      "licenseFiles": [
+        "local-game-assets/rdr2-fonts-peter1501/HapnaSlabSerif-DemiBold.LICENSING-NOTES.txt",
+        "local-game-assets/rdr2-fonts-peter1501/HapnaSlabSerif-DemiBold.PROVENANCE.json",
+        "local-game-assets/rdr2-fonts-peter1501/Readme-20.11.2019.txt"
+      ],
+      "copyrightStatus": "Original family copyright retained; public pack attributed to Peter1501 describes extraction/conversion from game. No outside-game redistribution permission verified. Keep local and Git-ignored.",
+      "provenance": "game-extracted-conversion; not verified byte-for-byte raw shipped game binary"
+    },
+    "rdr2map": {
+      "path": "local-game-assets/rdr2-fonts-peter1501/TTF/RDRLino-Regular.ttf",
+      "postScriptName": "RDRLino-Regular",
+      "name": "RDR Lino",
+      "sourceUrl": "https://www.worldofmods.com/rdr-2/tools/56923-rdr-2-font-russian-cyrillic-latin.html",
+      "sha256": "f1c1d83487c9607e5d9fb22ba6fc74464947134302ceb97aabb4a5e2bafea99f",
+      "licenseFiles": [
+        "local-game-assets/rdr2-fonts-peter1501/RDRLino-Regular.LICENSING-NOTES.txt",
+        "local-game-assets/rdr2-fonts-peter1501/RDRLino-Regular.PROVENANCE.json",
+        "local-game-assets/rdr2-fonts-peter1501/Readme-20.11.2019.txt"
+      ],
+      "copyrightStatus": "Original family copyright retained; public pack attributed to Peter1501 describes extraction/conversion from game. No outside-game redistribution permission verified. Keep local and Git-ignored.",
+      "provenance": "game-extracted-conversion; not verified byte-for-byte raw shipped game binary"
+    }
+  },
+  "spritesGta": "local-game-assets/gta-sa-original",
+  "spritesRdr": "local-game-assets/rdr2-original/blips",
+  "assetManifest": "local-game-assets/manifest.json",
+  "researchReadme": "local-game-assets/README.md",
+  "spritesGtaSourceUrl": "https://gtamidori.com/textdrawsprites",
+  "spritesRdrSourceUrl": "https://github.com/femga/rdr3_discoveries/blob/master/useful_info_from_rpfs/textures/blips/README.md",
+  "spritesCopyright": "Rockstar Games. Original public exports; no outside-game redistribution permission verified. Local package and generated derivatives must stay Git-ignored.",
+  "selectedSprites": {
+    "gta": {
+      "food": "radar_burgerShot.png",
+      "health": "radar_hostpital.png",
+      "shops": "radar_tshirt.png",
+      "parking": "radar_impound.png",
+      "parks": null,
+      "fuel": null,
+      "aliases": {
+        "barber": "radar_barbers.png",
+        "police": "radar_police.png",
+        "restaurant": "radar_diner.png",
+        "pizza": "radar_pizza.png",
+        "bar": "radar_dateDrink.png",
+        "gym": "radar_gym.png",
+        "airport": "radar_runway.png",
+        "repair": "radar_modGarage.png",
+        "clothing": "radar_tshirt.png",
+        "save": "radar_saveGame.png",
+        "waypoint": "radar_waypoint.png"
+      }
+    },
+    "rdr2": {
+      "food": "blip_saloon.png",
+      "health": "blip_shop_doctor.png",
+      "shops": "blip_shop_store.png",
+      "parking": "blip_shop_horse.png",
+      "parks": null,
+      "fuel": null,
+      "aliases": {
+        "barber": "blip_shop_barber.png",
+        "restaurant": "blip_saloon.png",
+        "hotel": "blip_hotel_bed.png",
+        "butcher": "blip_shop_butcher.png",
+        "train": "blip_shop_train.png",
+        "tailor": "blip_shop_tailor.png",
+        "guns": "blip_shop_gunsmith.png",
+        "repair": "blip_shop_blacksmith.png",
+        "bank": "blip_robbery_bank.png"
+      }
+    }
+  },
+  "mappingNotes": "parks/fuel have no verified exact original category counterpart in these games and need coherent new artwork. GTA shops uses original clothing icon; parking uses impound. RDR2 food uses saloon and parking uses stables as thematic semantic aliases. These aliases do not claim the original game had modern category equivalents.",
+  "mapFontNotes": "RDR Lino is an extracted Rockstar family selected for the game identity. This research does not prove RDR Lino is the exact original geographic-map label face; Effra map identification remains unconfirmed by primary game-file evidence."
+}

@@ -52,7 +52,7 @@ class ConnectionInstructionsActivity : ComponentActivity() {
 
             Mundo online carrega mapas OpenFreeMap / OpenStreetMap pela internet, sem uma chave de mapa. Goiânia offline conserva o recorte incluído no aparelho e funciona sem conexão dentro desse limite. Trocar a cobertura não encerra o GPS nem a viagem. Busca de endereços e cálculo de rotas usam Geoapify pela internet, com sua chave configurada no celular. O GPS preciso é ativado ao solicitar localização ou navegação. Não há orientação por voz.
         """.trimIndent())
-        paragraph("Na tela do carro", "Conecte o telefone a uma central compatível com Android Auto e abra o NavSkin. A cobertura, os temas e as seis categorias podem ser escolhidos em Aparência na central. A central controla o movimento e o zoom do mapa e pode limitar as interações durante a condução.")
+        paragraph("Na tela do carro", "Conecte o telefone a uma central compatível com Android Auto e abra o NavSkin. A cobertura, os temas e as categorias de lugares podem ser escolhidos em Aparência na central. A central controla o movimento e o zoom do mapa e pode limitar as interações durante a condução.")
         val details = phoneText("""
             É necessário um host com Car App API 7 ou superior. O NavSkin usa a categoria Navegação e compartilha destino e viagem com o celular. Inicie o GPS no celular antes de conectar caso o Android impeça iniciar a localização apenas pela central.
 
@@ -109,7 +109,7 @@ class ConnectionInstructionsActivity : ComponentActivity() {
         }.getOrElse {
             "<p>OpenStreetMap contributors e Overture Maps Foundation: ODbL 1.0.</p>" +
                 "<p>Google Open Buildings: CC BY 4.0. Microsoft Global ML Building Footprints: ODbL 1.0.</p>" +
-                "<p>Maki / Mapbox e arte original NavSkin (Rosa Pop e RDR2): CC0 1.0.</p>" +
+                "<p>Maki / Mapbox e somente adaptações originais NavSkin: CC0 1.0. Sprites e fontes dos jogos mantêm seus próprios copyrights e avisos.</p>" +
                 "<p>Noto Sans Bold e Noto Serif Bold: SIL Open Font License 1.1.</p>"
         }
         content.addView(phoneText("", 14f).apply {
@@ -122,11 +122,12 @@ class ConnectionInstructionsActivity : ComponentActivity() {
             setTextColor(colors.muted); setLinkTextColor(colors.accent)
             movementMethod = LinkMovementMethod.getInstance()
         }, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(12) })
-        content.addView(phoneText("Os temas são interpretações visuais originais do NavSkin. GTA e Red Dead Redemption são marcas de seus respectivos titulares. O app não é afiliado à Rockstar Games. Links de fontes e licenças são referências.", 12f).apply {
+        content.addView(phoneText("Os temas combinam fontes e sprites dos jogos com adaptações visuais do NavSkin. GTA e Red Dead Redemption são marcas de seus respectivos titulares. O app não é afiliado à Rockstar Games. Links de fontes e licenças são referências.", 12f).apply {
             setTextColor(colors.muted); setLineSpacing(dip(3).toFloat(), 1f)
         }, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(18) })
         val scroll = ScrollView(this).apply { addView(content); setBackgroundColor(colors.surface) }
         setContentView(scroll)
+        GameTypography.observe(scroll) { (application as GameMapApplication).preferences.snapshot().theme }
         ViewCompat.setOnApplyWindowInsetsListener(scroll) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)

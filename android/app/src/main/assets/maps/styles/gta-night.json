@@ -28088,15 +28088,24 @@
       }
     },
     {
-      "id": "road-labels",
+      "id": "road-oneway-directions",
       "type": "symbol",
       "source": "roads",
-      "minzoom": 15.5,
+      "minzoom": 16.5,
+      "metadata": {
+        "navskin": {
+          "role": "traffic-direction",
+          "sourceDirectionRequired": true
+        }
+      },
       "filter": [
         "all",
         [
-          "has",
-          "name"
+          "==",
+          [
+            "geometry-type"
+          ],
+          "LineString"
         ],
         [
           "in",
@@ -28107,30 +28116,97 @@
           [
             "literal",
             [
-              "primary",
+              "service",
+              "residential",
+              "unclassified",
+              "living_street",
+              "road",
+              "tertiary",
               "secondary",
-              "tertiary"
+              "busway",
+              "primary",
+              "trunk",
+              "motorway"
+            ]
+          ]
+        ],
+        [
+          "in",
+          [
+            "to-string",
+            [
+              "coalesce",
+              [
+                "get",
+                "oneway"
+              ],
+              ""
+            ]
+          ],
+          [
+            "literal",
+            [
+              "yes",
+              "true",
+              "1",
+              "-1",
+              "reverse"
             ]
           ]
         ]
       ],
       "layout": {
         "symbol-placement": "line",
-        "symbol-spacing": 330,
-        "text-field": [
-          "get",
-          "name"
+        "symbol-spacing": 130,
+        "icon-image": "road-oneway-forward",
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          16.5,
+          0.42,
+          18,
+          0.65
         ],
-        "text-font": [
-          "GameMapSans"
+        "icon-rotate": [
+          "case",
+          [
+            "in",
+            [
+              "to-string",
+              [
+                "coalesce",
+                [
+                  "get",
+                  "oneway"
+                ],
+                ""
+              ]
+            ],
+            [
+              "literal",
+              [
+                "-1",
+                "reverse"
+              ]
+            ]
+          ],
+          180,
+          0
         ],
-        "text-size": 11.5,
-        "text-max-angle": 30
+        "icon-rotation-alignment": "map",
+        "icon-pitch-alignment": "map",
+        "icon-keep-upright": false,
+        "icon-padding": 4,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false
       },
       "paint": {
-        "text-color": "#F3F6E9",
-        "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "icon-opacity": 0.94
       }
     },
     {
@@ -28178,7 +28254,7 @@
           ]
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": 12,
         "text-letter-spacing": 0.06,
@@ -28188,8 +28264,337 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5,
+        "text-halo-width": 2,
         "text-opacity": 0.9
+      }
+    },
+    {
+      "id": "poi-religion",
+      "type": "symbol",
+      "source": "pois",
+      "minzoom": 14.2,
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "religion"
+      ],
+      "metadata": {
+        "gamemap": {
+          "category": "religion",
+          "label": "Locais de culto"
+        }
+      },
+      "layout": {
+        "visibility": "visible",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "religion"
+            ],
+            ""
+          ],
+          "christian",
+          "poi-worship",
+          "poi-religion"
+        ],
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.76,
+          15,
+          0.9,
+          18,
+          1.05
+        ],
+        "icon-padding": 5,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": [
+          "case",
+          [
+            "==",
+            [
+              "get",
+              "name"
+            ],
+            ""
+          ],
+          1,
+          0
+        ],
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "NavSkinGtaDisplay"
+        ],
+        "text-size": [
+          "step",
+          [
+            "zoom"
+          ],
+          0,
+          15,
+          13
+        ],
+        "text-optional": true,
+        "text-offset": [
+          0,
+          1.65
+        ],
+        "text-anchor": "top",
+        "text-padding": 4,
+        "text-max-width": 13,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": "#F3F6E9",
+        "text-halo-color": "#182118",
+        "text-halo-width": 2.25
+      }
+    },
+    {
+      "id": "poi-culture",
+      "type": "symbol",
+      "source": "pois",
+      "minzoom": 14,
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "culture"
+      ],
+      "metadata": {
+        "gamemap": {
+          "category": "culture",
+          "label": "Museus, teatros e cultura"
+        }
+      },
+      "layout": {
+        "visibility": "visible",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "amenity"
+            ],
+            [
+              "get",
+              "tourism"
+            ],
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "museum",
+          "poi-museum",
+          [
+            "theatre",
+            "cinema",
+            "arts_centre"
+          ],
+          "poi-theatre",
+          "poi-culture"
+        ],
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.76,
+          15,
+          0.9,
+          18,
+          1.05
+        ],
+        "icon-padding": 5,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": [
+          "case",
+          [
+            "==",
+            [
+              "get",
+              "name"
+            ],
+            ""
+          ],
+          1,
+          0
+        ],
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "NavSkinGtaDisplay"
+        ],
+        "text-size": [
+          "step",
+          [
+            "zoom"
+          ],
+          0,
+          15,
+          13
+        ],
+        "text-optional": true,
+        "text-offset": [
+          0,
+          1.65
+        ],
+        "text-anchor": "top",
+        "text-padding": 4,
+        "text-max-width": 13,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": "#F3F6E9",
+        "text-halo-color": "#182118",
+        "text-halo-width": 2.25
+      }
+    },
+    {
+      "id": "poi-education",
+      "type": "symbol",
+      "source": "pois",
+      "minzoom": 13.5,
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "education"
+      ],
+      "metadata": {
+        "gamemap": {
+          "category": "education",
+          "label": "Escolas e universidades"
+        }
+      },
+      "layout": {
+        "visibility": "visible",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "amenity"
+            ],
+            [
+              "get",
+              "tourism"
+            ],
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          [
+            "school",
+            "university",
+            "college",
+            "kindergarten"
+          ],
+          "poi-school",
+          "poi-education"
+        ],
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.76,
+          15,
+          0.9,
+          18,
+          1.05
+        ],
+        "icon-padding": 5,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": [
+          "case",
+          [
+            "==",
+            [
+              "get",
+              "name"
+            ],
+            ""
+          ],
+          1,
+          0
+        ],
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "NavSkinGtaDisplay"
+        ],
+        "text-size": [
+          "step",
+          [
+            "zoom"
+          ],
+          0,
+          15,
+          13
+        ],
+        "text-optional": true,
+        "text-offset": [
+          0,
+          1.65
+        ],
+        "text-anchor": "top",
+        "text-padding": 4,
+        "text-max-width": 13,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": "#F3F6E9",
+        "text-halo-color": "#182118",
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28250,7 +28655,7 @@
           "name"
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "step",
@@ -28258,13 +28663,13 @@
             "zoom"
           ],
           0,
-          16.8,
-          11.5
+          15,
+          13
         ],
         "text-optional": true,
         "text-offset": [
           0,
-          1.9
+          1.65
         ],
         "text-anchor": "top",
         "text-padding": 4,
@@ -28274,7 +28679,7 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28298,7 +28703,39 @@
       },
       "layout": {
         "visibility": "visible",
-        "icon-image": "poi-health",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "amenity"
+            ],
+            [
+              "get",
+              "tourism"
+            ],
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "pharmacy",
+          "poi-pharmacy",
+          "hospital",
+          "poi-hospital",
+          [
+            "clinic",
+            "doctors"
+          ],
+          "poi-clinic",
+          "poi-health"
+        ],
         "icon-size": [
           "interpolate",
           [
@@ -28335,7 +28772,7 @@
           "name"
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "step",
@@ -28343,13 +28780,13 @@
             "zoom"
           ],
           0,
-          16.8,
-          11.5
+          15,
+          13
         ],
         "text-optional": true,
         "text-offset": [
           0,
-          1.9
+          1.65
         ],
         "text-anchor": "top",
         "text-padding": 4,
@@ -28359,7 +28796,7 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28420,7 +28857,7 @@
           "name"
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "step",
@@ -28428,13 +28865,13 @@
             "zoom"
           ],
           0,
-          16.8,
-          11.5
+          15,
+          13
         ],
         "text-optional": true,
         "text-offset": [
           0,
-          1.9
+          1.65
         ],
         "text-anchor": "top",
         "text-padding": 4,
@@ -28444,7 +28881,7 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28468,7 +28905,41 @@
       },
       "layout": {
         "visibility": "visible",
-        "icon-image": "poi-food",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "amenity"
+            ],
+            [
+              "get",
+              "tourism"
+            ],
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "cafe",
+          "poi-cafe",
+          "fast_food",
+          "poi-fast-food",
+          "restaurant",
+          "poi-restaurant",
+          [
+            "bar",
+            "pub"
+          ],
+          "poi-bar",
+          "poi-food"
+        ],
         "icon-size": [
           "interpolate",
           [
@@ -28505,7 +28976,7 @@
           "name"
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "step",
@@ -28513,13 +28984,13 @@
             "zoom"
           ],
           0,
-          16.8,
-          11.5
+          15,
+          13
         ],
         "text-optional": true,
         "text-offset": [
           0,
-          1.9
+          1.65
         ],
         "text-anchor": "top",
         "text-padding": 4,
@@ -28529,7 +29000,7 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28590,7 +29061,7 @@
           "name"
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "step",
@@ -28598,13 +29069,13 @@
             "zoom"
           ],
           0,
-          16.8,
-          11.5
+          15,
+          13
         ],
         "text-optional": true,
         "text-offset": [
           0,
-          1.9
+          1.65
         ],
         "text-anchor": "top",
         "text-padding": 4,
@@ -28614,7 +29085,7 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28675,7 +29146,7 @@
           "name"
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "step",
@@ -28683,13 +29154,13 @@
             "zoom"
           ],
           0,
-          16.8,
-          11.5
+          15,
+          13
         ],
         "text-optional": true,
         "text-offset": [
           0,
-          1.9
+          1.65
         ],
         "text-anchor": "top",
         "text-padding": 4,
@@ -28699,7 +29170,7 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2.25
       }
     },
     {
@@ -28728,7 +29199,7 @@
           ]
         ],
         "text-font": [
-          "GameMapSans"
+          "NavSkinGtaDisplay"
         ],
         "text-size": [
           "interpolate",
@@ -28760,7 +29231,71 @@
       "paint": {
         "text-color": "#F3F6E9",
         "text-halo-color": "#182118",
-        "text-halo-width": 1.5
+        "text-halo-width": 2
+      }
+    },
+    {
+      "id": "road-labels",
+      "type": "symbol",
+      "source": "roads",
+      "minzoom": 14.5,
+      "filter": [
+        "all",
+        [
+          "has",
+          "name"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "name"
+          ],
+          ""
+        ],
+        [
+          "in",
+          [
+            "get",
+            "kind"
+          ],
+          [
+            "literal",
+            [
+              "service",
+              "residential",
+              "unclassified",
+              "living_street",
+              "road",
+              "tertiary",
+              "secondary",
+              "busway",
+              "primary",
+              "trunk",
+              "motorway"
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "symbol-placement": "line",
+        "symbol-spacing": 170,
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "NavSkinGtaRoad"
+        ],
+        "text-size": 12.5,
+        "text-max-angle": 30,
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.18
+      },
+      "paint": {
+        "text-color": "#F3F6E9",
+        "text-halo-color": "#182118",
+        "text-halo-width": 2
       }
     }
   ],
@@ -28780,7 +29315,10 @@
         "food",
         "parking",
         "health",
-        "shops"
+        "shops",
+        "education",
+        "culture",
+        "religion"
       ],
       "attribution": "© OpenStreetMap contributors · Overture Maps Foundation · Google Open Buildings · Microsoft Global ML Building Footprints",
       "creditsAsset": "maps/credits/attribution.html",
@@ -28792,7 +29330,17 @@
       ],
       "note": "Asset validation does not establish Android Auto Surface compatibility. Validate Native rendering separately.",
       "appearance": "night",
-      "variant": "gta-night"
+      "variant": "gta-night",
+      "typography": {
+        "profile": "gta",
+        "roles": {
+          "road": "NavSkinGtaRoad",
+          "poi": "NavSkinGtaDisplay",
+          "place": "NavSkinGtaDisplay"
+        },
+        "catalog": "game-assets/catalog.json",
+        "unicodeFallback": "Noto for codepoints absent from the selected game font"
+      }
     }
   }
 }

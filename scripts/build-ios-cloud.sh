@@ -7,6 +7,7 @@ if [[ "$(uname -s)" != Darwin ]] || ! command -v xcodebuild >/dev/null 2>&1; the
   exit 2
 fi
 python3 -B -m unittest discover -s "$taskRoot/tests" -p 'test_ios_unsigned_package.py'
+python3 -B "$taskRoot/scripts/check-ios-game-assets.py"
 output="$taskRoot/ios/artifacts/cloud"
 mkdir -p "$output"
 project="$taskRoot/ios/NavSkin.xcodeproj"

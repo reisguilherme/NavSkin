@@ -1,9 +1,9 @@
 {
   "specification": {
-    "gtaReference": "Approved PoC src/style.js and public/styles/tokens.json. No game artwork or extracted assets.",
+    "gtaReference": "Calibrated against the user TO-BE screenshots (2026-10-27): gray urban fabric, off-white footprints, deep green parks, black roads, original game fonts/sprites from the separately supplied asset pack.",
     "rosaReference": "Original candy-pink Rosa Pop cartography: vivid mint parks, turquoise water, pink/lilac night fabric and cute original symbols.",
     "edit": "Edit these palettes and android/maps/icons/{gta,rosa,rdr2}/*.svg, then run node scripts/prepare-android-maps.mjs.",
-    "rdr2Reference": "Original parchment, dark-ink roads, muted water and selective red accents inspired by the official Piggyback RDR2 atlas. No game imagery, invented features or extracted symbols."
+    "rdr2Reference": "Parchment and ink cartography with imported game font families and matching original blips, plus explicitly authored adaptations for modern categories. See game-assets/provenance.json for exact origin and notices."
   },
   "zoomStops": [
     11,
@@ -13,24 +13,24 @@
   ],
   "palettes": {
     "gta": {
-      "background": "#999999",
-      "urban": "#999999",
+      "background": "#9C989C",
+      "urban": "#9C989C",
       "commercial": "#A2A29A",
       "industrial": "#978572",
-      "park": "#748837",
-      "wood": "#38682C",
-      "grass": "#879548",
+      "park": "#28681C",
+      "wood": "#1C4F13",
+      "grass": "#28681C",
       "water": "#7088AB",
       "square": "#B4B5A5",
       "waterOutline": "#475C70",
-      "building": "#F7FCF8",
-      "road": "#080A08",
+      "building": "#E0E0DC",
+      "road": "#000000",
       "roadOutline": "#E4E7DC",
       "motorway": "#969A87",
-      "path": "#B2AE8F",
+      "path": "#9C989C",
       "rail": "#533D30",
       "label": "#FFFFFF",
-      "labelHalo": "#20251D"
+      "labelHalo": "#000000"
     },
     "rosa": {
       "background": "#FFD5ED",
@@ -296,7 +296,18 @@
     ],
     "districtSize": 12,
     "roadSize": 11.5,
-    "haloWidth": 1.5
+    "haloWidth": 1.5,
+    "gta": {
+      "roadSize": 12.5,
+      "roadMinzoom": 14.5,
+      "roadSpacing": 230,
+      "roadLetterSpacing": 0.18,
+      "roadHaloWidth": 1.25,
+      "haloWidth": 2,
+      "poiNamesMinzoom": 15,
+      "poiSize": 13,
+      "poiHaloWidth": 2.25
+    }
   },
   "categories": [
     {
@@ -340,6 +351,27 @@
       "maki": "grocery",
       "color": "#E6A3FB",
       "minzoom": 14.5
+    },
+    {
+      "id": "education",
+      "label": "Escolas e universidades",
+      "maki": "college",
+      "color": "#20486B",
+      "minzoom": 13.5
+    },
+    {
+      "id": "culture",
+      "label": "Museus, teatros e cultura",
+      "maki": "museum",
+      "color": "#E2CF91",
+      "minzoom": 14
+    },
+    {
+      "id": "religion",
+      "label": "Locais de culto",
+      "maki": "religious-christian",
+      "color": "#FFD450",
+      "minzoom": 14.2
     }
   ],
   "geometry": {

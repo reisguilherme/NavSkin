@@ -1,6 +1,6 @@
 # NavSkin no iPhone usando Windows
 
-O caminho desta entrega é **um amigo compilar o NavSkin 0.5.0 no Mac e enviar o IPA ao Guilherme**. Depois, o AltServer no Windows usa a Apple Account do próprio Guilherme para assinar e instalar no iPhone com iOS 17 ou posterior. Para essa instalação, você precisa do IPA, PC, cabo USB e Apple Account.
+O caminho desta entrega é **um amigo compilar o NavSkin 0.6.0 no Mac e enviar o IPA ao Guilherme**. Depois, o AltServer no Windows usa a Apple Account do próprio Guilherme para assinar e instalar no iPhone com iOS 17 ou posterior. Para essa instalação, você precisa do IPA, PC, cabo USB e Apple Account.
 
 As instruções de compilação estão no [README para quem vai usar o Mac](../README.md#para-quem-vai-compilar-no-mac). O projeto está preparado; a compilação Apple ainda precisa ser executada. O GitHub Actions permanece uma alternativa manual, mas a execução nesta conta foi bloqueada pelo GitHub. Isso não impede o amigo de compilar localmente.
 

@@ -53,8 +53,8 @@ struct SheetHeading: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(title).font(.title2.bold()).foregroundStyle(palette.text)
-            Text(subtitle).font(.subheadline).foregroundStyle(palette.muted)
+            Text(title).gameFont(.title2, weight: .bold).foregroundStyle(palette.text)
+            Text(subtitle).gameFont(.subheadline).foregroundStyle(palette.muted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -68,7 +68,7 @@ struct MessageCard: View {
 
     var body: some View {
         Label(text, systemImage: symbol)
-            .font(.footnote).fixedSize(horizontal: false, vertical: true)
+            .gameFont(.footnote).fixedSize(horizontal: false, vertical: true)
             .foregroundStyle(palette.text).padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(palette.soft, in: RoundedRectangle(cornerRadius: 14))
@@ -114,11 +114,11 @@ struct ThemePreviewCard: View {
             }
             VStack(alignment: .leading, spacing: 3) {
                 HStack {
-                    Text(theme.title).font(.headline)
+                    Text(theme.title).gameFont(.headline)
                     Spacer()
                     if store.theme == theme { Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.palette.accent) }
                 }
-                Text(theme.subtitle).font(.caption).foregroundStyle(theme.palette.muted).lineLimit(1)
+                Text(theme.subtitle).gameFont(.caption).foregroundStyle(theme.palette.muted).lineLimit(1)
             }
             .foregroundStyle(theme.palette.text).padding(12)
         }
@@ -126,6 +126,7 @@ struct ThemePreviewCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(store.theme == theme ? theme.palette.accent : theme.palette.border, lineWidth: store.theme == theme ? 2 : 1))
         .shadow(color: .black.opacity(0.14), radius: 8, y: 4)
+        .environment(\.gameTheme, theme)
     }
 }
 

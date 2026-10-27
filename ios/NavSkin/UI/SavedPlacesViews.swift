@@ -33,7 +33,7 @@ struct SavedPlacesSheet: View {
                     Button { addPlace() } label: { Label("Adicionar local", systemImage: "plus").frame(maxWidth: .infinity) }
                         .buttonStyle(.borderedProminent).controlSize(.large).disabled(store.places.loadError != nil)
                     if !store.places.recents.isEmpty {
-                        Text("RECENTES").font(.caption.weight(.bold)).foregroundStyle(palette.muted)
+                        Text("RECENTES").gameFont(.caption, weight: .bold).foregroundStyle(palette.muted)
                         ForEach(store.places.recents, id: \.destination.id) { recent in
                             DestinationRow(destination: recent.destination, palette: palette, symbol: "clock") { select(recent.destination) }
                         }
@@ -41,8 +41,8 @@ struct SavedPlacesSheet: View {
                 }.padding(20)
             }
             .background(palette.surface).foregroundStyle(palette.text)
-            .navigationTitle("Locais salvos").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() } } }
+            .gameNavigationTitle("Locais salvos").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
             .sheet(item: $editing) { item in SavedPlaceEditor(store: store, destination: item.destination, existing: item.place) }
             .confirmationDialog("Excluir este local?", isPresented: Binding(
                 get: { deleting != nil }, set: { if !$0 { deleting = nil } }
@@ -59,12 +59,12 @@ struct SavedPlacesSheet: View {
                 HStack(spacing: 12) {
                     CatalogBitmap(url: store.resources.savedIcon(id: place.iconId).flatMap { store.resources.imageURL(for: $0, theme: store.theme) }, size: 44)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(place.name).font(.headline).foregroundStyle(palette.text)
-                        if !place.address.isEmpty { Text(place.address).font(.caption).foregroundStyle(palette.muted).lineLimit(1) }
+                        Text(place.name).gameFont(.headline).foregroundStyle(palette.text)
+                        if !place.address.isEmpty { Text(place.address).gameFont(.caption).foregroundStyle(palette.muted).lineLimit(1) }
                         HStack(spacing: 8) {
                             if store.places.homeId == place.id { Label("Casa", systemImage: "house.fill") }
                             if store.places.workId == place.id { Label("Trabalho", systemImage: "briefcase.fill") }
-                        }.font(.caption2.bold()).foregroundStyle(palette.accent)
+                        }.gameFont(.caption2, weight: .bold).foregroundStyle(palette.accent)
                     }
                     Spacer(minLength: 0)
                 }.frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
@@ -144,7 +144,7 @@ struct SavedPlaceEditor: View {
                             Button { iconId = icon.id } label: {
                                 VStack(spacing: 5) {
                                     CatalogBitmap(url: store.resources.imageURL(for: icon, theme: store.theme), size: 46)
-                                    Text(icon.label).font(.caption2).lineLimit(2).multilineTextAlignment(.center)
+                                    Text(icon.label).gameFont(.caption2).lineLimit(2).multilineTextAlignment(.center)
                                 }
                                 .foregroundStyle(palette.text).frame(maxWidth: .infinity, minHeight: 82)
                                 .background(iconId == icon.id ? palette.soft : Color.clear, in: RoundedRectangle(cornerRadius: 12))
@@ -153,13 +153,13 @@ struct SavedPlaceEditor: View {
                         }
                     }.padding(.vertical, 6)
                 }
-                if let validation { Section { Text(validation).foregroundStyle(.red).font(.footnote) } }
-                if let error = store.uiError { Section { Text(error).foregroundStyle(.red).font(.footnote) } }
-                Section { Button("Salvar local", action: save).frame(maxWidth: .infinity).font(.headline) }
+                if let validation { Section { Text(validation).foregroundStyle(.red).gameFont(.footnote) } }
+                if let error = store.uiError { Section { Text(error).foregroundStyle(.red).gameFont(.footnote) } }
+                Section { Button("Salvar local", action: save).frame(maxWidth: .infinity).gameFont(.headline) }
             }
             .tint(palette.accent)
-            .navigationTitle(existing == nil ? "Novo favorito" : "Editar favorito").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Cancelar") { dismiss() } } }
+            .gameNavigationTitle(existing == nil ? "Novo favorito" : "Editar favorito").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Cancelar") { dismiss() }.gameFont(.body) } }
         }
     }
 

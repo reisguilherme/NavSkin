@@ -1,28 +1,31 @@
 #!/usr/bin/env node
-/** Prepare an independent, attributable six-category POI package. Node >= 20. */
+/** Prepare an independent, attributable nine-category POI package. Node >= 20. */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { bounds } from './fetch-osm.mjs';
-import { buildPois } from './build-pois.mjs';
+import { buildPois, classifyPoi } from './build-pois.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cacheDir = path.join(root, 'data', 'android');
 const outputDir = path.join(root, 'android', 'maps');
 const hash = text => createHash('sha256').update(text).digest('hex');
 const idOf = element => element.type + '/' + element.id;
-export const androidKinds = ['parks', 'fuel', 'food', 'parking', 'health', 'shops'];
+export const androidKinds = ['parks', 'fuel', 'food', 'parking', 'health', 'shops', 'education', 'culture', 'religion'];
 export const categoryMappings = {
   parks: { leisure: ['park', 'garden'] },
   fuel: { amenity: ['fuel'] },
-  food: { amenity: ['restaurant', 'cafe', 'fast_food'] },
+  food: { amenity: ['restaurant', 'cafe', 'fast_food', 'bar', 'pub'] },
   parking: { amenity: ['parking'] },
   health: { amenity: ['hospital', 'clinic', 'doctors', 'pharmacy'] },
   shops: { shop: ['supermarket', 'convenience'] },
+  education: { amenity: ['school', 'university', 'college', 'kindergarten'] },
+  culture: { amenity: ['theatre', 'cinema', 'arts_centre'], tourism: ['museum'] },
+  religion: { amenity: ['place_of_worship'] },
 };
 // Prefer the site's explicit amenity over a secondary shop/leisure tag.
-export const categoryPriority = ['fuel', 'parking', 'health', 'food', 'shops', 'parks'];
+export const categoryPriority = ['fuel', 'parking', 'health', 'education', 'culture', 'religion', 'food', 'shops', 'parks'];
 const matchingCategories = tags => categoryPriority.filter(kind =>
   Object.entries(categoryMappings[kind]).some(([key, values]) => values.includes(tags[key])),
 );
@@ -31,9 +34,10 @@ const queryBbox = [bounds.south, bounds.west, bounds.north, bounds.east].join(',
 export const androidPoiQuery = [
   '[out:json][timeout:180][maxsize:134217728];',
   '(',
-  '  nwr(' + queryBbox + ')["amenity"~"^(fuel|parking|restaurant|cafe|fast_food|hospital|clinic|doctors|pharmacy)$"];',
+  '  nwr(' + queryBbox + ')["amenity"~"^(fuel|parking|restaurant|cafe|fast_food|bar|pub|hospital|clinic|doctors|pharmacy|school|university|college|kindergarten|theatre|cinema|arts_centre|place_of_worship)$"];',
   '  nwr(' + queryBbox + ')["leisure"~"^(park|garden)$"];',
   '  nwr(' + queryBbox + ')["shop"~"^(supermarket|convenience)$"];',
+  '  nwr(' + queryBbox + ')["tourism"="museum"];',
   ');',
   'out meta geom;',
 ].join('\n');
@@ -55,7 +59,12 @@ export function buildAndroidPois(data, bbox = bounds) {
     if (kind === 'parks') delete proxyTags.amenity;
     adapted.push({ ...element, tags: proxyTags });
   }
-  const result = buildPois({ elements: adapted }, bbox);
+  // The shared geometry/dedup pipeline retains exact subtypes. Its web defaults
+  // stay unchanged; only this native package selects the additional OSM tags.
+  const extraSubtypes = new Set(['college', 'kindergarten', 'bar', 'pub', 'place_of_worship']);
+  const result = buildPois({ elements: adapted }, bbox, {
+    classify: tags => classifyPoi(tags) ?? (extraSubtypes.has(tags.amenity) ? tags.amenity : null),
+  });
   for (const feature of result.collection.features) {
     const original = originals.get(feature.properties.osm_id);
     const rawTags = { ...(original.tags ?? {}) };
@@ -146,8 +155,15 @@ export async function writeAndroidPois() {
   const result = buildAndroidPois(data);
   const features = result.collection.features;
   const counts = Object.fromEntries(androidKinds.map(kind => [kind, features.filter(f => f.properties.kind === kind).length]));
+  const missingTagSelectors = Object.fromEntries(androidKinds.map(kind => [kind,
+    Object.entries(categoryMappings[kind]).flatMap(([key, values]) => values.filter(value => !query.includes(value)).map(value => `${key}=${value}`)),
+  ]));
+  const incompleteCategories = androidKinds.filter(kind => missingTagSelectors[kind].length > 0);
+  const notCollectedCategories = incompleteCategories.filter(kind => counts[kind] === 0);
+  if (incompleteCategories.length) result.warnings.push(
+    'Cached snapshot is preserved from its original query/date. It did not request all subtypes in the current nine-group specification; missing selectors are recorded in dataCollection. No unrelated snapshot was merged.');
   const metadata = {
-    title: 'Goiânia — six semantic POI categories for Android',
+    title: 'Goiânia — nine semantic POI categories for NavSkin',
     ...provenance, bounds, crs: 'EPSG:4326', query,
     generatedAt: new Date().toISOString(),
     geojsonFile: 'android/maps/pois.geojson',
@@ -157,6 +173,12 @@ export async function writeAndroidPois() {
       namedByKind: Object.fromEntries(androidKinds.map(kind => [kind, features.filter(f => f.properties.kind === kind && f.properties.name).length])),
     },
     categoryMappings, categoryPriority,
+    dataCollection: {
+      completeForCurrentSpecification: incompleteCategories.length === 0,
+      incompleteCategories, notCollectedCategories, missingTagSelectors,
+      currentRequestedQuery: androidPoiQuery,
+      note: 'Source query, fetchedAt, dataTimestamp and hashes above describe the actual single cached snapshot. A failed refresh never changes those values. Empty uncollected offline groups do not imply the places are absent from the worldwide map.',
+    },
     sourceIds: features.flatMap(f => f.properties.source_ids).sort(),
     examplesByKind: Object.fromEntries(androidKinds.map(kind => [
       kind, features.filter(f => f.properties.kind === kind && f.properties.name).slice(0, 8)

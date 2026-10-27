@@ -2,7 +2,13 @@
 
 Aplicativo nativo em Kotlin com mapas mundiais, GPS do Android e navegação visual para automóvel no telefone e no Android Auto. A integração usa a categoria **Navegação** da Car App Library. MapLibre Native renderiza **Mundo online**, padrão, com mapas OpenFreeMap / OpenStreetMap por HTTPS, ou **Goiânia offline**, com o recorte cartográfico incluído no APK. Geoapify fornece busca e rotas pela internet com a chave do usuário.
 
-Versão do código: **0.5.0**, `versionCode 4`. Consulte [configuração e uso](docs/NAVIGATION.md) e [validação da v0.5](docs/VALIDATION-v0.5.md). A marca pública e o nome do projeto agora são NavSkin. O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico; seus resultados não comprovam a validação da v0.5.
+Versão do código: **0.6.0**, `versionCode 5`. Consulte [configuração e uso](docs/NAVIGATION.md) e [validação da v0.6](docs/VALIDATION-v0.6.md). O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.5](docs/VALIDATION-v0.5.md), [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico.
+
+## Recursos visuais da versão 0.6
+
+Pricedown histórica é usada na UI e nos rótulos GTA; Hapna e RDR Lino no tema RDR2. Os sprites originais de POIs mantêm sua procedência, com adaptações próprias para categorias sem equivalente no jogo. Cores, contornos, nomes de ruas e sentidos foram calibrados pelos exemplos. São nove filtros, incluindo ensino, cultura e culto; os três novos grupos não estão no snapshot offline atual, mas aparecem no mundial. [Fontes, origem e importação](../docs/game-assets-provenance.md).
+
+O pacote original é local, separado do código versionado. O build verifica seus arquivos e informa se faltar algum; restaure os recursos da entrega completa antes de compilar um clone.
 
 ## Funcionalidades implementadas
 
@@ -14,8 +20,8 @@ Versão do código: **0.5.0**, `versionCode 4`. Consulte [configuração e uso](
 - Sessão única entre telefone e central, mantida por foreground service com notificação. Após encerramento do processo, o destino pode ser retomado com uma nova rota.
 - Mapa ocupando a tela, controles flutuantes e menus retráteis para cobertura, temas e filtros. **Mundo online** usa rede; **Goiânia offline** usa somente o recorte incluído. A escolha é compartilhada e persistida entre telefone e central.
 - Carrossel inicial com prévias reais e locais de **GTA SA**, **Rosa Pop** e **RDR2**. Cada tema tem variante noturna selecionada pelo modo do sistema no telefone e pelo host no carro.
-- Rosa Pop com interface clara, rosa vivo, menta e turquesa; RDR2 com papel sépia e tinta; as letras serifadas são usadas no recorte offline, e o mapa mundial usa Noto Sans Bold para ampliar a cobertura de caracteres. Os ícones são editáveis e não foram extraídos dos jogos.
-- Seis filtros independentes: parques; combustível; alimentação; estacionamento; saúde; mercados e conveniências.
+- Rosa Pop com interface clara, rosa vivo, menta e turquesa; RDR2 com papel sépia e tinta. GTA usa Pricedown, e RDR2 usa Hapna e RDR Lino nos dois modos de mapa. Noto complementa caracteres ausentes. Sprites originais e adaptações NavSkin têm sua procedência registrada separadamente.
+- Nove filtros independentes: parques; combustível; alimentação; estacionamento; saúde; mercados e conveniências; ensino; cultura; locais de culto.
 - Locais salvos editáveis no telefone, atalhos Casa/Trabalho e destinos recentes, persistidos localmente. A visibilidade dos salvos é independente dos filtros de POI.
 - Catálogo próprio com 12 ícones de locais e seis marcadores de veículo por tema, prévias reais e IDs semânticos preservados ao trocar tema. O desenho de moto ou veículo temático é uma preferência visual; a rota continua sendo de automóvel.
 - No carro, `NavigationTemplate`, manobras/estimativas oficiais e controles do host; destinos salvos/recentes, pesquisa permitida, iniciar/encerrar, câmera, temas, filtros e seleção simplificada de marcador.
@@ -25,7 +31,7 @@ O mapa mundial depende de internet e não exige chave cartográfica. Quando falt
 
 ## Começar a usar
 
-No telefone, escolha a cobertura em **Temas** ou **Filtros**; ela também está em **Para onde? → Cobertura do mapa**. No Android Auto, use **Aparência → Cobertura do mapa**. GTA SA, Rosa Pop, RDR2, modo noturno e os seis filtros estão disponíveis nos dois mapas. As prévias do carrossel são capturas do recorte offline e representam a identidade visual dos temas.
+No telefone, escolha a cobertura em **Temas** ou **Filtros**; ela também está em **Para onde? → Cobertura do mapa**. No Android Auto, use **Aparência → Cobertura do mapa**. GTA SA, Rosa Pop, RDR2 e modo noturno estão disponíveis nos dois mapas. Os nove filtros aparecem no painel; ensino, cultura e culto dependem dos dados mundiais e ainda não estão no snapshot offline. As prévias do carrossel são capturas nativas de São Paulo no mapa mundial.
 
 Para navegar, abra **Para onde? → Configurar chave Geoapify**, salve uma chave da sua conta e ative **GPS**. Autorize localização precisa durante o uso; a notificação mantém a sessão com a tela bloqueada. A chave é criptografada com Android KeyStore e não precisa ser inserida no código ou no build. Sem chave, o mapa, GPS e dados locais continuam disponíveis; o aplicativo informa a configuração pendente ao solicitar busca ou rota.
 
@@ -131,3 +137,5 @@ No modo mundial, o fornecedor de tiles é OpenFreeMap, no esquema OpenMapTiles, 
 Em **Goiânia offline**, rotas podem ultrapassar o recorte local; nesses trechos faltam detalhes dos tiles empacotados e a prévia informa essa limitação. Em **Mundo online**, a cobertura usa os tiles mundiais, sem essa restrição geográfica local. Nenhum modo oferece cálculo offline de rotas.
 
 Consulte também [procedência e categorias POI](../docs/android-poi-categories.md), [decisão de navegação e custos](../docs/navigation-provider-decision.md), [requisitos de plataforma](../docs/android-navigation-platform.md), [viabilidade Android Auto anterior](../docs/android-auto-feasibility.md) e [ambiente emulado](../docs/emulator-status.md).
+
+O pacote local `NavSkin-game-assets-0.6.0.zip` contém a árvore de recursos preparada: extraia seu conteúdo na raiz do clone, mantendo as pastas `android` e `ios`. O ZIP iOS completo já está preparado para abrir no Mac e dispensa essa etapa. Os arquivos de assinatura pessoal continuam excluídos.

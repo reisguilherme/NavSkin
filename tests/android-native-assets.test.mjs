@@ -1,19 +1,65 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { validateStyleMin, featureFilter } from '@maplibre/maplibre-gl-style-spec';
+import { validateStyleMin, featureFilter, createExpression } from '@maplibre/maplibre-gl-style-spec';
 import { PbfReader } from 'pbf';
 import sharp from 'sharp';
 
 const root = new URL('../', import.meta.url);
 const assetRoot = new URL('android/app/src/main/assets/maps/', root);
-const categories = ['parks', 'fuel', 'food', 'parking', 'health', 'shops'];
+const categories = ['parks', 'fuel', 'food', 'parking', 'health', 'shops', 'education', 'culture', 'religion'];
 const themes = ['gta', 'rosa', 'rdr2'];
 const variants = [...themes, ...themes.map(theme => `${theme}-night`)];
 const json = async path => JSON.parse(await readFile(new URL(path, root), 'utf8'));
 const asset = async path => JSON.parse(await readFile(new URL(path, assetRoot), 'utf8'));
+const gameCatalog = await json('android/maps/game-assets/catalog.json');
 const hash = data => createHash('sha256').update(data).digest('hex');
+const evaluate = (expression, properties, zoom = 17) => {
+  const compiled = createExpression(expression, 'layers[0].layout.icon-image');
+  assert.equal(compiled.result, 'success');
+  return compiled.value.evaluate({ zoom }, { type: 2, properties });
+};
+
+test('offline oneway symbols keep original OSM direction and never invent missing or two-way restrictions', async () => {
+  const roads = await json('public/data/roads.geojson');
+  const tokens = await json('android/maps/theme-tokens.json');
+  const kinds = new Set(tokens.roads.flatMap(road => road.kinds));
+  for (const mode of variants) {
+    const style = await asset(`styles/${mode}.json`);
+    const layer = style.layers.find(item => item.id === 'road-oneway-directions');
+    assert.ok(layer, mode);
+    assert.equal(layer.source, 'roads');
+    assert.equal(layer['source-layer'], undefined);
+    const matches = featureFilter(layer.filter, 'oneway.filter').filter;
+    const actual = roads.features.filter(feature => matches({ zoom: 17 }, { type: 2, properties: feature.properties }));
+    const expected = roads.features.filter(feature => kinds.has(feature.properties.kind) && feature.properties.oneway === 'yes');
+    assert.deepEqual(actual.map(feature => feature.id), expected.map(feature => feature.id));
+    assert.ok(actual.length > 9000, 'must exercise the actual source roads');
+    for (const [oneway, angle] of [['yes', 0], ['1', 0], [true, 0], ['true', 0], [-1, 180], ['-1', 180], ['reverse', 180]]) {
+      const properties = { kind: 'residential', oneway };
+      assert.ok(matches({ zoom: 17 }, { type: 2, properties }));
+      assert.equal(evaluate(layer.layout['icon-rotate'], properties), angle);
+    }
+    for (const oneway of [null, undefined, 'no', 0, false, 'reversible']) {
+      assert.equal(matches({ zoom: 17 }, { type: 2, properties: { kind: 'residential', oneway } }), false);
+    }
+    assert.equal(matches({ zoom: 17 }, { type: 2, properties: { kind: 'footway', oneway: 'yes' } }), false);
+  }
+});
+
+test('native subtype icons distinguish original OSM amenity while keeping category fallbacks', async () => {
+  for (const mode of variants) {
+    const style = await asset(`styles/${mode}.json`);
+    const food = style.layers.find(layer => layer.id === 'poi-food');
+    const health = style.layers.find(layer => layer.id === 'poi-health');
+    assert.equal(evaluate(food.layout['icon-image'], { amenity: 'cafe' }), 'poi-cafe');
+    assert.equal(evaluate(food.layout['icon-image'], { amenity: 'fast_food' }), 'poi-fast-food');
+    assert.equal(evaluate(health.layout['icon-image'], { amenity: 'pharmacy' }), 'poi-pharmacy');
+    assert.equal(evaluate(health.layout['icon-image'], { amenity: 'doctors' }), 'poi-clinic');
+    assert.equal(evaluate(health.layout['icon-image'], {}), 'poi-health');
+  }
+});
 
 test('native filters cover every actual road grade and the real Praça Cívica park', async () => {
   const roads = await json('public/data/roads.geojson');
@@ -57,12 +103,14 @@ test('all day/night native variants satisfy the schema and share geographic sour
     assert.ok(style.metadata.gamemap.attribution.includes('Google'));
     assert.ok(style.metadata.gamemap.attribution.includes('Microsoft'));
     for (const layer of style.layers.filter(l => l.type === 'symbol' && l.layout['text-field'])) {
-      assert.deepEqual(layer.layout['text-font'], [style.metadata.gamemap.theme === 'rdr2' ? 'GameMapSerif' : 'GameMapSans']);
+      const theme = style.metadata.gamemap.theme;
+      const role = layer.id === 'road-labels' ? 'road' : layer.id.startsWith('poi-') ? 'poi' : 'place';
+      assert.deepEqual(layer.layout['text-font'], [gameCatalog.themes[theme]?.map?.[role] ?? (theme === 'rdr2' ? 'GameMapSerif' : 'GameMapSans')]);
     }
   }
 });
 
-test('six independent POI layers cover every real POI once and keep green areas separate', async () => {
+test('nine independent POI layers cover every available offline POI once and keep green areas separate', async () => {
   const pois = await json('android/maps/pois.geojson');
   assert.equal(pois.features.length, 1571);
   for (const mode of variants) {
@@ -85,18 +133,19 @@ test('six independent POI layers cover every real POI once and keep green areas 
   }
 });
 
-test('hiding all six categories removes every marker while preserving geographic text and park fills', async () => {
+test('hiding all nine categories removes every POI while preserving traffic directions and geographic layers', async () => {
   const categoryIds = categories.map(category => `poi-${category}`).sort();
   const isMarker = layer => layer.type === 'circle' || (layer.type === 'symbol' && Object.hasOwn(layer.layout ?? {}, 'icon-image'));
   const visible = layer => layer.layout?.visibility !== 'none';
   for (const mode of variants) {
     const style = await asset(`styles/${mode}.json`);
     const markers = style.layers.filter(isMarker);
-    assert.deepEqual(markers.map(layer => layer.id).sort(), categoryIds, `${mode}: category-independent or duplicate marker`);
-    assert.ok(markers.every(layer => layer.source === 'pois' && layer.type === 'symbol'));
-    for (const marker of markers) marker.layout.visibility = 'none';
-    assert.deepEqual(style.layers.filter(layer => visible(layer) && isMarker(layer)), [], `${mode}: marker survives all categories disabled`);
-    assert.deepEqual(style.layers.filter(layer => visible(layer) && layer.type === 'symbol').map(layer => layer.id).sort(), ['district-labels', 'place-labels', 'road-labels']);
+    assert.deepEqual(markers.map(layer => layer.id).sort(), [...categoryIds, 'road-oneway-directions'].sort(), `${mode}: unexpected or duplicate marker`);
+    const pois = markers.filter(layer => layer.id.startsWith('poi-'));
+    assert.ok(pois.every(layer => layer.source === 'pois' && layer.type === 'symbol'));
+    for (const marker of pois) marker.layout.visibility = 'none';
+    assert.deepEqual(style.layers.filter(layer => visible(layer) && isMarker(layer)).map(layer => layer.id), ['road-oneway-directions'], `${mode}: POI survives all categories disabled`);
+    assert.deepEqual(style.layers.filter(layer => visible(layer) && layer.type === 'symbol' && layer.layout['text-field']).map(layer => layer.id).sort(), ['district-labels', 'place-labels', 'road-labels']);
     for (const label of style.layers.filter(layer => layer.source === 'places')) {
       assert.equal(label.type, 'symbol');
       assert.ok(label.layout['text-field']);
@@ -163,13 +212,18 @@ test('local Noto glyph PBFs cover all label codepoints including uppercase and a
   assert.match(await readFile(new URL('credits/Noto-Serif-OFL-1.1.md', assetRoot), 'utf8'), /SIL OPEN FONT LICENSE Version 1\.1/);
 });
 
-test('both 1x and 2x sprite atlases contain six different editable category icons', async () => {
+test('both sprite atlases include every editable icon, nine categories, subtype aliases and the traffic arrow', async () => {
   for (const mode of themes) {
     for (const ratio of [1, 2]) {
       const suffix = ratio === 2 ? '@2x' : '';
       const index = await asset(`sprites/${mode}${suffix}.json`);
       const png = await sharp(await readFile(new URL(`sprites/${mode}${suffix}.png`, assetRoot))).metadata();
-      assert.deepEqual(Object.keys(index).sort(), categories.map(c => `poi-${c}`).sort());
+      const sourceNames = (await readdir(new URL(`android/maps/icons/${mode}/`, root)))
+        .filter(name => /^[a-z0-9-]+\.svg$/.test(name)).map(name => name.slice(0, -4)).sort();
+      assert.deepEqual(Object.keys(index).sort(), sourceNames);
+      for (const id of [...categories.map(c => `poi-${c}`), 'road-oneway-forward',
+        'poi-cafe', 'poi-fast-food', 'poi-restaurant', 'poi-pharmacy', 'poi-hospital', 'poi-clinic',
+        'poi-school', 'poi-museum', 'poi-theatre', 'poi-bar', 'poi-worship']) assert.ok(index[id], `${mode}: missing ${id}`);
       for (const entry of Object.values(index)) {
         assert.equal(entry.pixelRatio, ratio);
         assert.equal(entry.width, 32 * ratio);
@@ -184,14 +238,16 @@ test('both 1x and 2x sprite atlases contain six different editable category icon
       assert.ok((await stat(new URL(`android/maps/icons/${mode}/poi-${category}.svg`, root))).size > 200);
       hashes.push(hash(svg));
     }
-    assert.equal(new Set(hashes).size, 6);
+    assert.equal(new Set(hashes).size, categories.length);
   }
 });
 
-test('GTA preserves approved palette and every day theme has distinct cartography with the same road grades', async () => {
+test('GTA uses measured TO-BE colors while every theme preserves the same real road hierarchy', async () => {
   const poc = await json('public/styles/tokens.json');
   const native = await json('android/maps/theme-tokens.json');
-  assert.deepEqual(native.palettes.gta, poc.palettes.gta);
+  for (const [property, color] of Object.entries({ urban: '#9C989C', building: '#E0E0DC', park: '#28681C', road: '#000000' })) {
+    assert.equal(native.palettes.gta[property], color, `measured GTA ${property}`);
+  }
   assert.deepEqual(native.roads, poc.roads);
   assert.deepEqual(native.zoomStops, poc.zoomStops);
   assert.notEqual(native.palettes.rosa.roadOutline, native.palettes.gta.roadOutline);
@@ -237,7 +293,7 @@ test('host night variants retain the same three themes, geometry, symbols and re
     for (const category of categories) {
       const layer = night.layers.find(layer => layer.id === `poi-${category}`);
       assert.equal(layer.layout.visibility, 'visible');
-      assert.equal(layer.layout['icon-image'], `poi-${category}`);
+      assert.equal(evaluate(layer.layout['icon-image'], {}), `poi-${category}`);
       assert.deepEqual(layer.layout, day.layers.find(dayLayer => dayLayer.id === `poi-${category}`).layout);
     }
     assert.notEqual(night.layers.find(layer => layer.id === 'water-fill').paint['fill-color'], day.layers.find(layer => layer.id === 'water-fill').paint['fill-color']);

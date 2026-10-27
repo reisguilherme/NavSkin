@@ -7,7 +7,7 @@ enum MapResourceError: Error, LocalizedError {
         case .missingStyle: return "Estilo do mapa não encontrado. Prepare os recursos do aplicativo."
         case .invalidStyle: return "Não foi possível ler o estilo do mapa."
         case .unsafeAsset: return "O estilo contém um caminho de recurso inválido."
-        case .missingCategories: return "O estilo não contém os seis filtros de lugares."
+        case .missingCategories: return "O estilo não contém todos os filtros de lugares."
         }
     }
 }

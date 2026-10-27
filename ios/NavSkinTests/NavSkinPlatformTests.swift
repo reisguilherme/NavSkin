@@ -4,6 +4,18 @@ import UIKit
 
 /// Apple-only checks: run with the NavSkin scheme on a real iOS simulator/device.
 final class NavSkinPlatformTests: XCTestCase {
+    @MainActor
+    func testConfiguredGameFontsRegisterTheirActualPostScriptNamesAndDoNotLeakAcrossThemes() throws {
+        for theme in MapTheme.allCases {
+            if let definition = GameTypography.catalog.themes[theme.rawValue]?.ui {
+                let actual = try XCTUnwrap(GameTypography.fontName(theme: theme), "Configured font must load: \(definition.file)")
+                XCTAssertNotNil(UIFont(name: actual, size: 17))
+                if let expected = definition.postScriptName { XCTAssertEqual(actual, expected) }
+            } else {
+                XCTAssertNil(GameTypography.fontName(theme: theme), "A theme without a supplied font must keep its own system font")
+            }
+        }
+    }
     func testEveryThemeCatalogImageAndNativePreviewLoadsInUIKit() throws {
         let root = try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("Resources")
         let resources = ResourceCatalog(root: root)

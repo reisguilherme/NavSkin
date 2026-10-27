@@ -18,15 +18,15 @@ struct APIKeySheet: View {
             Form {
                 Section {
                     Label(store.snapshot.providerConfigured ? "Chave salva neste iPhone" : "Configure sua chave", systemImage: "key.fill")
-                        .font(.headline)
+                        .gameFont(.headline)
                     Text("Sua chave é guardada no Keychain e enviada diretamente à Geoapify nas consultas. Uma chave salva ainda pode ser recusada pelo serviço.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .gameFont(.footnote).foregroundStyle(.secondary)
                     SecureField(store.snapshot.providerConfigured ? "Nova chave para substituir" : "Chave da API Geoapify", text: $key)
                         .textInputAutocapitalization(.never).autocorrectionDisabled().privacySensitive()
                         .focused($focused).submitLabel(.done).onSubmit(saveKey)
                     Button(store.snapshot.providerConfigured ? "Substituir chave" : "Salvar chave", action: saveKey)
                         .disabled(key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    if saved { Label("Chave salva. Tente calcular a rota novamente.", systemImage: "checkmark.circle.fill").font(.footnote) }
+                    if saved { Label("Chave salva. Tente calcular a rota novamente.", systemImage: "checkmark.circle.fill").gameFont(.footnote) }
                     if store.snapshot.providerConfigured {
                         Button("Remover chave", role: .destructive) { removing = true }
                     }
@@ -41,7 +41,7 @@ struct APIKeySheet: View {
                         }
                     }
                     Text("O GPS é solicitado pela sua ação. Durante uma navegação ativa, o aplicativo pode manter a localização para acompanhar a viagem com a tela bloqueada.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .gameFont(.footnote).foregroundStyle(.secondary)
                 }
                 #if DEBUG
                 Section("Ferramentas de desenvolvimento") {
@@ -49,18 +49,18 @@ struct APIKeySheet: View {
                         if store.snapshot.simulation { store.stopSimulation() }
                         else { store.startSimulation(); dismiss() }
                     }
-                    Text("Replay sintético identificado como SIMULAÇÃO. Não representa uma posição GPS real.").font(.footnote).foregroundStyle(.secondary)
+                    Text("Replay sintético identificado como SIMULAÇÃO. Não representa uma posição GPS real.").gameFont(.footnote).foregroundStyle(.secondary)
                 }
                 #endif
                 Section {
                     Text("NavSkin oferece mapa mundial online e um recorte de Goiânia offline. Busca e rotas são online; a estimativa de chegada não inclui trânsito ao vivo.")
-                        .font(.footnote).foregroundStyle(.secondary)
-                    if let error = store.uiError { Text(error).font(.footnote).foregroundStyle(.red) }
+                        .gameFont(.footnote).foregroundStyle(.secondary)
+                    if let error = store.uiError { Text(error).gameFont(.footnote).foregroundStyle(.red) }
                 }
             }
             .tint(palette.accent)
-            .navigationTitle("Configurações").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Concluir") { key = ""; dismiss() } } }
+            .gameNavigationTitle("Configurações").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Concluir") { key = ""; dismiss() }.gameFont(.body) } }
             .confirmationDialog("Remover a chave salva?", isPresented: $removing, titleVisibility: .visible) {
                 Button("Remover chave", role: .destructive) { store.removeAPIKey(); saved = false; key = "" }
                 Button("Cancelar", role: .cancel) {}

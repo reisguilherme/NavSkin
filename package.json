@@ -1,6 +1,6 @@
 {
   "name": "navskin",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,8 @@
     "buildings:tiles": "node scripts/tile-buildings.mjs",
     "buildings:validate-tiles": "node scripts/validate-building-tiles.mjs",
     "maps:world": "node scripts/prepare-world-maps.mjs",
-    "ios:prepare": "node scripts/prepare-ios.mjs"
+    "ios:prepare": "node scripts/prepare-ios.mjs",
+    "assets:game": "node scripts/prepare-game-assets.mjs"
   },
   "dependencies": {
     "maplibre-gl": "6.16.0"

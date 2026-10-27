@@ -1,5 +1,5 @@
 {
-  "title": "Goiânia — six semantic POI categories for Android",
+  "title": "Goiânia — nine semantic POI categories for NavSkin",
   "source": "OpenStreetMap via Overpass API",
   "endpoint": "https://overpass-api.de/api/interpreter",
   "fetchedAt": "2026-10-27T00:50:44.022Z",
@@ -28,7 +28,7 @@
   },
   "crs": "EPSG:4326",
   "query": "[out:json][timeout:180][maxsize:134217728];\n(\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"amenity\"~\"^(fuel|parking|restaurant|cafe|fast_food|hospital|clinic|doctors|pharmacy)$\"];\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"leisure\"~\"^(park|garden)$\"];\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"shop\"~\"^(supermarket|convenience)$\"];\n);\nout meta geom;",
-  "generatedAt": "2026-10-27T00:52:31.821Z",
+  "generatedAt": "2026-10-27T19:00:17.006Z",
   "geojsonFile": "android/maps/pois.geojson",
   "activation": "Prepared data package only. Integrate with the full phone/car UI only after validating the minimal Android Auto Surface map.",
   "counts": {
@@ -39,7 +39,10 @@
       "food": 308,
       "parking": 152,
       "health": 245,
-      "shops": 94
+      "shops": 94,
+      "education": 0,
+      "culture": 0,
+      "religion": 0
     },
     "namedByKind": {
       "parks": 266,
@@ -47,7 +50,10 @@
       "food": 275,
       "parking": 3,
       "health": 220,
-      "shops": 83
+      "shops": 83,
+      "education": 0,
+      "culture": 0,
+      "religion": 0
     }
   },
   "categoryMappings": {
@@ -66,7 +72,9 @@
       "amenity": [
         "restaurant",
         "cafe",
-        "fast_food"
+        "fast_food",
+        "bar",
+        "pub"
       ]
     },
     "parking": {
@@ -87,16 +95,84 @@
         "supermarket",
         "convenience"
       ]
+    },
+    "education": {
+      "amenity": [
+        "school",
+        "university",
+        "college",
+        "kindergarten"
+      ]
+    },
+    "culture": {
+      "amenity": [
+        "theatre",
+        "cinema",
+        "arts_centre"
+      ],
+      "tourism": [
+        "museum"
+      ]
+    },
+    "religion": {
+      "amenity": [
+        "place_of_worship"
+      ]
     }
   },
   "categoryPriority": [
     "fuel",
     "parking",
     "health",
+    "education",
+    "culture",
+    "religion",
     "food",
     "shops",
     "parks"
   ],
+  "dataCollection": {
+    "completeForCurrentSpecification": false,
+    "incompleteCategories": [
+      "food",
+      "education",
+      "culture",
+      "religion"
+    ],
+    "notCollectedCategories": [
+      "education",
+      "culture",
+      "religion"
+    ],
+    "missingTagSelectors": {
+      "parks": [],
+      "fuel": [],
+      "food": [
+        "amenity=bar",
+        "amenity=pub"
+      ],
+      "parking": [],
+      "health": [],
+      "shops": [],
+      "education": [
+        "amenity=school",
+        "amenity=university",
+        "amenity=college",
+        "amenity=kindergarten"
+      ],
+      "culture": [
+        "amenity=theatre",
+        "amenity=cinema",
+        "amenity=arts_centre",
+        "tourism=museum"
+      ],
+      "religion": [
+        "amenity=place_of_worship"
+      ]
+    },
+    "currentRequestedQuery": "[out:json][timeout:180][maxsize:134217728];\n(\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"amenity\"~\"^(fuel|parking|restaurant|cafe|fast_food|bar|pub|hospital|clinic|doctors|pharmacy|school|university|college|kindergarten|theatre|cinema|arts_centre|place_of_worship)$\"];\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"leisure\"~\"^(park|garden)$\"];\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"shop\"~\"^(supermarket|convenience)$\"];\n  nwr(-16.755,-49.325,-16.64,-49.205)[\"tourism\"=\"museum\"];\n);\nout meta geom;",
+    "note": "Source query, fetchedAt, dataTimestamp and hashes above describe the actual single cached snapshot. A failed refresh never changes those values. Empty uncollected offline groups do not imply the places are absent from the worldwide map."
+  },
   "sourceIds": [
     "node/10024596817",
     "node/10039441450",
@@ -1902,7 +1978,10 @@
         "osm_id": "way/195567746",
         "source_url": "https://www.openstreetmap.org/way/195567746"
       }
-    ]
+    ],
+    "education": [],
+    "culture": [],
+    "religion": []
   },
   "processing": {
     "classification": "One semantic kind per original element. Explicit amenity takes precedence over shop, then leisure; exact priority is recorded above.",
@@ -1963,5 +2042,7 @@
     }
   ],
   "omitted": [],
-  "warnings": []
+  "warnings": [
+    "Cached snapshot is preserved from its original query/date. It did not request all subtypes in the current nine-group specification; missing selectors are recorded in dataCollection. No unrelated snapshot was merged."
+  ]
 }

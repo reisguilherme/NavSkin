@@ -46,14 +46,27 @@
         "food",
         "parking",
         "health",
-        "shops"
+        "shops",
+        "education",
+        "culture",
+        "religion"
       ],
       "attribution": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>",
       "creditsAsset": "maps/credits/world-attribution.html",
       "provider": "OpenFreeMap",
       "schema": "OpenMapTiles",
       "font": "Noto Sans Bold",
-      "note": "Online tiles and glyphs require network. The optional bundled Goiânia package remains separate."
+      "note": "Online tiles and glyphs require network. The optional bundled Goiânia package remains separate.",
+      "typography": {
+        "profile": "rdr2",
+        "roles": {
+          "road": "NavSkinRdrMap",
+          "poi": "NavSkinRdrUi",
+          "place": "NavSkinRdrMap"
+        },
+        "catalog": "game-assets/catalog.json",
+        "unicodeFallback": "Noto for codepoints absent from the selected game font"
+      }
     }
   },
   "layers": [
@@ -5582,6 +5595,124 @@
       }
     },
     {
+      "id": "road-oneway-directions",
+      "type": "symbol",
+      "source": "world",
+      "source-layer": "transportation",
+      "minzoom": 16.5,
+      "metadata": {
+        "navskin": {
+          "role": "traffic-direction",
+          "sourceDirectionRequired": true
+        }
+      },
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "LineString"
+        ],
+        [
+          "in",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "literal",
+            [
+              "service",
+              "minor",
+              "tertiary",
+              "secondary",
+              "busway",
+              "bus_guideway",
+              "primary",
+              "trunk",
+              "motorway"
+            ]
+          ]
+        ],
+        [
+          "in",
+          [
+            "to-string",
+            [
+              "coalesce",
+              [
+                "get",
+                "oneway"
+              ],
+              ""
+            ]
+          ],
+          [
+            "literal",
+            [
+              "1",
+              "-1"
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "symbol-placement": "line",
+        "symbol-spacing": 130,
+        "icon-image": "road-oneway-forward",
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          16.5,
+          0.42,
+          18,
+          0.65
+        ],
+        "icon-rotate": [
+          "case",
+          [
+            "in",
+            [
+              "to-string",
+              [
+                "coalesce",
+                [
+                  "get",
+                  "oneway"
+                ],
+                ""
+              ]
+            ],
+            [
+              "literal",
+              [
+                "-1",
+                "reverse"
+              ]
+            ]
+          ],
+          180,
+          0
+        ],
+        "icon-rotation-alignment": "map",
+        "icon-pitch-alignment": "map",
+        "icon-keep-upright": false,
+        "icon-padding": 4,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false
+      },
+      "paint": {
+        "icon-opacity": 0.94
+      }
+    },
+    {
       "id": "road-labels",
       "type": "symbol",
       "source": "world",
@@ -5637,7 +5768,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrMap"
         ],
         "text-allow-overlap": false,
         "symbol-placement": "line",
@@ -5679,7 +5810,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrMap"
         ],
         "text-allow-overlap": false,
         "text-size": 12,
@@ -5737,7 +5868,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrMap"
         ],
         "text-allow-overlap": false,
         "text-size": 12,
@@ -5750,6 +5881,419 @@
         "text-halo-color": "#F1DEB6",
         "text-halo-width": 1.5,
         "text-opacity": 0.9
+      }
+    },
+    {
+      "id": "poi-religion",
+      "type": "symbol",
+      "source": "world",
+      "source-layer": "poi",
+      "minzoom": 14.2,
+      "metadata": {
+        "navskin": {
+          "category": "religion",
+          "label": "Locais de culto"
+        }
+      },
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Point"
+        ],
+        [
+          "==",
+          [
+            "get",
+            "class"
+          ],
+          "place_of_worship"
+        ]
+      ],
+      "layout": {
+        "text-field": [
+          "coalesce",
+          [
+            "get",
+            "name:pt"
+          ],
+          [
+            "get",
+            "name"
+          ],
+          [
+            "get",
+            "name:latin"
+          ],
+          [
+            "get",
+            "name:en"
+          ],
+          ""
+        ],
+        "text-font": [
+          "NavSkinRdrUi"
+        ],
+        "text-allow-overlap": false,
+        "visibility": "visible",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "christian",
+          "poi-worship",
+          "poi-religion"
+        ],
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.76,
+          15,
+          0.9,
+          18,
+          1.05
+        ],
+        "icon-padding": 5,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": [
+          "coalesce",
+          [
+            "get",
+            "rank"
+          ],
+          100
+        ],
+        "text-size": [
+          "step",
+          [
+            "zoom"
+          ],
+          0,
+          16.8,
+          11.5
+        ],
+        "text-optional": true,
+        "text-offset": [
+          0,
+          1.9
+        ],
+        "text-anchor": "top",
+        "text-padding": 4,
+        "text-max-width": 13
+      },
+      "paint": {
+        "text-color": "#39281C",
+        "text-halo-color": "#F1DEB6",
+        "text-halo-width": 1.5
+      }
+    },
+    {
+      "id": "poi-culture",
+      "type": "symbol",
+      "source": "world",
+      "source-layer": "poi",
+      "minzoom": 14,
+      "metadata": {
+        "navskin": {
+          "category": "culture",
+          "label": "Museus, teatros e cultura"
+        }
+      },
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Point"
+        ],
+        [
+          "in",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ]
+          ],
+          [
+            "literal",
+            [
+              "museum",
+              "theatre",
+              "cinema",
+              "arts_centre"
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "text-field": [
+          "coalesce",
+          [
+            "get",
+            "name:pt"
+          ],
+          [
+            "get",
+            "name"
+          ],
+          [
+            "get",
+            "name:latin"
+          ],
+          [
+            "get",
+            "name:en"
+          ],
+          ""
+        ],
+        "text-font": [
+          "NavSkinRdrUi"
+        ],
+        "text-allow-overlap": false,
+        "visibility": "visible",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "museum",
+          "poi-museum",
+          [
+            "theatre",
+            "cinema",
+            "arts_centre"
+          ],
+          "poi-theatre",
+          "poi-culture"
+        ],
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.76,
+          15,
+          0.9,
+          18,
+          1.05
+        ],
+        "icon-padding": 5,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": [
+          "coalesce",
+          [
+            "get",
+            "rank"
+          ],
+          100
+        ],
+        "text-size": [
+          "step",
+          [
+            "zoom"
+          ],
+          0,
+          16.8,
+          11.5
+        ],
+        "text-optional": true,
+        "text-offset": [
+          0,
+          1.9
+        ],
+        "text-anchor": "top",
+        "text-padding": 4,
+        "text-max-width": 13
+      },
+      "paint": {
+        "text-color": "#39281C",
+        "text-halo-color": "#F1DEB6",
+        "text-halo-width": 1.5
+      }
+    },
+    {
+      "id": "poi-education",
+      "type": "symbol",
+      "source": "world",
+      "source-layer": "poi",
+      "minzoom": 13.5,
+      "metadata": {
+        "navskin": {
+          "category": "education",
+          "label": "Escolas e universidades"
+        }
+      },
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Point"
+        ],
+        [
+          "in",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ]
+          ],
+          [
+            "literal",
+            [
+              "school",
+              "university",
+              "college",
+              "kindergarten"
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "text-field": [
+          "coalesce",
+          [
+            "get",
+            "name:pt"
+          ],
+          [
+            "get",
+            "name"
+          ],
+          [
+            "get",
+            "name:latin"
+          ],
+          [
+            "get",
+            "name:en"
+          ],
+          ""
+        ],
+        "text-font": [
+          "NavSkinRdrUi"
+        ],
+        "text-allow-overlap": false,
+        "visibility": "visible",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          [
+            "school",
+            "university",
+            "college",
+            "kindergarten"
+          ],
+          "poi-school",
+          "poi-education"
+        ],
+        "icon-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.76,
+          15,
+          0.9,
+          18,
+          1.05
+        ],
+        "icon-padding": 5,
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": [
+          "coalesce",
+          [
+            "get",
+            "rank"
+          ],
+          100
+        ],
+        "text-size": [
+          "step",
+          [
+            "zoom"
+          ],
+          0,
+          16.8,
+          11.5
+        ],
+        "text-optional": true,
+        "text-offset": [
+          0,
+          1.9
+        ],
+        "text-anchor": "top",
+        "text-padding": 4,
+        "text-max-width": 13
+      },
+      "paint": {
+        "text-color": "#39281C",
+        "text-halo-color": "#F1DEB6",
+        "text-halo-width": 1.5
       }
     },
     {
@@ -5817,7 +6361,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrUi"
         ],
         "text-allow-overlap": false,
         "visibility": "visible",
@@ -5939,11 +6483,35 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrUi"
         ],
         "text-allow-overlap": false,
         "visibility": "visible",
-        "icon-image": "poi-health",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "pharmacy",
+          "poi-pharmacy",
+          "hospital",
+          "poi-hospital",
+          [
+            "clinic",
+            "doctors"
+          ],
+          "poi-clinic",
+          "poi-health"
+        ],
         "icon-size": [
           "interpolate",
           [
@@ -6058,7 +6626,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrUi"
         ],
         "text-allow-overlap": false,
         "visibility": "visible",
@@ -6152,7 +6720,9 @@
             [
               "restaurant",
               "cafe",
-              "fast_food"
+              "fast_food",
+              "bar",
+              "pub"
             ]
           ]
         ]
@@ -6179,11 +6749,37 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrUi"
         ],
         "text-allow-overlap": false,
         "visibility": "visible",
-        "icon-image": "poi-food",
+        "icon-image": [
+          "match",
+          [
+            "coalesce",
+            [
+              "get",
+              "subclass"
+            ],
+            [
+              "get",
+              "class"
+            ],
+            ""
+          ],
+          "cafe",
+          "poi-cafe",
+          "fast_food",
+          "poi-fast-food",
+          "restaurant",
+          "poi-restaurant",
+          [
+            "bar",
+            "pub"
+          ],
+          "poi-bar",
+          "poi-food"
+        ],
         "icon-size": [
           "interpolate",
           [
@@ -6298,7 +6894,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrUi"
         ],
         "text-allow-overlap": false,
         "visibility": "visible",
@@ -6418,7 +7014,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrUi"
         ],
         "text-allow-overlap": false,
         "visibility": "visible",
@@ -6521,7 +7117,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold"
+          "NavSkinRdrMap"
         ],
         "text-allow-overlap": false,
         "symbol-sort-key": [

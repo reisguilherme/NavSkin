@@ -55,12 +55,18 @@ class MapStyleRepository(context: Context) {
             layout.put("visibility", if (category in preferences.enabledCategories) "visible" else "none")
             seen.add(category)
         }
-        check(seen == PoiCategory.entries.toSet()) { "Estilo sem as seis categorias de POIs" }
+        check(seen == PoiCategory.entries.toSet()) { "Estilo sem todas as categorias de POIs" }
         return style.toString()
     }
 
     fun categoryCounts(): Map<PoiCategory, Int> = PoiCategory.entries.associateWith { category ->
         catalog.count { it.category == category }
+    }
+
+    fun offlineMissingCategories(): Set<PoiCategory> {
+        val values = JSONObject(read("maps/data/pois-metadata.json"))
+            .optJSONObject("dataCollection")?.optJSONArray("notCollectedCategories") ?: return emptySet()
+        return (0 until values.length()).mapNotNull { PoiCategory.fromId(values.optString(it)) }.toSet()
     }
 
     /** Manual map center only. This never reads the device's location or computes a route. */

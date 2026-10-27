@@ -129,10 +129,10 @@ const normalizedName = name => name.normalize('NFKD').replace(/\p{M}/gu, '').toL
 const distanceMeters = (a, b) => Math.hypot((a[0] - b[0]) * Math.cos((a[1] + b[1]) * Math.PI / 360), a[1] - b[1]) * 111_195;
 const featureInPolygon = (candidate, polygonCandidate) => polygonCandidate.polygons.some(rings => pointInPolygon(candidate.feature.geometry.coordinates, rings));
 
-export function buildPois(data, bbox = bounds) {
+export function buildPois(data, bbox = bounds, { classify = classifyPoi } = {}) {
   const warnings = [], candidates = [], omitted = [];
   for (const element of data.elements) {
-    const tags = element.tags ?? {}, kind = classifyPoi(tags);
+    const tags = element.tags ?? {}, kind = classify(tags);
     if (!kind) continue;
     const polygons = polygonParts(element, warnings);
     const point = element.type === 'node' && Number.isFinite(element.lon) && Number.isFinite(element.lat) ? [element.lon, element.lat] : representativePoint(polygons, bbox);

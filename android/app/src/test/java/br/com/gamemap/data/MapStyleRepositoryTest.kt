@@ -43,10 +43,13 @@ class MapStyleRepositoryTest {
             assertEquals(PoiCategory.entries.map { "poi-${it.id}" }.toSet(), ids.toSet())
         }
     }
-    @Test fun catalogHasRealCoverageForAllSixGroups() {
+    @Test fun catalogRetainsRealCoverageAndExplicitlyReportsGroupsMissingFromTheSnapshot() {
         val counts = repository.categoryCounts()
         assertEquals(1571, counts.values.sum())
-        assertTrue(counts.values.all { it > 0 })
+        val unavailable = setOf(PoiCategory.EDUCATION, PoiCategory.CULTURE, PoiCategory.RELIGION)
+        assertEquals(unavailable, repository.offlineMissingCategories())
+        assertTrue(counts.filterKeys { it !in unavailable }.values.all { it > 0 })
+        assertTrue(unavailable.all { counts[it] == 0 })
         assertEquals(94, counts[PoiCategory.SHOPS])
     }
     @Test fun nightAppearanceKeepsThemeIdentitySourcesAndFilters() {

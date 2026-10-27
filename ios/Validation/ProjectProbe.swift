@@ -7,6 +7,11 @@ enum ProjectProbe {
     static func main() throws {
         guard CommandLine.arguments.count == 2 else { throw ProbeError.failed("Pass the ios directory") }
         let ios = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
+        try require(PoiCategory.allCases.count == 9, "Nine categories required")
+        try require(PoiCategory.migratedSelection(nil, schemaVersion: 0) == Set(PoiCategory.allCases.map(\.id)), "New install categories")
+        try require(PoiCategory.migratedSelection(["health"], schemaVersion: 0) == ["health", "education", "culture", "religion"], "Legacy category migration")
+        try require(PoiCategory.migratedSelection([], schemaVersion: 0).isEmpty, "Explicit all-off migration")
+        try require(PoiCategory.migratedSelection(["health"], schemaVersion: 2) == ["health"], "Category migration must run once")
         let root = ios.appendingPathComponent("NavSkin/Resources")
         let resources = ResourceCatalog(root: root)
         try require(resources.loadError == nil, "Catalog failed to load")
@@ -68,7 +73,7 @@ enum ProjectProbe {
         for object in objects.values where object["isa"] as? String == "XCBuildConfiguration" {
             guard let settings = object["buildSettings"] as? [String: Any], settings["PRODUCT_NAME"] as? String == "NavSkin" else { continue }
             try require(settings["PRODUCT_MODULE_NAME"] as? String == "NavSkin", "Renamed app module")
-            try require(settings["MARKETING_VERSION"] as? String == "0.5.0", "Marketing version")
+            try require(settings["MARKETING_VERSION"] as? String == "0.6.0", "Marketing version")
             try require(settings["CURRENT_PROJECT_VERSION"] as? String == "1", "Build version")
         }
         for (_, object) in objects where object["isa"] as? String == "PBXFileReference" {

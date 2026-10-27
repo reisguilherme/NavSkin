@@ -3,6 +3,76 @@
   "origin": "Shared NavSkin world styles, Goiânia offline cartography and original navigation artwork.",
   "files": [
     {
+      "path": "game-assets/catalog.json",
+      "bytes": 594,
+      "sha256": "40d65768a3a535add4c4b8c51e13574638d42651afdb51efb38cc99b9d7c5590"
+    },
+    {
+      "path": "game-assets/gta/fonts/pricedow.ttf",
+      "bytes": 36552,
+      "sha256": "973c5294ea6e0fe07e58b986b38c0393244bc835cc65889ca9f7b39b8c89ba1e"
+    },
+    {
+      "path": "game-assets/gta/fonts/pricedow.ttf-0-pricedown-prince-2004-LICENSE.html",
+      "bytes": 9850,
+      "sha256": "c92ac4471e5d8772a9d0456cfdc9ca5b87eacca41e155e29be4ce3fddbb83fe0"
+    },
+    {
+      "path": "game-assets/gta/fonts/pricedow.ttf-1-prince-host-permission.html",
+      "bytes": 399,
+      "sha256": "d4e084b5165f4e2b895e8e94404309d9502b4f1b1d5c8862773b31fdc0010eb6"
+    },
+    {
+      "path": "game-assets/gta/fonts/pricedow.ttf-2-READ_ME.TXT",
+      "bytes": 4782,
+      "sha256": "243d4b93a29ac1a57defbe5f59b1f304919ef736f87c94a8be5a6169579fc099"
+    },
+    {
+      "path": "game-assets/gta/fonts/pricedow.ttf-3-copyright",
+      "bytes": 3905,
+      "sha256": "ef0a6fa6888eabe62c8dd0c177eed01e618dd9efa82a912951f1ccf6b7381ab6"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf",
+      "bytes": 84644,
+      "sha256": "468a87efc589dc45ab1142b28083d8a109192d53af619a7598921e861157ff64"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf-0-HapnaSlabSerif-DemiBold.LICENSING-NOTES.txt",
+      "bytes": 578,
+      "sha256": "f14842976175b4b2e94060b97e2ce66cb7bcc5e6e66cb19d8896e9dcff861ba3"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf-1-HapnaSlabSerif-DemiBold.PROVENANCE.json",
+      "bytes": 1454,
+      "sha256": "09cfafebd9adea96a5f9bce2d222fb652ec42cf2ba34f34137c0e2f72282c0b1"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf-2-Readme-20.11.2019.txt",
+      "bytes": 7847,
+      "sha256": "6cdf78ab604275b95da59b902f4d7da4dcce7aad5a5a402e05acc446fc7266f7"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/RDRLino-Regular.ttf",
+      "bytes": 832152,
+      "sha256": "f1c1d83487c9607e5d9fb22ba6fc74464947134302ceb97aabb4a5e2bafea99f"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/RDRLino-Regular.ttf-0-RDRLino-Regular.LICENSING-NOTES.txt",
+      "bytes": 555,
+      "sha256": "a392f3e72714367bd7c984f5ac30539211ce758df19886bf0dc54a3f65698329"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/RDRLino-Regular.ttf-1-RDRLino-Regular.PROVENANCE.json",
+      "bytes": 1390,
+      "sha256": "304a3adf507f5f65241a792c73a4108fc4255e1de4b9edefba749c95d99adab7"
+    },
+    {
+      "path": "game-assets/rdr2/fonts/RDRLino-Regular.ttf-2-Readme-20.11.2019.txt",
+      "bytes": 7847,
+      "sha256": "6cdf78ab604275b95da59b902f4d7da4dcce7aad5a5a402e05acc446fc7266f7"
+    },
+    {
       "path": "maps/credits/Maki-CC0.txt",
       "bytes": 6555,
       "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
@@ -19,8 +89,8 @@
     },
     {
       "path": "maps/credits/RDR2-Inspired-CC0.txt",
-      "bytes": 288,
-      "sha256": "939fe724295d0ce7453757c11d08a7cea159678b1a082c5f0d0b81f69b186c42"
+      "bytes": 459,
+      "sha256": "550ec6f35c1f4cc880aa4a61b5e5fea488920c21634bc4b46663ee7ac92d751d"
     },
     {
       "path": "maps/credits/Rosa-Pop-CC0.txt",
@@ -29,23 +99,28 @@
     },
     {
       "path": "maps/credits/asset-manifest.json",
-      "bytes": 253292,
-      "sha256": "a6404a22eaac2ddd7a2a87ac7b46248f10ad3fcd1bd5fc0bd9eb21b267cca84d"
+      "bytes": 266201,
+      "sha256": "aca5dee284cdc02df520aaa3d489e0a9ec2ffb25fbd2bd3652dca8aa3037d2fc"
     },
     {
       "path": "maps/credits/attribution.html",
-      "bytes": 1632,
-      "sha256": "09bf3074a5d810a58f71886f7acb6bf080402217cdc5e2f9af6b3a51fa2071c1"
+      "bytes": 1866,
+      "sha256": "b9262585a61a1d14760f36a6f43e254f903392d436523fc53628f2b849d9e8ba"
+    },
+    {
+      "path": "maps/credits/game-assets-provenance.json",
+      "bytes": 13287,
+      "sha256": "0280480783b4454eeab04fe2e94a14d00304d535c45d63175848b9a6d9dff4ed"
     },
     {
       "path": "maps/credits/sources.json",
-      "bytes": 5412,
-      "sha256": "c688ef4251e4f46373793f20acb69ff56f8a0d48263d20e5d360a00987efe1f4"
+      "bytes": 6349,
+      "sha256": "9a8138da84f1b4bf8726b0551f9d2251d7c3c4251bd222041c20642f0a6cd5af"
     },
     {
       "path": "maps/credits/world-attribution.html",
-      "bytes": 1174,
-      "sha256": "4b3c83b144ff8d041a2f2d10c35857695b94c3eff67a348b2a1fcf0cd5ff348c"
+      "bytes": 1427,
+      "sha256": "adf12a43455b2e0c0e6566bd1635ed77e4f74fdfd491088f8f9d2f824ed19fbe"
     },
     {
       "path": "maps/credits/world-sources.json",
@@ -74,8 +149,8 @@
     },
     {
       "path": "maps/data/pois-metadata.json",
-      "bytes": 47430,
-      "sha256": "f24f249763f6adb53ca37c23325dd9883684b3afc2fa145e24ac4dd80b48ecd5"
+      "bytes": 49898,
+      "sha256": "d6795a598aa643c4bc60e405f600a03a8ddd82aff1502021732b324cd372f6a4"
     },
     {
       "path": "maps/data/pois.geojson",
@@ -113,39 +188,184 @@
       "sha256": "9c1d14ddf7cb0313e09350438ce7e90fca409bb27a422a82a1d05f774f50ed18"
     },
     {
+      "path": "maps/glyphs/NavSkinGtaDisplay/0-255.pbf",
+      "bytes": 56378,
+      "sha256": "5d9c6e84bf496366e0574f441ff95a7c024f01aa58880f2667cf58db7ad4f966"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaDisplay/256-511.pbf",
+      "bytes": 121096,
+      "sha256": "b73bc2cac5fe7daefd013cf1e38e275324eacdbffba38d68d76574ddb7b2f0a4"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaDisplay/512-767.pbf",
+      "bytes": 100606,
+      "sha256": "77d42647116753b276472d02a93f5320f4c064388e88d71e6dda02a2dfff0515"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaDisplay/8192-8447.pbf",
+      "bytes": 34267,
+      "sha256": "af75910f9a736001277082f77481e13f7f3c703627df4d59359c0dd6e013323f"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaDisplay/8448-8703.pbf",
+      "bytes": 43530,
+      "sha256": "48e2501dbceb27e1f2c8ae27f45ee53305a984380019fcb190d390f35a671440"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaRoad/0-255.pbf",
+      "bytes": 56378,
+      "sha256": "5d9c6e84bf496366e0574f441ff95a7c024f01aa58880f2667cf58db7ad4f966"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaRoad/256-511.pbf",
+      "bytes": 121096,
+      "sha256": "b73bc2cac5fe7daefd013cf1e38e275324eacdbffba38d68d76574ddb7b2f0a4"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaRoad/512-767.pbf",
+      "bytes": 100606,
+      "sha256": "77d42647116753b276472d02a93f5320f4c064388e88d71e6dda02a2dfff0515"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaRoad/8192-8447.pbf",
+      "bytes": 34267,
+      "sha256": "af75910f9a736001277082f77481e13f7f3c703627df4d59359c0dd6e013323f"
+    },
+    {
+      "path": "maps/glyphs/NavSkinGtaRoad/8448-8703.pbf",
+      "bytes": 43530,
+      "sha256": "48e2501dbceb27e1f2c8ae27f45ee53305a984380019fcb190d390f35a671440"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/0-255.pbf",
+      "bytes": 81475,
+      "sha256": "a10b726f3e583d6a891588e15d0b5ba45fd95773ade210e929b65dec04d1e2d4"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/1024-1279.pbf",
+      "bytes": 136521,
+      "sha256": "8291b46fbcec444701004d211f6cd4aeaec43398fe43343d48bcdf19b20744f5"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/256-511.pbf",
+      "bytes": 133369,
+      "sha256": "65967ff5b833c7794ca4b96d257855619802831607853da2c44e4fdbd0010fb2"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/512-767.pbf",
+      "bytes": 100548,
+      "sha256": "f0aaae1bd8e69a9d5d93fc9f81c79ef2e649c9ee0b6d564b43ce4683a128017c"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/64256-64511.pbf",
+      "bytes": 99368,
+      "sha256": "d9c601601897b676eec7fe8cb8fea6a182513a1350b696b2a1f27ddb07956da6"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/768-1023.pbf",
+      "bytes": 77809,
+      "sha256": "a76271add6e45211c3ccbfb83a2f3f3b78695860a8a861f847a2f3048e7b2fcc"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/7680-7935.pbf",
+      "bytes": 138926,
+      "sha256": "8a6f2b40a2e33a319cad2de6f60cfca07966157bd6f4d1168cfba15560ae30ff"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/8192-8447.pbf",
+      "bytes": 39257,
+      "sha256": "3da466d5da86080cf8e49fab0519384ece2e9cfdcb71f41f8be9d015f518ea01"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/8448-8703.pbf",
+      "bytes": 44559,
+      "sha256": "15a0059b06c970caf855dbfef93077fd50ea810ad1fa1f3222e09f63f0179032"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrMap/8704-8959.pbf",
+      "bytes": 41053,
+      "sha256": "67002dcc337d3235ab9e27b5b84a952bd10f861e2442f12566e8a609f3892160"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/0-255.pbf",
+      "bytes": 71464,
+      "sha256": "d13e0dabea766ac68dff7858b5850dd9a33f571e0a24ec93e843420532d838d4"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/1024-1279.pbf",
+      "bytes": 126769,
+      "sha256": "44b13c2da40d5e34372cea57024dd14d2bf3e2e445c17652632a7ebc23f9f858"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/256-511.pbf",
+      "bytes": 123007,
+      "sha256": "8d339d4d0aec328cc126cf80cea1881e50fb9bc967a17cadabc3e129c6489b99"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/512-767.pbf",
+      "bytes": 98047,
+      "sha256": "1d6d956e8a19b6924006c2c290a3f68108ac47add815e5b4d0d0e863b6e0f2af"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/768-1023.pbf",
+      "bytes": 78412,
+      "sha256": "e15a96b5b05da8c868b2cad41af317506a62226aa2bf9d69ba21e3d9fcd7a9c7"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/7680-7935.pbf",
+      "bytes": 138509,
+      "sha256": "873473ff4c99f2c2e5b98cdcd5dc0c1fcf1a5b961f824ae5f663f96ccc6af5c8"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/8192-8447.pbf",
+      "bytes": 34263,
+      "sha256": "29dad6b34ee3cc1d1d7ec25bca00952fa32e2f36e2c73770d7b50aa0614229a8"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/8448-8703.pbf",
+      "bytes": 43786,
+      "sha256": "404d90c1fc165cd2a384eb39e24b81a4027ef46acc2e1e01f27e887051ebb654"
+    },
+    {
+      "path": "maps/glyphs/NavSkinRdrUi/8704-8959.pbf",
+      "bytes": 40786,
+      "sha256": "0a0bcc66d16dc4fc4d8fc3cdf1b2b55b1b9222de6cad9560764b1838bdccb089"
+    },
+    {
       "path": "maps/previews/gta.png",
-      "bytes": 613155,
-      "sha256": "496b9e2d603017201335eeea257656fc388ca0268fe8b9333ff8db1a1d7f0222"
+      "bytes": 293615,
+      "sha256": "b8523b5bb241bf60ceb7904cac31df22ca51200609b315e99102dbc095e1ab37"
     },
     {
       "path": "maps/previews/gta.webp",
-      "bytes": 167772,
-      "sha256": "22246e856a338229ab0ea3d3e5315d2f4edb2b14e1d31cc5ea6655019bdc09ee"
+      "bytes": 39040,
+      "sha256": "79fa2349cc59563f4760addc13e711a31c2143a7ae5b0bbdfa7969eca6219f02"
     },
     {
       "path": "maps/previews/index.json",
-      "bytes": 1891,
-      "sha256": "4c2308dafccb437fa1b6d79c91254ad41f12a851d76c2831a99aa1fe94737169"
+      "bytes": 2056,
+      "sha256": "93f76d8f968a6db0a16d7e1ab2fe5fa41136609cfd2826a0c14583286ff2dc7d"
     },
     {
       "path": "maps/previews/rdr2.png",
-      "bytes": 805624,
-      "sha256": "be86bf3e22f7d20b464bd6ca3a807674e025b3ce8ba6cff45ec558f695cc6637"
+      "bytes": 312056,
+      "sha256": "369d838808eeb380e295bcd9fcb24cb516b2d73bb353b48726a955f1e0dd25b5"
     },
     {
       "path": "maps/previews/rdr2.webp",
-      "bytes": 168124,
-      "sha256": "e679be7e6fd15549c298fb3de15a71e5f0fe30096d8c79162cf8fce3e465257d"
+      "bytes": 38406,
+      "sha256": "c5e45d0e0f6ee0edf9ee0918b8d3bdf3f45f1f560446a2fa100bcb9eb1f7cd57"
     },
     {
       "path": "maps/previews/rosa.png",
-      "bytes": 816346,
-      "sha256": "10ba71bd9fa442adb5caf9a4bd810257b390ff6b572770aec1542f7fe9c41b33"
+      "bytes": 375820,
+      "sha256": "ae7a004970d20f1afce35d672ada660862d864b0be4463fffb9e7d485c3a6a49"
     },
     {
       "path": "maps/previews/rosa.webp",
-      "bytes": 186488,
-      "sha256": "912fdda9095c1cb74ff265385c7848ca58b5e6074cac7541582690cdfb396e23"
+      "bytes": 53536,
+      "sha256": "f18b0f40b3ae3b87a93d1637123d4006bb9d4f83237095206c2a8c8023bc4da4"
     },
     {
       "path": "maps/probe-style.json",
@@ -154,128 +374,128 @@
     },
     {
       "path": "maps/sprites/gta.json",
-      "bytes": 618,
-      "sha256": "e9987cfe08cc3395a61a5ea9617494dbdd1119ea5bffadb237a19bfb7968e098"
+      "bytes": 2206,
+      "sha256": "e05681c4cb587370aab481e4cfcccfdb2618d7870dd6002d5b1b453d10804d0f"
     },
     {
       "path": "maps/sprites/gta.png",
-      "bytes": 3733,
-      "sha256": "ae8efb5f0960bcf4197e960f1f2a6b305d3af85a840c8e691902d004b06f99de"
+      "bytes": 6276,
+      "sha256": "936e28195360856cd0d860981207df7c6955d6a7287ab978d970a9a7bd8251d4"
     },
     {
       "path": "maps/sprites/gta@2x.json",
-      "bytes": 619,
-      "sha256": "f5eef42334fb8c8cc1662fd34993478a40498a21cc86222bb0317c2cd367d4ee"
+      "bytes": 2214,
+      "sha256": "0bbf78889415f5572f9575f4b3df1691f62d013b7224836a4448b50babcd5e77"
     },
     {
       "path": "maps/sprites/gta@2x.png",
-      "bytes": 8311,
-      "sha256": "8b39562c24850a2ba0f7a659fe6e482d24c4f449b0b6ce4479df710da49ca547"
+      "bytes": 19556,
+      "sha256": "f87da14f499010ff239c5ab75690f555f69e23f42fae7b6cace363ceb2dc6d78"
     },
     {
       "path": "maps/sprites/rdr2.json",
-      "bytes": 618,
-      "sha256": "e9987cfe08cc3395a61a5ea9617494dbdd1119ea5bffadb237a19bfb7968e098"
+      "bytes": 2206,
+      "sha256": "e05681c4cb587370aab481e4cfcccfdb2618d7870dd6002d5b1b453d10804d0f"
     },
     {
       "path": "maps/sprites/rdr2.png",
-      "bytes": 2328,
-      "sha256": "28181af16046cc7dc07147a06b16d6831c88143577d08640da7ff7a87d9dd08c"
+      "bytes": 13287,
+      "sha256": "d8065f5c8027b589cb21a28d50a339baaadd1be67d45ec4c9faa4d4ccdcd0d7b"
     },
     {
       "path": "maps/sprites/rdr2@2x.json",
-      "bytes": 619,
-      "sha256": "f5eef42334fb8c8cc1662fd34993478a40498a21cc86222bb0317c2cd367d4ee"
+      "bytes": 2214,
+      "sha256": "0bbf78889415f5572f9575f4b3df1691f62d013b7224836a4448b50babcd5e77"
     },
     {
       "path": "maps/sprites/rdr2@2x.png",
-      "bytes": 4705,
-      "sha256": "1ba413dcfe9b9707940bfbd6b7fd5bf587bb8aa137e02be219e7785c3ce5df0f"
+      "bytes": 53225,
+      "sha256": "36f62fc2589504a92504954b3d9627ed4c1de5195a411231512abe26050a1fab"
     },
     {
       "path": "maps/sprites/rosa.json",
-      "bytes": 618,
-      "sha256": "e9987cfe08cc3395a61a5ea9617494dbdd1119ea5bffadb237a19bfb7968e098"
+      "bytes": 2206,
+      "sha256": "e05681c4cb587370aab481e4cfcccfdb2618d7870dd6002d5b1b453d10804d0f"
     },
     {
       "path": "maps/sprites/rosa.png",
-      "bytes": 4658,
-      "sha256": "c4906ed81e77c9084a93e6bee6cf4e03e618d60d7ecbada15f040c6bea4548ea"
+      "bytes": 10586,
+      "sha256": "f687e9880f38f3d3fa73ac6fc5aca2934fd5fb0af1282868a47430520272ec53"
     },
     {
       "path": "maps/sprites/rosa@2x.json",
-      "bytes": 619,
-      "sha256": "f5eef42334fb8c8cc1662fd34993478a40498a21cc86222bb0317c2cd367d4ee"
+      "bytes": 2214,
+      "sha256": "0bbf78889415f5572f9575f4b3df1691f62d013b7224836a4448b50babcd5e77"
     },
     {
       "path": "maps/sprites/rosa@2x.png",
-      "bytes": 9943,
-      "sha256": "362b8880c20b30ebed786e748bc6e08c62e6d397513e70fbf930b82991843678"
+      "bytes": 23195,
+      "sha256": "d65887653ab211e1efe0e1d7106c911e96af0f56e29a26248c107cd235d7710f"
     },
     {
       "path": "maps/styles/gta-night.json",
-      "bytes": 592800,
-      "sha256": "d41eb540eaa11d86a2c4c7fc3a60814ae090abfbbe6fa91b29be8634df1cf958"
+      "bytes": 603469,
+      "sha256": "54044c682415977664f691f440c4d15fc8a95defbd1e360da85e9779e7082a05"
     },
     {
       "path": "maps/styles/gta.json",
-      "bytes": 592732,
-      "sha256": "3e0e7ed0aad905c24c16c2db0d880de643614116b94fd48134e2abcb41f572d4"
+      "bytes": 603401,
+      "sha256": "2a7da8b5532faf292dd6250382a3c2c318679010ad50e871431dece7459a5551"
     },
     {
       "path": "maps/styles/rdr2-night.json",
-      "bytes": 592851,
-      "sha256": "b9777b3fc00ad27bdd2bf85b7bee2988a3cc3b84e9ed28ef8d8081f5b8d22237"
+      "bytes": 603073,
+      "sha256": "cce396f6df12184789345b947517c88af76348f3b29423bc912f02916a5a878e"
     },
     {
       "path": "maps/styles/rdr2.json",
-      "bytes": 592782,
-      "sha256": "42f53bbdf0d594d90d22a7b42957ca244f00f0c487c46c2d156e7996fc699b41"
+      "bytes": 603004,
+      "sha256": "6f68e94555a70ba72f4ff5599c2f95fe492e6157bf27923f2a4fa75644ebbd2e"
     },
     {
       "path": "maps/styles/rosa-night.json",
-      "bytes": 592846,
-      "sha256": "c07ce1ccbc84b63763549852b5c6e90b92470322123dada1a2636d3f92528dde"
+      "bytes": 602740,
+      "sha256": "5e27a16a6e68b81a4105dda1500a7346fc7c36f04f1e477977dc898bb596c631"
     },
     {
       "path": "maps/styles/rosa.json",
-      "bytes": 592777,
-      "sha256": "3502f591c2ebc952ad51778a5242830da7cac9f7a67f05eeb8215af23f80bc41"
+      "bytes": 602671,
+      "sha256": "ddccf278b5be22d6d42f361127465da7c26628e46b92cdbed091e2e9343333e0"
     },
     {
       "path": "maps/styles/theme-tokens.json",
-      "bytes": 8007,
-      "sha256": "38abdec9fe0154b6e64f737a10b5a7a8ec92021ccb43b64abb56b5b620e40beb"
+      "bytes": 8867,
+      "sha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4"
     },
     {
       "path": "maps/styles/world-gta-night.json",
-      "bytes": 115453,
-      "sha256": "0c5a94dc8fd42b768b99c737e8886bcb2cf1108abb785bda6f1bf83c290c447d"
+      "bytes": 126933,
+      "sha256": "b3f8bbbbdc644b4503b722034cfb3e23fb1a15b90b5d4b265b52a4bfec6a43d5"
     },
     {
       "path": "maps/styles/world-gta.json",
-      "bytes": 115436,
-      "sha256": "3b6004f1ab9c0e1ec0e9ebdd81a29f5ffdeafe184d7e272178f48b40f18ea8df"
+      "bytes": 126916,
+      "sha256": "c169871692807efffbc00779db1938b53643d70edd3df96041772837b57b87fe"
     },
     {
       "path": "maps/styles/world-rdr2-night.json",
-      "bytes": 115494,
-      "sha256": "80cc6a5beaf354533e00ec83d85a27e58fbe12d94648cffd385fa0e68cc306f4"
+      "bytes": 126852,
+      "sha256": "e87df9a501a03a5aae5d1f13969e6268a34ebc995b7e23fd0c69e2935642bd05"
     },
     {
       "path": "maps/styles/world-rdr2.json",
-      "bytes": 115477,
-      "sha256": "b5bfc2cc381cd06826aa1f890af8a68d0aeec581a9807a4e3eaf1578191522af"
+      "bytes": 126835,
+      "sha256": "624ef8a0318e9010244e3f7fa7c8093c67277903b24234722e61f856abc1f60b"
     },
     {
       "path": "maps/styles/world-rosa-night.json",
-      "bytes": 115499,
-      "sha256": "2669e40d0c46b0c6d7f9b5e19221f4427a542dc66d842d54a85c0817793c21cf"
+      "bytes": 126557,
+      "sha256": "ccf4851c19e91f1b98f73d053ab67657fdb312b7960ef12b231bd8410de2d170"
     },
     {
       "path": "maps/styles/world-rosa.json",
-      "bytes": 115482,
-      "sha256": "273821d9872aec0daab9350c825e001ef1bddb9c28d8f1507ec5a28846defd4b"
+      "bytes": 126540,
+      "sha256": "c127ef55e98b5dc828291ee6db69d4b365e84370fa35d62f8523435e97ecc465"
     },
     {
       "path": "maps/tiles/buildings/11/743/1120.pbf",

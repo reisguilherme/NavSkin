@@ -18,7 +18,7 @@ class PreferenceStoreTest {
         context = RuntimeEnvironment.getApplication()
         context.getSharedPreferences(PreferenceStore.FILE_NAME, Context.MODE_PRIVATE).edit().clear().commit()
     }
-    @Test fun firstRunHasWorldGtaAndSixCategories() {
+    @Test fun firstRunHasWorldGtaAndNineCategories() {
         PreferenceStore(context).use { store ->
             assertEquals(MapBaseMode.WORLD, store.snapshot().baseMapMode)
             assertEquals(MapTheme.GTA_SA, store.snapshot().theme)
@@ -48,9 +48,16 @@ class PreferenceStoreTest {
         PreferenceStore(context).use {
             assertEquals(MapBaseMode.WORLD, it.snapshot().baseMapMode)
             assertEquals(MapTheme.RDR2, it.snapshot().theme)
-            assertEquals(setOf(PoiCategory.HEALTH), it.snapshot().enabledCategories)
+            assertEquals(setOf(PoiCategory.HEALTH, PoiCategory.EDUCATION, PoiCategory.CULTURE, PoiCategory.RELIGION), it.snapshot().enabledCategories)
+            it.setCategoryEnabled(PoiCategory.EDUCATION, false)
         }
+        PreferenceStore(context).use { assertFalse(PoiCategory.EDUCATION in it.snapshot().enabledCategories) }
         assertEquals(MapBaseMode.WORLD, MapBaseMode.fromId("unknown-future-mode"))
+    }
+    @Test fun legacyExplicitAllOffRemainsOffWhenNewGroupsArrive() {
+        context.getSharedPreferences(PreferenceStore.FILE_NAME, Context.MODE_PRIVATE).edit()
+            .putStringSet("poi_categories", emptySet()).commit()
+        PreferenceStore(context).use { assertTrue(it.snapshot().enabledCategories.isEmpty()) }
     }
     @Test fun coverageChangeNotifiesVisiblePhoneAndCarObservers() {
         PreferenceStore(context).use { store ->

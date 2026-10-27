@@ -501,6 +501,7 @@ internal class PhoneNavigationUi(
         newDialog.setContentView(scroll)
         newDialog.setOnDismissListener { if (dialog === newDialog) { dialog = null; searchStatus = null; searchResults = null } }
         newDialog.setOnShowListener {
+            newDialog.window?.decorView?.let { GameTypography.observe(it) { app.preferences.snapshot().theme } }
             newDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let { frame ->
                 frame.layoutParams.height = (activity.resources.displayMetrics.heightPixels * .82).toInt()
                 frame.layoutParams = frame.layoutParams

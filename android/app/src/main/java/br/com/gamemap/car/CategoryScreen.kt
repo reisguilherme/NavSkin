@@ -23,6 +23,7 @@ class CategoryScreen(
     override fun onGetTemplate(): Template {
         val state = preferences.snapshot()
         val counts = maps.categoryCounts()
+        val offlineMissing = maps.offlineMissingCategories()
         val pageSize = hostListLimit(carContext)
         val pageCount = (PoiCategory.entries.size + pageSize - 1) / pageSize
         page = page.coerceIn(0, pageCount - 1)
@@ -30,6 +31,7 @@ class CategoryScreen(
         PoiCategory.entries.drop(page * pageSize).take(pageSize).forEach { category ->
             items.addItem(Row.Builder().setTitle(category.label)
                 .addText(if (state.baseMapMode == MapBaseMode.WORLD) "Locais no mapa mundial · dados OpenStreetMap"
+                    else if (category in offlineMissing) "Não incluído neste snapshot"
                     else "${counts[category] ?: 0} pontos no recorte offline")
                 .setToggle(Toggle.Builder { enabled ->
                     preferences.setCategoryEnabled(category, enabled)

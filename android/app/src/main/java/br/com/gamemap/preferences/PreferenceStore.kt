@@ -16,7 +16,18 @@ class PreferenceStore(context: Context) : AutoCloseable {
             listeners.toList().forEach { it(state) }
         }
     }
-    init { storage.registerOnSharedPreferenceChangeListener(changed) }
+    init {
+        if (storage.getInt(CATEGORY_SCHEMA, 0) < 2) {
+            val previous = storage.getStringSet(CATEGORIES, null)
+            val edit = storage.edit().putInt(CATEGORY_SCHEMA, 2)
+            // Preserve an explicit "all off"; enable newly introduced groups once
+            // for an existing nonempty selection without changing earlier toggles.
+            if (!previous.isNullOrEmpty()) edit.putStringSet(CATEGORIES,
+                previous + setOf(PoiCategory.EDUCATION.id, PoiCategory.CULTURE.id, PoiCategory.RELIGION.id))
+            check(edit.commit()) { "Não foi possível atualizar as categorias" }
+        }
+        storage.registerOnSharedPreferenceChangeListener(changed)
+    }
 
     fun snapshot(): MapPreferences {
         val categories = storage.getStringSet(CATEGORIES, null)
@@ -61,6 +72,7 @@ class PreferenceStore(context: Context) : AutoCloseable {
         const val FILE_NAME = "gamemap_preferences_v1"
         private const val THEME = "map_theme"
         private const val CATEGORIES = "poi_categories"
+        private const val CATEGORY_SCHEMA = "poi_categories_schema"
         private const val BASE_MAP_MODE = "base_map_mode"
     }
 }

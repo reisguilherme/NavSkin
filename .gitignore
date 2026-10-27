@@ -19,3 +19,39 @@ data/overture/buildings.raw.geojson.state
 data/overture/building-collection.json
 docs/brief.txt
 docs/*-brief.txt
+
+# Original game asset pack: local delivery with retained third-party notices.
+android/maps/game-assets/runtime/
+android/maps/game-assets/glyphs/
+android/app/src/main/assets/game-assets/
+android/app/src/main/assets/maps/glyphs/NavSkin*/
+ios/NavSkin/Resources/game-assets/
+ios/NavSkin/Resources/maps/glyphs/NavSkin*/
+android/app/src/main/assets/maps/sprites/gta*
+android/app/src/main/assets/maps/sprites/rdr2*
+ios/NavSkin/Resources/maps/sprites/gta*
+ios/NavSkin/Resources/maps/sprites/rdr2*
+android/maps/icons/gta/poi-food.svg
+android/maps/icons/gta/poi-health.svg
+android/maps/icons/gta/poi-parking.svg
+android/maps/icons/gta/poi-restaurant.svg
+android/maps/icons/gta/poi-cafe.svg
+android/maps/icons/gta/poi-fast-food.svg
+android/maps/icons/gta/poi-hospital.svg
+android/maps/icons/gta/poi-clinic.svg
+android/maps/icons/gta/poi-pharmacy.svg
+android/maps/icons/gta/poi-bar.svg
+android/maps/icons/rdr2/poi-food.svg
+android/maps/icons/rdr2/poi-health.svg
+android/maps/icons/rdr2/poi-shops.svg
+android/maps/icons/rdr2/poi-restaurant.svg
+android/maps/icons/rdr2/poi-cafe.svg
+android/maps/icons/rdr2/poi-fast-food.svg
+android/maps/icons/rdr2/poi-hospital.svg
+android/maps/icons/rdr2/poi-clinic.svg
+android/maps/icons/rdr2/poi-pharmacy.svg
+android/maps/icons/rdr2/poi-bar.svg
+android/maps/icons/rdr2/poi-theatre.svg
+
+# Historical duplicate screenshots from isolated emulator runs.
+android/screenshots/v0.6/* (*).png

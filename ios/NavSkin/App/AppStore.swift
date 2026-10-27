@@ -32,8 +32,11 @@ final class AppStore: ObservableObject {
         preferences = defaults
         theme = MapTheme(rawValue: defaults.string(forKey: "map_theme") ?? "gta") ?? .gta
         baseMapMode = MapBaseMode(rawValue: defaults.string(forKey: "base_map_mode") ?? "world") ?? .world
-        enabledCategories = Set(defaults.stringArray(forKey: "poi_categories") ?? PoiCategory.allCases.map(\.rawValue))
-            .intersection(Set(PoiCategory.allCases.map(\.rawValue)))
+        let initialCategories = PoiCategory.migratedSelection(defaults.stringArray(forKey: "poi_categories"),
+            schemaVersion: defaults.integer(forKey: "poi_categories_schema"))
+        enabledCategories = initialCategories
+        defaults.set(initialCategories.sorted(), forKey: "poi_categories")
+        defaults.set(2, forKey: "poi_categories_schema")
         navigationPreferences = defaults.data(forKey: "navigation_preferences")
             .flatMap { try? JSONDecoder().decode(NavigationPreferences.self, from: $0) } ?? NavigationPreferences()
         let assets = (Bundle.main.resourceURL ?? Bundle.main.bundleURL).appendingPathComponent("Resources", isDirectory: true)

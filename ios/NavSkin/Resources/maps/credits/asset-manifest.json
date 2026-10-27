@@ -40,17 +40,17 @@
       ]
     }
   },
-  "totalBytes": 139016410,
+  "totalBytes": 141625660,
   "buildInputs": [
     {
       "path": "scripts/prepare-android-maps.mjs",
-      "bytes": 28381,
-      "sha256": "1ce444898cd5edceb13d57a57d19b2f9d76224665d72093d14a15eb782efb543"
+      "bytes": 30904,
+      "sha256": "12c4a95ccf735c3bed5ef3198a2bdfb66c636d953176b71e44f97066086e24cb"
     },
     {
       "path": "scripts/prepare-world-maps.mjs",
-      "bytes": 12949,
-      "sha256": "b2ddc882b63ce7d930570050adcaaab9f21d80dc246af14c5c865da007a6b7f2"
+      "bytes": 16309,
+      "sha256": "54308354ae0a51701f0ee9c8218dcf96854810e4059e9f3caf50e0b2e37cf745"
     },
     {
       "path": "android/maps/world-source.json",
@@ -69,43 +69,148 @@
     },
     {
       "path": "android/maps/theme-tokens.json",
-      "bytes": 8007,
-      "sha256": "38abdec9fe0154b6e64f737a10b5a7a8ec92021ccb43b64abb56b5b620e40beb"
+      "bytes": 8867,
+      "sha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-bar.svg",
+      "bytes": 584,
+      "sha256": "56a145a721654e1745389b38519f67cddf0fbaa1d1b7f13bf1e344d2ea150e96"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-cafe.svg",
+      "bytes": 571,
+      "sha256": "671a6702a398ece88872e3f250992d26e59ceef59b1e1f1b4fa01a3164fffc08"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-clinic.svg",
+      "bytes": 496,
+      "sha256": "a217fe496d80a08bfc8d84420a5aed478212c708be585176277261ecff9ebdb8"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-culture.svg",
+      "bytes": 352,
+      "sha256": "445e460834d8a5311001ee1a2432d8551c0b963888da51870ccee26e4097418e"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-education.svg",
+      "bytes": 379,
+      "sha256": "74723fe5ff79e6ba79caa4121d55ae2514294a19c3e00700f4a417e238a63a06"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-fast-food.svg",
+      "bytes": 745,
+      "sha256": "79ec8df0983ec0851e5c910be5ab32f302266505ed955e7affc713d382f97e1a"
     },
     {
       "path": "android/maps/icons/gta/poi-food.svg",
-      "bytes": 968,
-      "sha256": "8e65989a7bb9b6610d4e387874c9eb0cadcfdff71834c332c218ba1127fc52e8"
+      "bytes": 571,
+      "sha256": "671a6702a398ece88872e3f250992d26e59ceef59b1e1f1b4fa01a3164fffc08"
     },
     {
       "path": "android/maps/icons/gta/poi-fuel.svg",
-      "bytes": 1102,
-      "sha256": "db5e2c726e29b85721c984980ca62ba25a638b6d9d16879c04c246536d6e553c"
+      "bytes": 367,
+      "sha256": "4b03616e92d178f94cd81d8d3f564cd7e01a2138e8c777475d8c737bc22e24be"
     },
     {
       "path": "android/maps/icons/gta/poi-health.svg",
-      "bytes": 786,
-      "sha256": "51f6b3b2901d496263257ddaa4a329d16716f7892625ced81598a799e3263c19"
+      "bytes": 496,
+      "sha256": "a217fe496d80a08bfc8d84420a5aed478212c708be585176277261ecff9ebdb8"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-hospital.svg",
+      "bytes": 496,
+      "sha256": "a217fe496d80a08bfc8d84420a5aed478212c708be585176277261ecff9ebdb8"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-museum.svg",
+      "bytes": 352,
+      "sha256": "445e460834d8a5311001ee1a2432d8551c0b963888da51870ccee26e4097418e"
     },
     {
       "path": "android/maps/icons/gta/poi-parking.svg",
-      "bytes": 707,
-      "sha256": "1cf99b34764c6aed354307bc9a4b90a8bbd121ed6016c5c1ceba2c3bdc271e28"
+      "bytes": 650,
+      "sha256": "60ccb77e08e4caa9a73a344ed1d059d7dec26334a99ec28dfe6a1e1ccdc15f25"
     },
     {
       "path": "android/maps/icons/gta/poi-parks.svg",
-      "bytes": 1633,
-      "sha256": "ed77cef897685b3a612a57642e3a42b664e0356bafb725934772ab195d6dd144"
+      "bytes": 393,
+      "sha256": "f59eb04cc9886af9996deedf4aff15f9e4fb96518dc116a9056c9c63e6fd5057"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-pharmacy.svg",
+      "bytes": 496,
+      "sha256": "a217fe496d80a08bfc8d84420a5aed478212c708be585176277261ecff9ebdb8"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-religion.svg",
+      "bytes": 321,
+      "sha256": "4fc75827676f88b49b000a2c590609e085841fe55a3e55c2aca7b57007e9cd0b"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-restaurant.svg",
+      "bytes": 588,
+      "sha256": "fa0c41223b0be26efd0229f7b98e2290371eb2bc408d0032a6032fcb3dd08d5a"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-school.svg",
+      "bytes": 379,
+      "sha256": "74723fe5ff79e6ba79caa4121d55ae2514294a19c3e00700f4a417e238a63a06"
     },
     {
       "path": "android/maps/icons/gta/poi-shops.svg",
-      "bytes": 1817,
-      "sha256": "a877c07d79aa906abe7c01f29f8b4464b809b51cfa6cf4d1c2ed98a5fcb423c3"
+      "bytes": 346,
+      "sha256": "c8a23f4bf5dbad987884a151da4a4978639be7d8b6a7802dff07f792503e7c7e"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-theatre.svg",
+      "bytes": 388,
+      "sha256": "8a913d9f3fa92c299f1f4a81d45f980d76c7c4cc53e5a5f4a0d822f6c1b272ab"
+    },
+    {
+      "path": "android/maps/icons/gta/poi-worship.svg",
+      "bytes": 321,
+      "sha256": "4fc75827676f88b49b000a2c590609e085841fe55a3e55c2aca7b57007e9cd0b"
+    },
+    {
+      "path": "android/maps/icons/gta/road-oneway-forward.svg",
+      "bytes": 338,
+      "sha256": "0df89296d1a3667060ed024e73363e4925ca8d2abcd3c8167c5cc3e5f281d493"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-bar.svg",
+      "bytes": 2389,
+      "sha256": "138838666eebbf1824d791be1638f150e1cdd547c26e620fc1bc1537df1ca288"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-cafe.svg",
+      "bytes": 2389,
+      "sha256": "138838666eebbf1824d791be1638f150e1cdd547c26e620fc1bc1537df1ca288"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-clinic.svg",
+      "bytes": 2138,
+      "sha256": "26dafecd2268548fe90b6144ed7fe6176529681637a4f7cbccf2c69ea055861d"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-culture.svg",
+      "bytes": 367,
+      "sha256": "b87538aaad433610ca3875abd433c38156c814a71f22b99889d28e6dc3463c6c"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-education.svg",
+      "bytes": 394,
+      "sha256": "b5272ca5c27200449db2b722207a6b9b17981d2f29ea3d705fef5ecb9907a8a8"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-fast-food.svg",
+      "bytes": 1964,
+      "sha256": "1299db25fa26211e450a898d756b23b0a51e8ea0ca4b0665df749377b0c71ade"
     },
     {
       "path": "android/maps/icons/rdr2/poi-food.svg",
-      "bytes": 612,
-      "sha256": "95a6610f29f9b656235398af2fe7d650095251495e3d107c3477d812887dfc3b"
+      "bytes": 1964,
+      "sha256": "1299db25fa26211e450a898d756b23b0a51e8ea0ca4b0665df749377b0c71ade"
     },
     {
       "path": "android/maps/icons/rdr2/poi-fuel.svg",
@@ -114,8 +219,18 @@
     },
     {
       "path": "android/maps/icons/rdr2/poi-health.svg",
-      "bytes": 667,
-      "sha256": "d4a285970711917befa2b912131b8bc5391041c8336086a3cc235847848a9c2a"
+      "bytes": 2138,
+      "sha256": "26dafecd2268548fe90b6144ed7fe6176529681637a4f7cbccf2c69ea055861d"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-hospital.svg",
+      "bytes": 2138,
+      "sha256": "26dafecd2268548fe90b6144ed7fe6176529681637a4f7cbccf2c69ea055861d"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-museum.svg",
+      "bytes": 367,
+      "sha256": "b87538aaad433610ca3875abd433c38156c814a71f22b99889d28e6dc3463c6c"
     },
     {
       "path": "android/maps/icons/rdr2/poi-parking.svg",
@@ -128,9 +243,74 @@
       "sha256": "fa59c9cc8947b04920b712e1e766d2cf0e9ac90a9b7b2fa9d75e44c9a74308dd"
     },
     {
+      "path": "android/maps/icons/rdr2/poi-pharmacy.svg",
+      "bytes": 2138,
+      "sha256": "26dafecd2268548fe90b6144ed7fe6176529681637a4f7cbccf2c69ea055861d"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-religion.svg",
+      "bytes": 336,
+      "sha256": "724d301079541d39559f912ea48ba661c3e81a1063cfa610b054f523814024ce"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-restaurant.svg",
+      "bytes": 1964,
+      "sha256": "1299db25fa26211e450a898d756b23b0a51e8ea0ca4b0665df749377b0c71ade"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-school.svg",
+      "bytes": 394,
+      "sha256": "b5272ca5c27200449db2b722207a6b9b17981d2f29ea3d705fef5ecb9907a8a8"
+    },
+    {
       "path": "android/maps/icons/rdr2/poi-shops.svg",
-      "bytes": 661,
-      "sha256": "47c3bfba09483f7d55cda7db4d5e7fd3203c0c89d8ddc74acb84e7fb6d056b91"
+      "bytes": 2053,
+      "sha256": "62297385f73433d05348ead95c2f2aebce69ecd88d1861b5786fbcc44811362f"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-theatre.svg",
+      "bytes": 2202,
+      "sha256": "7f7faeea3435e61f28fe7f880b6999c319eae49562bdc8e12b50ee47682413d7"
+    },
+    {
+      "path": "android/maps/icons/rdr2/poi-worship.svg",
+      "bytes": 336,
+      "sha256": "724d301079541d39559f912ea48ba661c3e81a1063cfa610b054f523814024ce"
+    },
+    {
+      "path": "android/maps/icons/rdr2/road-oneway-forward.svg",
+      "bytes": 338,
+      "sha256": "0df89296d1a3667060ed024e73363e4925ca8d2abcd3c8167c5cc3e5f281d493"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-bar.svg",
+      "bytes": 686,
+      "sha256": "5882edb629a2c2561c174d2b39200ad5db1c15422d8f5a4d31cb24998ea3f306"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-cafe.svg",
+      "bytes": 686,
+      "sha256": "5882edb629a2c2561c174d2b39200ad5db1c15422d8f5a4d31cb24998ea3f306"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-clinic.svg",
+      "bytes": 660,
+      "sha256": "9b10348a7c8894ffa5a88018040da1564170f3207acf1829f431efd5ef00fec9"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-culture.svg",
+      "bytes": 352,
+      "sha256": "60c71ce5f58babfc98bdf98bcea3d6f514cd19ae464c3a5a74aad6df4ca45b60"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-education.svg",
+      "bytes": 379,
+      "sha256": "5a33a19995dbe720e1a7e9e3de4e082af99465135517bf1bb5772a7981d3ec11"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-fast-food.svg",
+      "bytes": 686,
+      "sha256": "5882edb629a2c2561c174d2b39200ad5db1c15422d8f5a4d31cb24998ea3f306"
     },
     {
       "path": "android/maps/icons/rosa/poi-food.svg",
@@ -148,6 +328,16 @@
       "sha256": "9b10348a7c8894ffa5a88018040da1564170f3207acf1829f431efd5ef00fec9"
     },
     {
+      "path": "android/maps/icons/rosa/poi-hospital.svg",
+      "bytes": 660,
+      "sha256": "9b10348a7c8894ffa5a88018040da1564170f3207acf1829f431efd5ef00fec9"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-museum.svg",
+      "bytes": 352,
+      "sha256": "60c71ce5f58babfc98bdf98bcea3d6f514cd19ae464c3a5a74aad6df4ca45b60"
+    },
+    {
       "path": "android/maps/icons/rosa/poi-parking.svg",
       "bytes": 719,
       "sha256": "7b2a48f803e4df69914b1def23d0eb233c6b95b6b6859625cb1764edcd9ae42e"
@@ -158,9 +348,44 @@
       "sha256": "591d49980fb9ff3f1081a9e1128ba7d020957371ce8d41cf7e5b801723a37494"
     },
     {
+      "path": "android/maps/icons/rosa/poi-pharmacy.svg",
+      "bytes": 660,
+      "sha256": "9b10348a7c8894ffa5a88018040da1564170f3207acf1829f431efd5ef00fec9"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-religion.svg",
+      "bytes": 321,
+      "sha256": "812f89951b56f9a0b6dd505673a0b68f009a6ef12b63aa707b2005189ba09eb2"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-restaurant.svg",
+      "bytes": 686,
+      "sha256": "5882edb629a2c2561c174d2b39200ad5db1c15422d8f5a4d31cb24998ea3f306"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-school.svg",
+      "bytes": 379,
+      "sha256": "5a33a19995dbe720e1a7e9e3de4e082af99465135517bf1bb5772a7981d3ec11"
+    },
+    {
       "path": "android/maps/icons/rosa/poi-shops.svg",
       "bytes": 841,
       "sha256": "9e648f4250f5c98cfd60a19409449be8d9629fbbf271c79241ce41a3a190d8d1"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-theatre.svg",
+      "bytes": 388,
+      "sha256": "0fb5eb17567b58a9db0688a0b121c717407260f015afe63e81695c755e181113"
+    },
+    {
+      "path": "android/maps/icons/rosa/poi-worship.svg",
+      "bytes": 321,
+      "sha256": "812f89951b56f9a0b6dd505673a0b68f009a6ef12b63aa707b2005189ba09eb2"
+    },
+    {
+      "path": "android/maps/icons/rosa/road-oneway-forward.svg",
+      "bytes": 338,
+      "sha256": "0df89296d1a3667060ed024e73363e4925ca8d2abcd3c8167c5cc3e5f281d493"
     },
     {
       "path": "android/maps/fonts/GameMapSans/0-255.pbf",
@@ -196,70 +421,70 @@
   "files": [
     {
       "path": "styles/gta-night.json",
-      "bytes": 592800,
-      "sha256": "d41eb540eaa11d86a2c4c7fc3a60814ae090abfbbe6fa91b29be8634df1cf958"
+      "bytes": 603469,
+      "sha256": "54044c682415977664f691f440c4d15fc8a95defbd1e360da85e9779e7082a05"
     },
     {
       "path": "styles/gta.json",
-      "bytes": 592732,
-      "sha256": "3e0e7ed0aad905c24c16c2db0d880de643614116b94fd48134e2abcb41f572d4"
+      "bytes": 603401,
+      "sha256": "2a7da8b5532faf292dd6250382a3c2c318679010ad50e871431dece7459a5551"
     },
     {
       "path": "styles/rdr2-night.json",
-      "bytes": 592851,
-      "sha256": "b9777b3fc00ad27bdd2bf85b7bee2988a3cc3b84e9ed28ef8d8081f5b8d22237"
+      "bytes": 603073,
+      "sha256": "cce396f6df12184789345b947517c88af76348f3b29423bc912f02916a5a878e"
     },
     {
       "path": "styles/rdr2.json",
-      "bytes": 592782,
-      "sha256": "42f53bbdf0d594d90d22a7b42957ca244f00f0c487c46c2d156e7996fc699b41"
+      "bytes": 603004,
+      "sha256": "6f68e94555a70ba72f4ff5599c2f95fe492e6157bf27923f2a4fa75644ebbd2e"
     },
     {
       "path": "styles/rosa-night.json",
-      "bytes": 592846,
-      "sha256": "c07ce1ccbc84b63763549852b5c6e90b92470322123dada1a2636d3f92528dde"
+      "bytes": 602740,
+      "sha256": "5e27a16a6e68b81a4105dda1500a7346fc7c36f04f1e477977dc898bb596c631"
     },
     {
       "path": "styles/rosa.json",
-      "bytes": 592777,
-      "sha256": "3502f591c2ebc952ad51778a5242830da7cac9f7a67f05eeb8215af23f80bc41"
+      "bytes": 602671,
+      "sha256": "ddccf278b5be22d6d42f361127465da7c26628e46b92cdbed091e2e9343333e0"
     },
     {
       "path": "styles/theme-tokens.json",
-      "bytes": 8007,
-      "sha256": "38abdec9fe0154b6e64f737a10b5a7a8ec92021ccb43b64abb56b5b620e40beb",
+      "bytes": 8867,
+      "sha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4",
       "sourcePath": "android/maps/theme-tokens.json",
-      "sourceSha256": "38abdec9fe0154b6e64f737a10b5a7a8ec92021ccb43b64abb56b5b620e40beb"
+      "sourceSha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4"
     },
     {
       "path": "styles/world-gta-night.json",
-      "bytes": 115453,
-      "sha256": "0c5a94dc8fd42b768b99c737e8886bcb2cf1108abb785bda6f1bf83c290c447d"
+      "bytes": 126933,
+      "sha256": "b3f8bbbbdc644b4503b722034cfb3e23fb1a15b90b5d4b265b52a4bfec6a43d5"
     },
     {
       "path": "styles/world-gta.json",
-      "bytes": 115436,
-      "sha256": "3b6004f1ab9c0e1ec0e9ebdd81a29f5ffdeafe184d7e272178f48b40f18ea8df"
+      "bytes": 126916,
+      "sha256": "c169871692807efffbc00779db1938b53643d70edd3df96041772837b57b87fe"
     },
     {
       "path": "styles/world-rdr2-night.json",
-      "bytes": 115494,
-      "sha256": "80cc6a5beaf354533e00ec83d85a27e58fbe12d94648cffd385fa0e68cc306f4"
+      "bytes": 126852,
+      "sha256": "e87df9a501a03a5aae5d1f13969e6268a34ebc995b7e23fd0c69e2935642bd05"
     },
     {
       "path": "styles/world-rdr2.json",
-      "bytes": 115477,
-      "sha256": "b5bfc2cc381cd06826aa1f890af8a68d0aeec581a9807a4e3eaf1578191522af"
+      "bytes": 126835,
+      "sha256": "624ef8a0318e9010244e3f7fa7c8093c67277903b24234722e61f856abc1f60b"
     },
     {
       "path": "styles/world-rosa-night.json",
-      "bytes": 115499,
-      "sha256": "2669e40d0c46b0c6d7f9b5e19221f4427a542dc66d842d54a85c0817793c21cf"
+      "bytes": 126557,
+      "sha256": "ccf4851c19e91f1b98f73d053ab67657fdb312b7960ef12b231bd8410de2d170"
     },
     {
       "path": "styles/world-rosa.json",
-      "bytes": 115482,
-      "sha256": "273821d9872aec0daab9350c825e001ef1bddb9c28d8f1507ec5a28846defd4b"
+      "bytes": 126540,
+      "sha256": "c127ef55e98b5dc828291ee6db69d4b365e84370fa35d62f8523435e97ecc465"
     },
     {
       "path": "data/areas.geojson",
@@ -291,10 +516,10 @@
     },
     {
       "path": "data/pois-metadata.json",
-      "bytes": 47430,
-      "sha256": "f24f249763f6adb53ca37c23325dd9883684b3afc2fa145e24ac4dd80b48ecd5",
+      "bytes": 49898,
+      "sha256": "d6795a598aa643c4bc60e405f600a03a8ddd82aff1502021732b324cd372f6a4",
       "sourcePath": "android/maps/pois-metadata.json",
-      "sourceSha256": "f24f249763f6adb53ca37c23325dd9883684b3afc2fa145e24ac4dd80b48ecd5"
+      "sourceSha256": "d6795a598aa643c4bc60e405f600a03a8ddd82aff1502021732b324cd372f6a4"
     },
     {
       "path": "data/pois.geojson",
@@ -319,63 +544,63 @@
     },
     {
       "path": "sprites/gta.json",
-      "bytes": 618,
-      "sha256": "e9987cfe08cc3395a61a5ea9617494dbdd1119ea5bffadb237a19bfb7968e098"
+      "bytes": 2206,
+      "sha256": "e05681c4cb587370aab481e4cfcccfdb2618d7870dd6002d5b1b453d10804d0f"
     },
     {
       "path": "sprites/gta.png",
-      "bytes": 3733,
-      "sha256": "ae8efb5f0960bcf4197e960f1f2a6b305d3af85a840c8e691902d004b06f99de"
+      "bytes": 6276,
+      "sha256": "936e28195360856cd0d860981207df7c6955d6a7287ab978d970a9a7bd8251d4"
     },
     {
       "path": "sprites/gta@2x.json",
-      "bytes": 619,
-      "sha256": "f5eef42334fb8c8cc1662fd34993478a40498a21cc86222bb0317c2cd367d4ee"
+      "bytes": 2214,
+      "sha256": "0bbf78889415f5572f9575f4b3df1691f62d013b7224836a4448b50babcd5e77"
     },
     {
       "path": "sprites/gta@2x.png",
-      "bytes": 8311,
-      "sha256": "8b39562c24850a2ba0f7a659fe6e482d24c4f449b0b6ce4479df710da49ca547"
+      "bytes": 19556,
+      "sha256": "f87da14f499010ff239c5ab75690f555f69e23f42fae7b6cace363ceb2dc6d78"
     },
     {
       "path": "sprites/rdr2.json",
-      "bytes": 618,
-      "sha256": "e9987cfe08cc3395a61a5ea9617494dbdd1119ea5bffadb237a19bfb7968e098"
+      "bytes": 2206,
+      "sha256": "e05681c4cb587370aab481e4cfcccfdb2618d7870dd6002d5b1b453d10804d0f"
     },
     {
       "path": "sprites/rdr2.png",
-      "bytes": 2328,
-      "sha256": "28181af16046cc7dc07147a06b16d6831c88143577d08640da7ff7a87d9dd08c"
+      "bytes": 13287,
+      "sha256": "d8065f5c8027b589cb21a28d50a339baaadd1be67d45ec4c9faa4d4ccdcd0d7b"
     },
     {
       "path": "sprites/rdr2@2x.json",
-      "bytes": 619,
-      "sha256": "f5eef42334fb8c8cc1662fd34993478a40498a21cc86222bb0317c2cd367d4ee"
+      "bytes": 2214,
+      "sha256": "0bbf78889415f5572f9575f4b3df1691f62d013b7224836a4448b50babcd5e77"
     },
     {
       "path": "sprites/rdr2@2x.png",
-      "bytes": 4705,
-      "sha256": "1ba413dcfe9b9707940bfbd6b7fd5bf587bb8aa137e02be219e7785c3ce5df0f"
+      "bytes": 53225,
+      "sha256": "36f62fc2589504a92504954b3d9627ed4c1de5195a411231512abe26050a1fab"
     },
     {
       "path": "sprites/rosa.json",
-      "bytes": 618,
-      "sha256": "e9987cfe08cc3395a61a5ea9617494dbdd1119ea5bffadb237a19bfb7968e098"
+      "bytes": 2206,
+      "sha256": "e05681c4cb587370aab481e4cfcccfdb2618d7870dd6002d5b1b453d10804d0f"
     },
     {
       "path": "sprites/rosa.png",
-      "bytes": 4658,
-      "sha256": "c4906ed81e77c9084a93e6bee6cf4e03e618d60d7ecbada15f040c6bea4548ea"
+      "bytes": 10586,
+      "sha256": "f687e9880f38f3d3fa73ac6fc5aca2934fd5fb0af1282868a47430520272ec53"
     },
     {
       "path": "sprites/rosa@2x.json",
-      "bytes": 619,
-      "sha256": "f5eef42334fb8c8cc1662fd34993478a40498a21cc86222bb0317c2cd367d4ee"
+      "bytes": 2214,
+      "sha256": "0bbf78889415f5572f9575f4b3df1691f62d013b7224836a4448b50babcd5e77"
     },
     {
       "path": "sprites/rosa@2x.png",
-      "bytes": 9943,
-      "sha256": "362b8880c20b30ebed786e748bc6e08c62e6d397513e70fbf930b82991843678"
+      "bytes": 23195,
+      "sha256": "d65887653ab211e1efe0e1d7106c911e96af0f56e29a26248c107cd235d7710f"
     },
     {
       "path": "glyphs/GameMapSans/0-255.pbf",
@@ -404,6 +629,151 @@
       "sha256": "9c1d14ddf7cb0313e09350438ce7e90fca409bb27a422a82a1d05f774f50ed18",
       "sourcePath": "android/maps/fonts/GameMapSerif/8192-8447.pbf",
       "sourceSha256": "9c1d14ddf7cb0313e09350438ce7e90fca409bb27a422a82a1d05f774f50ed18"
+    },
+    {
+      "path": "glyphs/NavSkinGtaDisplay/0-255.pbf",
+      "bytes": 56378,
+      "sha256": "5d9c6e84bf496366e0574f441ff95a7c024f01aa58880f2667cf58db7ad4f966"
+    },
+    {
+      "path": "glyphs/NavSkinGtaDisplay/256-511.pbf",
+      "bytes": 121096,
+      "sha256": "b73bc2cac5fe7daefd013cf1e38e275324eacdbffba38d68d76574ddb7b2f0a4"
+    },
+    {
+      "path": "glyphs/NavSkinGtaDisplay/512-767.pbf",
+      "bytes": 100606,
+      "sha256": "77d42647116753b276472d02a93f5320f4c064388e88d71e6dda02a2dfff0515"
+    },
+    {
+      "path": "glyphs/NavSkinGtaDisplay/8192-8447.pbf",
+      "bytes": 34267,
+      "sha256": "af75910f9a736001277082f77481e13f7f3c703627df4d59359c0dd6e013323f"
+    },
+    {
+      "path": "glyphs/NavSkinGtaDisplay/8448-8703.pbf",
+      "bytes": 43530,
+      "sha256": "48e2501dbceb27e1f2c8ae27f45ee53305a984380019fcb190d390f35a671440"
+    },
+    {
+      "path": "glyphs/NavSkinGtaRoad/0-255.pbf",
+      "bytes": 56378,
+      "sha256": "5d9c6e84bf496366e0574f441ff95a7c024f01aa58880f2667cf58db7ad4f966"
+    },
+    {
+      "path": "glyphs/NavSkinGtaRoad/256-511.pbf",
+      "bytes": 121096,
+      "sha256": "b73bc2cac5fe7daefd013cf1e38e275324eacdbffba38d68d76574ddb7b2f0a4"
+    },
+    {
+      "path": "glyphs/NavSkinGtaRoad/512-767.pbf",
+      "bytes": 100606,
+      "sha256": "77d42647116753b276472d02a93f5320f4c064388e88d71e6dda02a2dfff0515"
+    },
+    {
+      "path": "glyphs/NavSkinGtaRoad/8192-8447.pbf",
+      "bytes": 34267,
+      "sha256": "af75910f9a736001277082f77481e13f7f3c703627df4d59359c0dd6e013323f"
+    },
+    {
+      "path": "glyphs/NavSkinGtaRoad/8448-8703.pbf",
+      "bytes": 43530,
+      "sha256": "48e2501dbceb27e1f2c8ae27f45ee53305a984380019fcb190d390f35a671440"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/0-255.pbf",
+      "bytes": 81475,
+      "sha256": "a10b726f3e583d6a891588e15d0b5ba45fd95773ade210e929b65dec04d1e2d4"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/1024-1279.pbf",
+      "bytes": 136521,
+      "sha256": "8291b46fbcec444701004d211f6cd4aeaec43398fe43343d48bcdf19b20744f5"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/256-511.pbf",
+      "bytes": 133369,
+      "sha256": "65967ff5b833c7794ca4b96d257855619802831607853da2c44e4fdbd0010fb2"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/512-767.pbf",
+      "bytes": 100548,
+      "sha256": "f0aaae1bd8e69a9d5d93fc9f81c79ef2e649c9ee0b6d564b43ce4683a128017c"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/64256-64511.pbf",
+      "bytes": 99368,
+      "sha256": "d9c601601897b676eec7fe8cb8fea6a182513a1350b696b2a1f27ddb07956da6"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/768-1023.pbf",
+      "bytes": 77809,
+      "sha256": "a76271add6e45211c3ccbfb83a2f3f3b78695860a8a861f847a2f3048e7b2fcc"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/7680-7935.pbf",
+      "bytes": 138926,
+      "sha256": "8a6f2b40a2e33a319cad2de6f60cfca07966157bd6f4d1168cfba15560ae30ff"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/8192-8447.pbf",
+      "bytes": 39257,
+      "sha256": "3da466d5da86080cf8e49fab0519384ece2e9cfdcb71f41f8be9d015f518ea01"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/8448-8703.pbf",
+      "bytes": 44559,
+      "sha256": "15a0059b06c970caf855dbfef93077fd50ea810ad1fa1f3222e09f63f0179032"
+    },
+    {
+      "path": "glyphs/NavSkinRdrMap/8704-8959.pbf",
+      "bytes": 41053,
+      "sha256": "67002dcc337d3235ab9e27b5b84a952bd10f861e2442f12566e8a609f3892160"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/0-255.pbf",
+      "bytes": 71464,
+      "sha256": "d13e0dabea766ac68dff7858b5850dd9a33f571e0a24ec93e843420532d838d4"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/1024-1279.pbf",
+      "bytes": 126769,
+      "sha256": "44b13c2da40d5e34372cea57024dd14d2bf3e2e445c17652632a7ebc23f9f858"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/256-511.pbf",
+      "bytes": 123007,
+      "sha256": "8d339d4d0aec328cc126cf80cea1881e50fb9bc967a17cadabc3e129c6489b99"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/512-767.pbf",
+      "bytes": 98047,
+      "sha256": "1d6d956e8a19b6924006c2c290a3f68108ac47add815e5b4d0d0e863b6e0f2af"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/768-1023.pbf",
+      "bytes": 78412,
+      "sha256": "e15a96b5b05da8c868b2cad41af317506a62226aa2bf9d69ba21e3d9fcd7a9c7"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/7680-7935.pbf",
+      "bytes": 138509,
+      "sha256": "873473ff4c99f2c2e5b98cdcd5dc0c1fcf1a5b961f824ae5f663f96ccc6af5c8"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/8192-8447.pbf",
+      "bytes": 34263,
+      "sha256": "29dad6b34ee3cc1d1d7ec25bca00952fa32e2f36e2c73770d7b50aa0614229a8"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/8448-8703.pbf",
+      "bytes": 43786,
+      "sha256": "404d90c1fc165cd2a384eb39e24b81a4027ef46acc2e1e01f27e887051ebb654"
+    },
+    {
+      "path": "glyphs/NavSkinRdrUi/8704-8959.pbf",
+      "bytes": 40786,
+      "sha256": "0a0bcc66d16dc4fc4d8fc3cdf1b2b55b1b9222de6cad9560764b1838bdccb089"
     },
     {
       "path": "tiles/buildings/11/743/1120.pbf",
@@ -5545,8 +5915,8 @@
     },
     {
       "path": "credits/RDR2-Inspired-CC0.txt",
-      "bytes": 288,
-      "sha256": "939fe724295d0ce7453757c11d08a7cea159678b1a082c5f0d0b81f69b186c42"
+      "bytes": 459,
+      "sha256": "550ec6f35c1f4cc880aa4a61b5e5fea488920c21634bc4b46663ee7ac92d751d"
     },
     {
       "path": "credits/Rosa-Pop-CC0.txt",
@@ -5555,18 +5925,23 @@
     },
     {
       "path": "credits/attribution.html",
-      "bytes": 1632,
-      "sha256": "09bf3074a5d810a58f71886f7acb6bf080402217cdc5e2f9af6b3a51fa2071c1"
+      "bytes": 1866,
+      "sha256": "b9262585a61a1d14760f36a6f43e254f903392d436523fc53628f2b849d9e8ba"
+    },
+    {
+      "path": "credits/game-assets-provenance.json",
+      "bytes": 13287,
+      "sha256": "0280480783b4454eeab04fe2e94a14d00304d535c45d63175848b9a6d9dff4ed"
     },
     {
       "path": "credits/sources.json",
-      "bytes": 5412,
-      "sha256": "c688ef4251e4f46373793f20acb69ff56f8a0d48263d20e5d360a00987efe1f4"
+      "bytes": 6349,
+      "sha256": "9a8138da84f1b4bf8726b0551f9d2251d7c3c4251bd222041c20642f0a6cd5af"
     },
     {
       "path": "credits/world-attribution.html",
-      "bytes": 1174,
-      "sha256": "4b3c83b144ff8d041a2f2d10c35857695b94c3eff67a348b2a1fcf0cd5ff348c"
+      "bytes": 1427,
+      "sha256": "adf12a43455b2e0c0e6566bd1635ed77e4f74fdfd491088f8f9d2f824ed19fbe"
     },
     {
       "path": "credits/world-sources.json",

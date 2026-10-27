@@ -14,7 +14,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
-import android.widget.ScrollView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -22,6 +21,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.widget.NestedScrollView
 import br.com.gamemap.GameMapApplication
 import br.com.gamemap.data.OfflineMapCoverage
 import br.com.gamemap.R
@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
     private var sheetMode = SheetMode.THEMES
     private var removeListener: (() -> Unit)? = null
     private var removeNetworkListener: (() -> Unit)? = null
+    private var removeTypography: (() -> Unit)? = null
     private var lastMapStatus = "Carregando mapa…"
     private var bindingPreferences = false
     private var destroying = false
@@ -72,6 +73,7 @@ class MainActivity : ComponentActivity() {
     private var insetsApplied = false
     private var palette = PhonePalette.forTheme(MapTheme.GTA_SA)
     private val counts by lazy { app.maps.categoryCounts() }
+    private val offlineMissing by lazy { app.maps.offlineMissingCategories() }
     private val landscape get() = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     private enum class SheetMode { NONE, THEMES, FILTERS }
 
@@ -103,6 +105,7 @@ class MainActivity : ComponentActivity() {
         }
         buildMapControls()
         setContentView(root)
+        removeTypography = GameTypography.observe(root) { app.preferences.snapshot().theme }
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             bottomInset = bars.bottom
@@ -238,12 +241,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun applyPreferences(preferences: MapPreferences) {
+        GameTypography.apply(root, preferences.theme)
+        sheet?.window?.decorView?.let { GameTypography.apply(it, preferences.theme) }
         renderer.applyStyle(currentStyle(preferences))
         palette = PhonePalette.forTheme(preferences.theme)
         root.setBackgroundColor(palette.soft)
         insetProtections.forEach { it.setBackgroundColor(palette.surface) }
         locationPill.surface(palette, 24)
-        locationPill.contentDescription = "NavSkin · ${preferences.baseMapMode.label} · ${preferences.theme.label} · ${preferences.enabledCategories.size}/6 categorias ativas"
+        locationPill.contentDescription = "NavSkin · ${preferences.baseMapMode.label} · ${preferences.theme.label} · ${preferences.enabledCategories.size}/${PoiCategory.entries.size} categorias ativas"
         selection.text = "${if (preferences.baseMapMode == MapBaseMode.WORLD) "Mundo" else "Goiânia offline"} · ${preferences.theme.label}"
         locationTitle.setTextColor(palette.text)
         selection.setTextColor(palette.muted)
@@ -283,6 +288,7 @@ class MainActivity : ComponentActivity() {
             View.VISIBLE else View.GONE
         categoryDetails.forEach { (category, label) ->
             label.text = if (preferences.baseMapMode == MapBaseMode.WORLD) "Locais no mapa mundial"
+                else if (category in offlineMissing) "Não incluído neste snapshot"
                 else "${counts[category] ?: 0} locais no recorte offline"
         }
         categorySwitches.forEach { (category, toggle) ->
@@ -296,9 +302,9 @@ class MainActivity : ComponentActivity() {
         val total = preferences.enabledCategories.sumOf { counts[it] ?: 0 }
         filterSummary?.text = when {
             preferences.enabledCategories.isEmpty() -> "Nenhuma categoria ativa · o desenho do mapa continua visível"
-            preferences.baseMapMode == MapBaseMode.WORLD -> "${preferences.enabledCategories.size} de 6 categorias · cobertura conforme os dados locais"
-            preferences.enabledCategories.size == 6 -> "Todas as categorias · $total locais no recorte offline"
-            else -> "${preferences.enabledCategories.size} de 6 categorias · $total locais no recorte offline"
+            preferences.baseMapMode == MapBaseMode.WORLD -> "${preferences.enabledCategories.size} de ${PoiCategory.entries.size} categorias · online, varia por área"
+            preferences.enabledCategories.size == PoiCategory.entries.size -> "Todas as categorias · $total locais no recorte offline"
+            else -> "${preferences.enabledCategories.size} de ${PoiCategory.entries.size} categorias · $total locais no recorte offline"
         }
         refreshMapStatus()
         sheet?.window?.navigationBarColor = palette.surface
@@ -339,22 +345,41 @@ class MainActivity : ComponentActivity() {
         if (mode == SheetMode.THEMES) buildThemes(content) else buildFilters(content)
         val explore = PhoneAction(this, R.drawable.phone_arrow, "Explorar mapa", true).apply { setOnClickListener { dialog.dismiss() } }
         sheetBindings.add { explore.bind(it, filled = true) }
-        content.addView(explore, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(16) })
-        val scroll = ScrollView(this).apply {
+        // Let Material distinguish scrolling to earlier rows from dragging the sheet.
+        val scroll = NestedScrollView(this).apply {
             isFillViewport = false
             isVerticalScrollBarEnabled = false
             clipToPadding = false
-            // The dialog extends behind gesture/three-button navigation on edge-to-edge Android.
-            setPadding(0, 0, 0, bottomInset)
             contentDescription = if (mode == SheetMode.FILTERS) "Categorias do mapa" else "Escolha do tema"
             addView(content, ViewGroup.LayoutParams(MATCH, WRAP))
+        }
+        // Keep the primary action reachable while long category/theme content scrolls.
+        val footer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dip(20), dip(12), dip(20), dip(12) + bottomInset)
+            addView(explore, LinearLayout.LayoutParams(MATCH, WRAP))
+        }
+        sheetBindings.add { footer.setBackgroundColor(it.surface) }
+        val panel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            clipToOutline = true
+            addView(scroll, LinearLayout.LayoutParams(MATCH, 0, 1f))
+            addView(footer, LinearLayout.LayoutParams(MATCH, WRAP))
+        }
+        sheetBindings.add { panel.background = rounded(it.surface, 28) }
+        ViewCompat.setOnApplyWindowInsetsListener(panel) { _, insets ->
+            val safeInset = maxOf(bottomInset, insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom)
+            footer.setPadding(dip(20), dip(12), dip(20), dip(12) + safeInset)
+            insets
         }
         val available = resources.displayMetrics.heightPixels - bottomInset - dip(24)
         // Compact on launch; large fonts and landscape can scroll the complete menu.
         val desired = (if (mode == SheetMode.THEMES) dip(556) else dip(830)) + bottomInset
         val height = desired.coerceAtMost((available * .88f).toInt()).coerceAtLeast(dip(150))
-        dialog.setContentView(scroll, ViewGroup.LayoutParams(MATCH, height))
+        dialog.setContentView(panel, ViewGroup.LayoutParams(MATCH, height))
         dialog.setOnShowListener {
+            ViewCompat.requestApplyInsets(panel)
+            dialog.window?.decorView?.let { GameTypography.observe(it) { app.preferences.snapshot().theme } }
             dialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let {
                 it.setBackgroundColor(Color.TRANSPARENT)
                 it.layoutParams.height = height
@@ -587,6 +612,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onLowMemory() { super.onLowMemory(); renderer.onLowMemory() }
     override fun onDestroy() {
+        removeTypography?.invoke(); removeTypography = null
         destroying = true
         sheet?.setOnDismissListener(null)
         sheet?.dismiss()

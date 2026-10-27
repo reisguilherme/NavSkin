@@ -16,6 +16,7 @@ import androidx.core.graphics.drawable.IconCompat
 import br.com.gamemap.R
 import br.com.gamemap.data.MapStyleRepository
 import br.com.gamemap.preferences.PreferenceStore
+import br.com.gamemap.preferences.PoiCategory
 import br.com.gamemap.render.CarSurfaceRenderer
 import br.com.gamemap.render.NativeMapRenderer
 
@@ -46,7 +47,7 @@ class MapScreen(
                 .setOnClickListener { screenManager.push(ThemeScreen(carContext, preferences)) }
                 .build())
             .addItem(Row.Builder().setTitle("Categorias")
-                .addText("${state.enabledCategories.size} de 6 ativas")
+                .addText("${state.enabledCategories.size} de ${PoiCategory.entries.size} ativas")
                 .setBrowsable(true)
                 .setOnClickListener { screenManager.push(CategoryScreen(carContext, preferences, maps)) }
                 .build())

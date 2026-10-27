@@ -13,17 +13,37 @@ const way = (id, tags, points = [[2, 2], [4, 2], [4, 4], [2, 4], [2, 2]]) => ({
   type: 'way', id, tags, geometry: points.map(([lon, lat]) => ({ lon, lat })),
 });
 
-test('all requested OSM tags map to exactly six semantic categories', () => {
-  assert.deepEqual(androidKinds, ['parks', 'fuel', 'food', 'parking', 'health', 'shops']);
+test('all requested OSM tags map to nine semantic categories with the six existing IDs preserved', () => {
+  assert.deepEqual(androidKinds, ['parks', 'fuel', 'food', 'parking', 'health', 'shops', 'education', 'culture', 'religion']);
   for (const [key, value, expected] of [
     ['leisure', 'park', 'parks'], ['leisure', 'garden', 'parks'],
     ['amenity', 'fuel', 'fuel'], ['amenity', 'parking', 'parking'],
-    ...['restaurant', 'cafe', 'fast_food'].map(value => ['amenity', value, 'food']),
+    ...['restaurant', 'cafe', 'fast_food', 'bar', 'pub'].map(value => ['amenity', value, 'food']),
     ...['hospital', 'clinic', 'doctors', 'pharmacy'].map(value => ['amenity', value, 'health']),
     ...['supermarket', 'convenience'].map(value => ['shop', value, 'shops']),
+    ...['school', 'university', 'college', 'kindergarten'].map(value => ['amenity', value, 'education']),
+    ...['theatre', 'cinema', 'arts_centre'].map(value => ['amenity', value, 'culture']),
+    ['tourism', 'museum', 'culture'], ['amenity', 'place_of_worship', 'religion'],
   ]) assert.equal(classifyAndroidPoi({ [key]: value }), expected, key + '=' + value);
-  for (const tags of [{}, { amenity: 'bank' }, { shop: 'clothes' }, { tourism: 'museum' }, { office: 'doctor' }]) {
+  for (const tags of [{}, { amenity: 'bank' }, { shop: 'clothes' }, { office: 'doctor' }]) {
     assert.equal(classifyAndroidPoi(tags), null);
+  }
+});
+
+test('education, culture, worship and drinking POIs retain exact original subtypes and provenance', () => {
+  const tags = [
+    { amenity: 'school' }, { amenity: 'university' }, { amenity: 'college' }, { amenity: 'kindergarten' },
+    { tourism: 'museum' }, { amenity: 'theatre' }, { amenity: 'cinema' }, { amenity: 'arts_centre' },
+    { amenity: 'place_of_worship', religion: 'christian' }, { amenity: 'bar' }, { amenity: 'pub' },
+  ];
+  const input = tags.map((value, index) => node(index + 100, { name: `Fonte ${index}`, ...value }));
+  const result = buildAndroidPois({ elements: input }, bbox);
+  assert.equal(result.collection.features.length, input.length);
+  for (const original of input) {
+    const feature = result.collection.features.find(item => item.properties.osm_id === `node/${original.id}`);
+    assert.deepEqual(feature.properties.raw_tags, original.tags);
+    assert.deepEqual(feature.geometry.coordinates, [original.lon, original.lat]);
+    assert.equal(feature.properties.kind, classifyAndroidPoi(original.tags));
   }
 });
 
@@ -91,12 +111,11 @@ test('polygon points lie inside complete geometry, outside holes, and incomplete
   assert.deepEqual(result.omitted.map(entry => entry.osm_id), ['way/13']);
 });
 
-test('dedicated query includes shops and all source subtypes without unrelated web categories', () => {
-  for (const value of ['fuel', 'parking', 'restaurant', 'cafe', 'fast_food', 'hospital', 'clinic', 'doctors', 'pharmacy', 'park', 'garden', 'supermarket', 'convenience']) {
+test('dedicated query includes all nine groups from one attributable snapshot', () => {
+  for (const value of ['fuel', 'parking', 'restaurant', 'cafe', 'fast_food', 'bar', 'pub', 'hospital', 'clinic', 'doctors', 'pharmacy', 'park', 'garden', 'supermarket', 'convenience', 'school', 'university', 'college', 'kindergarten', 'museum', 'theatre', 'cinema', 'arts_centre', 'place_of_worship']) {
     assert.ok(androidPoiQuery.includes(value), value);
   }
   assert.ok(androidPoiQuery.includes('out meta geom;'));
-  assert.ok(!androidPoiQuery.includes('museum'));
   assert.ok(!androidPoiQuery.includes('bank'));
 });
 
@@ -136,4 +155,11 @@ test('prepared Android package matches cached OSM source, metadata and point geo
   assert.equal(new Set(allSourceIds).size, allSourceIds.length, 'one original element must not appear in two categories');
   assert.deepEqual(metadata.sourceIds, allSourceIds.sort());
   assert.ok(metadata.counts.byKind.shops > 0, 'shops need a dedicated query, not the old web subset');
+  for (const category of ['education', 'culture', 'religion']) {
+    assert.ok(metadata.counts.byKind[category] > 0 || metadata.dataCollection.notCollectedCategories.includes(category), category);
+  }
+  if (!metadata.dataCollection.completeForCurrentSpecification) {
+    assert.ok(metadata.warnings.some(warning => warning.includes('No unrelated snapshot was merged')));
+    assert.ok(Object.values(metadata.dataCollection.missingTagSelectors).some(values => values.length > 0));
+  }
 });

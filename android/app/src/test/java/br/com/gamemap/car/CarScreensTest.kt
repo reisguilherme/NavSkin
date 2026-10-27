@@ -72,21 +72,30 @@ class CarScreensTest {
         }
     }
 
-    @Test fun sixHostSwitchesChangeCategoriesIndependently() {
+    @Test fun allNineHostSwitchesRemainIndependentAcrossHostLimitedPages() {
         val screen = CategoryScreen(carContext, store, maps)
-        val rows = (screen.onGetTemplate() as ListTemplate).singleList!!.items.map { it as Row }
-        assertEquals(PoiCategory.entries.map { it.label }, rows.map { it.title.toString() })
-        assertTrue(rows.all { it.toggle!!.isChecked })
-        PoiCategory.entries.forEachIndexed { index, category ->
-            rows[index].toggle!!.onCheckedChangeDelegate.sendCheckedChange(false, completed)
+        val visited = linkedSetOf<PoiCategory>()
+        while (true) {
+            val template = screen.onGetTemplate() as ListTemplate
+            val rows = template.singleList!!.items.map { it as Row }
+            assertTrue(rows.all { it.toggle!!.isChecked })
+            rows.forEach { row ->
+                val category = PoiCategory.entries.single { it.label == row.title.toString() }
+                assertTrue("Category repeated across pages", visited.add(category))
+                row.toggle!!.onCheckedChangeDelegate.sendCheckedChange(false, completed)
+                shadowOf(Looper.getMainLooper()).idle()
+                assertEquals(PoiCategory.entries.toSet() - category, store.snapshot().enabledCategories)
+                val changed = (screen.onGetTemplate() as ListTemplate).singleList!!.items.map { it as Row }
+                assertFalse(changed.single { it.title.toString() == category.label }.toggle!!.isChecked)
+                changed.single { it.title.toString() == category.label }.toggle!!.onCheckedChangeDelegate.sendCheckedChange(true, completed)
+                shadowOf(Looper.getMainLooper()).idle()
+                assertEquals(PoiCategory.entries.toSet(), store.snapshot().enabledCategories)
+            }
+            val next = template.header!!.endHeaderActions.firstOrNull { it.title?.toString() == "Próximas" } ?: break
+            next.onClickDelegate!!.sendClick(completed)
             shadowOf(Looper.getMainLooper()).idle()
-            assertEquals(PoiCategory.entries.toSet() - category, store.snapshot().enabledCategories)
-            val changed = (screen.onGetTemplate() as ListTemplate).singleList!!.items.map { it as Row }
-            assertEquals(PoiCategory.entries.map { it != category }, changed.map { it.toggle!!.isChecked })
-            changed[index].toggle!!.onCheckedChangeDelegate.sendCheckedChange(true, completed)
-            shadowOf(Looper.getMainLooper()).idle()
-            assertEquals(PoiCategory.entries.toSet(), store.snapshot().enabledCategories)
         }
+        assertEquals(PoiCategory.entries.toSet(), visited)
     }
 
     @Test fun visibleHostThemeScreenRefreshesAfterPhoneChangesTheTheme() {

@@ -176,6 +176,38 @@ class NativeWorldMapTest {
                 awaitWorldFrame(MapTheme.RDR2, marker, emptySet(), offlineStyle.get())
                 scenario.onActivity { assertSameCamera(expectedCamera.get(), map.get().cameraPosition) }
                 saveNativeFrame("world-sao-paulo-rdr2-after-offline.png", MapTheme.RDR2)
+                // Same real Goiânia square shown in the user's visual reference.
+                scenario.onActivity {
+                    forgetRenderedFrame()
+                    PoiCategory.entries.forEach { app.preferences.setCategoryEnabled(it, true) }
+                    app.preferences.setTheme(MapTheme.GTA_SA)
+                }
+                awaitWorldFrame(MapTheme.GTA_SA, marker, PoiCategory.entries.toSet())
+                scenario.onActivity {
+                    forgetRenderedFrame()
+                    map.get().cameraPosition = CameraPosition.Builder()
+                        .target(LatLng(-16.6769541, -49.2438716)).zoom(16.8).bearing(0.0).tilt(0.0).build()
+                }
+                var goianiaStatus = "not evaluated"
+                var goianiaSnapshotRequested = false
+                awaitNative("Goiânia university square with real world geometry and game lettering", { goianiaStatus }) {
+                    val style = map.get().style ?: return@awaitNative false
+                    val poi = style.getSourceAs<VectorSource>("world")?.querySourceFeatures(arrayOf("poi"), null) ?: return@awaitNative false
+                    val inCity = poi.any { feature -> (feature.geometry() as? Point)?.let {
+                        it.longitude() in -49.27..-49.22 && it.latitude() in -16.70..-16.65
+                    } == true }
+                    val labels = map.get().queryRenderedFeatures(viewport(), "road-labels").size
+                    goianiaStatus = "camera=${map.get().cameraPosition.target}, poi=${poi.size}, inCity=$inCity, roadLabels=$labels, full=${style.isFullyLoaded}, frame=${renderedFrameReady(style)}"
+                    if (!goianiaSnapshotRequested && renderedFrameReady(style) && inCity) {
+                        goianiaSnapshotRequested = true
+                        map.get().snapshot { image ->
+                            savePersistentImage("world-goiania-diagnostic.png", image)
+                            image.recycle()
+                        }
+                    }
+                    renderedFrameReady(style) && inCity && labels > 0
+                }
+                saveNativeFrame("world-goiania-universitaria-gta.png", MapTheme.GTA_SA)
             }
         } finally {
             instrumentation.runOnMainSync {
@@ -227,7 +259,12 @@ class NativeWorldMapTest {
                     feature.hasProperty("name") && feature.getStringProperty("name").isNotBlank()
                 }) return@awaitNative false
             val roadLabels = checkNotNull(style.getLayerAs<SymbolLayer>("road-labels"))
-            assertArrayEquals(arrayOf("Noto Sans Bold"), roadLabels.textFont.value)
+            val directions = native.queryRenderedFeatures(viewport(), "road-oneway-directions")
+            if (directions.isEmpty()) return@awaitNative false
+            assertTrue("Direction markers must come from actual one-way roads", directions.all {
+                it.hasProperty("oneway") && kotlin.math.abs(it.getNumberProperty("oneway").toInt()) == 1
+            })
+            assertArrayEquals(arrayOf(when(theme) { MapTheme.GTA_SA -> "NavSkinGtaRoad"; MapTheme.RDR2 -> "NavSkinRdrMap"; else -> "Noto Sans Bold" }), roadLabels.textFont.value)
             for (category in PoiCategory.entries) {
                 val layer = checkNotNull(style.getLayer("poi-${category.id}"))
                 if (layer.visibility.value != if (category in enabled) "visible" else "none") return@awaitNative false
@@ -260,7 +297,7 @@ class NativeWorldMapTest {
 
     private fun renderedFrameReady(style: Style) = finishedFrameStyle.get() === style && idleStyle.get() === style
 
-    private fun awaitNative(description: String, predicate: () -> Boolean) {
+    private fun awaitNative(description: String, detail: () -> String = { "" }, predicate: () -> Boolean) {
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30)
         while (System.nanoTime() < deadline) {
             var ready = false
@@ -268,7 +305,7 @@ class NativeWorldMapTest {
             if (ready) return
             Thread.sleep(100)
         }
-        fail("Timed out after 30s: $description. Native error: ${lastNativeError.get() ?: "none reported"}")
+        fail("Timed out after 30s: $description. ${detail()}. Native error: ${lastNativeError.get() ?: "none reported"}")
     }
 
     private fun saveNativeFrame(name: String, theme: MapTheme) {
@@ -280,7 +317,7 @@ class NativeWorldMapTest {
         try {
             savePersistentImage(name, image)
             val expectedBuilding = when (theme) {
-                MapTheme.GTA_SA -> 0xfff7fcf8.toInt()
+                MapTheme.GTA_SA -> 0xffe0e0dc.toInt()
                 MapTheme.ROSA_POP -> 0xfffff3fb.toInt()
                 MapTheme.RDR2 -> 0xffb6a17a.toInt()
             }
@@ -296,7 +333,7 @@ class NativeWorldMapTest {
     }
 
     private fun savePersistentImage(name: String, bitmap: Bitmap) {
-        val directory = "Pictures/NavSkinWorld/"
+        val directory = "Pictures/NavSkinWorld/v0.6/"
         val media = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         context.contentResolver.delete(media,
             "${MediaStore.Images.Media.DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.RELATIVE_PATH} = ?",

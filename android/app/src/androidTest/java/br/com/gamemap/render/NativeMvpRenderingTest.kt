@@ -47,6 +47,7 @@ class NativeMvpRenderingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context get() = instrumentation.targetContext
     private var previousCoverage = MapBaseMode.WORLD
+    private var sheetSafeBottom = 0
 
     @Before fun useDeterministicOfflineMap() {
         instrumentation.runOnMainSync {
@@ -171,11 +172,7 @@ class NativeMvpRenderingTest {
         try {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 waitForDescription(device, "Explorar mapa")
-                var safeBottom = device.displayHeight
-                scenario.onActivity { activity ->
-                    safeBottom -= androidx.core.view.ViewCompat.getRootWindowInsets(activity.window.decorView)
-                        ?.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())?.bottom ?: 0
-                }
+                val safeBottom = captureSheetSafeBottom(scenario, device)
                 val footerDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
                 while (waitForDescription(device, "Explorar mapa").visibleBounds.bottom > safeBottom &&
                     System.nanoTime() < footerDeadline) Thread.sleep(100)
@@ -239,7 +236,7 @@ class NativeMvpRenderingTest {
                 awaitPhoneLayers(scenario, selected)
                 savePhoneScreenshot("phone-filters.png")
                 collapsePanel(device)
-                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 5/6 categorias ativas")
+                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 8/9 categorias ativas")
 
                 // A different theme must not reset the user's independent POI filters.
                 for (theme in listOf(MapTheme.ROSA_POP, MapTheme.RDR2)) {
@@ -253,7 +250,7 @@ class NativeMvpRenderingTest {
                     sameCamera(camera, readPhoneCamera(scenario))
                 }
                 scenario.recreate()
-                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 5/6 categorias ativas")
+                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 8/9 categorias ativas")
                 assertFalse("A collapsed panel reopened after Activity recreation",
                     device.hasObject(By.desc("Explorar mapa")))
                 PreferenceStore(context).use { reopened ->
@@ -290,8 +287,9 @@ class NativeMvpRenderingTest {
         }
         val device = UiDevice.getInstance(instrumentation)
         try {
-            ActivityScenario.launch(MainActivity::class.java).use {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 waitForDescription(device, "Explorar mapa")
+                captureSheetSafeBottom(scenario, device)
                 collapsePanel(device)
                 awaitPhonePixels(Palette.ROSA_NIGHT).also { bitmap ->
                     try {
@@ -304,7 +302,7 @@ class NativeMvpRenderingTest {
                             android.graphics.Color.blue(pixel) > 230)
                     } finally { bitmap.recycle() }
                 }
-                waitForDescription(device, "NavSkin · Goiânia · offline · Rosa Pop · 6/6 categorias ativas")
+                waitForDescription(device, "NavSkin · Goiânia · offline · Rosa Pop · 9/9 categorias ativas")
                 waitForDescription(device, "Temas")
                 waitForDescription(device, "Filtros")
             }
@@ -319,10 +317,23 @@ class NativeMvpRenderingTest {
         }
     }
 
-    private fun waitForDescription(device: UiDevice, description: String) =
-        checkNotNull(device.wait(Until.findObject(By.desc(description)), 15000)) {
-            "Missing accessible control: $description"
+    private fun captureSheetSafeBottom(scenario: ActivityScenario<MainActivity>, device: UiDevice): Int {
+        val displayHeight = device.displayHeight
+        scenario.onActivity { activity ->
+            val insets = checkNotNull(androidx.core.view.ViewCompat.getRootWindowInsets(activity.window.decorView)) {
+                "Window insets unavailable for safe sheet gestures"
+            }
+            sheetSafeBottom = displayHeight -
+                insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).bottom
         }
+        check(sheetSafeBottom in 1..displayHeight) { "Invalid safe sheet bottom: $sheetSafeBottom" }
+        return sheetSafeBottom
+    }
+
+    private fun waitForDescription(device: UiDevice, description: String): UiObject2 =
+        device.wait(Until.findObject(By.desc(description)), 15000)
+            ?: failSheetScroll(device, description,
+                "Missing accessible control: $description; foreground=${device.currentPackageName}; safeBottom=$sheetSafeBottom")
 
     private fun chooseTheme(device: UiDevice, theme: MapTheme) {
         clickScrollableControl(device, "Tema ${theme.label}", "Prévia dos temas", horizontal = true)
@@ -345,22 +356,37 @@ class NativeMvpRenderingTest {
 
     private fun collapsePanel(device: UiDevice) {
         val container = if (device.hasObject(By.desc("Categorias do mapa"))) "Categorias do mapa" else "Escolha do tema"
-        revealSheetControl(device, "Explorar mapa", container).click()
-        assertTrue("The panel did not retract", device.wait(Until.gone(By.desc("Explorar mapa")), 5000))
+        val explore = revealSheetControl(device, "Explorar mapa", container)
+        assertTrue("Sheet CTA overlaps system navigation", explore.visibleBounds.bottom <= sheetSafeBottom)
+        explore.click()
+        if (!device.wait(Until.gone(By.desc("Explorar mapa")), 5000))
+            failSheetScroll(device, "Explorar mapa", "The panel did not retract after clicking the pinned footer")
         waitForDescription(device, "Aumentar zoom")
     }
 
     private fun revealSheetControl(device: UiDevice, description: String, container: String): UiObject2 {
+        check(sheetSafeBottom > 0) { "Measure window insets before interacting with a sheet" }
         waitForDescription(device, container)
-        val order = PoiCategory.entries.map { "Filtro ${it.label}" } + "Explorar mapa"
-        val targetIndex = order.indexOf(description)
-        check(targetIndex >= 0) { "Unknown sheet control: $description" }
         val density = context.resources.displayMetrics.density
         val minimumVisibleHeight = (48 * density).toInt() - 2
+        if (description == "Explorar mapa") {
+            device.waitForIdle(500)
+            val footer = waitForDescription(device, description)
+            val safeDisplay = android.graphics.Rect(0, 0, device.displayWidth, sheetSafeBottom)
+            val bounds = footer.visibleBounds
+            if (bounds.width() <= 0 || bounds.height() < minimumVisibleHeight || !safeDisplay.contains(bounds))
+                failSheetScroll(device, description, "Pinned footer is not fully visible above system navigation: $bounds, safe=$safeDisplay")
+            return footer
+        }
+        val order = PoiCategory.entries.map { "Filtro ${it.label}" }
+        val targetIndex = order.indexOf(description)
+        check(targetIndex >= 0) { "Unknown sheet control: $description" }
         repeat(12) {
             val panel = device.findObject(By.desc(container))
                 ?: failSheetScroll(device, description, "The panel disappeared while looking for $description")
-            val viewport = panel.visibleBounds
+            val viewport = android.graphics.Rect(panel.visibleBounds).apply {
+                bottom = minOf(bottom, sheetSafeBottom)
+            }
             val target = device.findObject(By.desc(description))
             val targetBounds = target?.visibleBounds
             if (target != null && targetBounds != null && targetBounds.width() > 0 &&
@@ -507,7 +533,7 @@ class NativeMvpRenderingTest {
     }
 
     private enum class Palette(val park: Int, val road: Int, val water: Int, val building: Int) {
-        GTA(0xff748837.toInt(),0xff080a08.toInt(),0xff7088ab.toInt(),0xfff7fcf8.toInt()),
+        GTA(0xff28681c.toInt(),0xff000000.toInt(),0xff7088ab.toInt(),0xffe0e0dc.toInt()),
         GTA_NIGHT(0xff53662d.toInt(),0xff060805.toInt(),0xff4b6e91.toInt(),0xffb2bbae.toInt()),
         // Sample wide primary-road fills; thin casing colors are blended by antialiasing.
         ROSA(0xff6fe3bd.toInt(),0xffffdf79.toInt(),0xff64d7eb.toInt(),0xfffff3fb.toInt()),
