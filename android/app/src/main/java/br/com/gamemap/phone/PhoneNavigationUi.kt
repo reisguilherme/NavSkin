@@ -68,6 +68,11 @@ internal class PhoneNavigationUi(
     private val search = label("Para onde?", 16f, true)
     private val guidance = label("", 17f, true)
     private val summary = LinearLayout(activity).apply { orientation = LinearLayout.VERTICAL }
+    private val preparationProgress = ProgressBar(activity).apply {
+        isIndeterminate = true
+        visibility = View.GONE
+        contentDescription = "Preparando rota"
+    }
     private val metrics = label("", 18f, true).apply { gravity = Gravity.CENTER }
     private val primary = label("", 14f, true)
     private val speedNumber = label("—", 24f, true).apply { gravity = Gravity.CENTER; maxLines = 1 }
@@ -115,6 +120,9 @@ internal class PhoneNavigationUi(
         summary.setPadding(dp(16), dp(12), dp(16), dp(10))
         summary.id = R.id.phone_route_summary
         summary.minimumHeight = dp(48)
+        summary.addView(preparationProgress, LinearLayout.LayoutParams(dp(20), dp(20)).apply {
+            gravity = Gravity.CENTER_HORIZONTAL; bottomMargin = dp(6)
+        })
         summary.addView(metrics)
         summary.addView(primary, LinearLayout.LayoutParams(MATCH, dp(48)).apply { topMargin = dp(6) })
         primary.gravity = Gravity.CENTER
@@ -166,6 +174,7 @@ internal class PhoneNavigationUi(
         listOf(search, guidance, metrics).forEach { it.setTextColor(colors.text) }
         speedNumber.setTextColor(colors.text)
         speedUnit.setTextColor(colors.muted)
+        preparationProgress.indeterminateTintList = android.content.res.ColorStateList.valueOf(colors.accent)
         primary.setTextColor(Color.WHITE)
         primary.touchSurface(colors.accent, 14)
         render()
@@ -214,7 +223,10 @@ internal class PhoneNavigationUi(
         summary.visibility = if (visible) View.VISIBLE else View.GONE
         val speed = state.location.speedKmh?.takeIf { state.location.quality == LocationQuality.GOOD }?.roundToInt()?.let { "$it km/h" } ?: "— km/h"
         val progress = state.progress.takeIf { state.guidanceAvailable }
+        val preparing = RoutePreparationUi.forState(state, granted(Manifest.permission.ACCESS_FINE_LOCATION))
+        preparationProgress.visibility = if (preparing?.busy == true) View.VISIBLE else View.GONE
         metrics.text = when {
+            preparing != null -> preparing.message
             progress != null -> "${duration(progress.remainingSeconds)} · ${distance(progress.remainingDistanceMeters)} · ${eta(progress.arrivalEpochMs)}"
             state.phase == NavigationPhase.PREVIEW && state.route != null -> "${duration(state.route!!.durationSeconds)} · ${distance(state.route!!.distanceMeters)} · ${eta(System.currentTimeMillis() + (state.route!!.durationSeconds * 1000).toLong())}"
             state.phase == NavigationPhase.ARRIVED -> "Você chegou!"
@@ -245,6 +257,7 @@ internal class PhoneNavigationUi(
             else -> "Aguardando GPS preciso para orientar"
         }
         primary.text = when {
+            preparing != null -> preparing.action.orEmpty()
             state.phase == NavigationPhase.PREVIEW -> "Iniciar navegação"
             state.phase == NavigationPhase.RESUME_AVAILABLE -> "Retomar e recalcular"
             state.phase == NavigationPhase.ERROR || state.phase == NavigationPhase.REROUTE_FAILED -> "Tentar novamente"
@@ -253,7 +266,9 @@ internal class PhoneNavigationUi(
             state.destination != null -> "Ver destino"
             else -> "Seus lugares e opções"
         }
-        primary.visibility = if (state.navigationActive) View.GONE else View.VISIBLE
+        primary.visibility = if (state.navigationActive || preparing != null && preparing.action == null) View.GONE else View.VISIBLE
+        summary.isClickable = preparing?.busy != true
+        summary.isFocusable = preparing?.busy != true
         if (state.phase == NavigationPhase.PREVIEW && state.route?.id != lastPreviewId) {
             lastPreviewId = state.route?.id
             renderer.showRouteOverview()
@@ -277,6 +292,12 @@ internal class PhoneNavigationUi(
     }
 
     private fun primaryAction() = when (state.phase) {
+        NavigationPhase.WAITING_FOR_LOCATION -> {
+            if (state.locationAccess == LocationAccess.DISABLED)
+                activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            else withGps { runtime.retryRoute() }
+        }
+        NavigationPhase.CALCULATING -> Unit
         NavigationPhase.PREVIEW -> withGps { runtime.startNavigation(); renderer.recenter(); dialog?.dismiss() }
         NavigationPhase.RESUME_AVAILABLE -> withGps { runtime.resumeDestination() }
         NavigationPhase.ERROR, NavigationPhase.REROUTE_FAILED -> {
@@ -369,11 +390,14 @@ internal class PhoneNavigationUi(
                 note(content, "Parte da rota está fora do mapa de Goiânia incluído. Nesses trechos o fundo não terá vias ou edifícios.")
         }
         state.message?.let { note(content, it) }
+        val preparing = RoutePreparationUi.forState(state, granted(Manifest.permission.ACCESS_FINE_LOCATION))
         if (state.navigationActive) action(content, "Continuar viagem") { dialog?.dismiss() }
-        else action(content, primary.text.toString()) { primaryAction() }
-        action(content, "Visão geral da rota") { renderer.showRouteOverview(); dialog?.dismiss() }
+        else if (preparing == null || preparing.action != null)
+            action(content, preparing?.action ?: primary.text.toString()) { primaryAction() }
+        if (state.route != null) action(content, "Visão geral da rota") { renderer.showRouteOverview(); dialog?.dismiss() }
         action(content, "Recentralizar e acompanhar") { withGps { renderer.recenter(); dialog?.dismiss() } }
-        action(content, "Recalcular rota") { withGps { runtime.retryRoute(); dialog?.dismiss() } }
+        if (state.phase !in setOf(NavigationPhase.WAITING_FOR_LOCATION, NavigationPhase.CALCULATING, NavigationPhase.RECALCULATING))
+            action(content, "Recalcular rota") { withGps { runtime.retryRoute(); dialog?.dismiss() } }
         action(content, "Salvar este destino") { editPlace(destination) }
         action(content, "Encerrar / cancelar rota") { runtime.stopNavigation(); dialog?.dismiss() }
         note(content, "Estimativas do provedor, sem trânsito ao vivo. Orientação visual, sem voz. Geoapify · © OpenStreetMap contributors.")

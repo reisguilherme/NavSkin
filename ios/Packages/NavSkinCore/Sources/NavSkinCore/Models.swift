@@ -156,7 +156,7 @@ public struct RouteProgress: Codable, Equatable, Sendable {
 }
 
 public enum NavigationPhase: String, Codable, Equatable, Sendable, CaseIterable {
-    case idle, calculating, preview, navigating, recalculating, rerouteFailed
+    case idle, waitingForLocation, calculating, preview, navigating, recalculating, rerouteFailed
     case arrived, error, resumeAvailable
 }
 

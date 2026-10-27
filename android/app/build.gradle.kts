@@ -9,8 +9,8 @@ android {
         applicationId = "br.com.gamemap.goiania"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.7.0"
+        versionCode = 7
+        versionName = "0.7.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { buildConfig = true }

@@ -63,8 +63,8 @@ class NavigationRuntimeTest {
         if (::settings.isInitialized) settings.close()
     }
 
-    private fun fix(x: Double = 0.0, y: Double = 0.0) {
-        runtime.acceptFix(LocationFix(GeoPoint(y / 111195.0, x / 111195.0), 5.0, 90.0, 10.0, 0.5,
+    private fun fix(x: Double = 0.0, y: Double = 0.0, accuracy: Double = 5.0) {
+        runtime.acceptFix(LocationFix(GeoPoint(y / 111195.0, x / 111195.0), accuracy, 90.0, 10.0, 0.5,
             elapsed, 1_000_000L + elapsed))
     }
 
@@ -105,17 +105,153 @@ class NavigationRuntimeTest {
     }
 
     @Test fun selectedDestinationWaitsForGpsThenAutomaticallyCalculatesPreview() {
+        val phases = mutableListOf<NavigationPhase>()
+        runtime.addListener { phases += it.phase }
         runtime.selectDestination(destination("A"))
         assertEquals(destination("A"), runtime.snapshot().destination)
+        assertEquals("WAITING_FOR_LOCATION", runtime.snapshot().phase.name)
+        assertFalse(phases.contains(NavigationPhase.ERROR))
+        assertNull(runtime.snapshot().location.speedKmh)
         assertEquals(0, executor.tasks.size)
+        assertTrue(requests.isEmpty())
         assertEquals(1, serviceStarts)
         runtime.onServiceStarted()
+        fix()
+        assertEquals(NavigationPhase.CALCULATING, runtime.snapshot().phase)
+        assertEquals(1, executor.tasks.size)
+        elapsed += 1_000
         fix()
         assertEquals(1, executor.tasks.size)
         executor.runAt(0)
         assertEquals(NavigationPhase.PREVIEW, runtime.snapshot().phase)
         assertNotNull(runtime.snapshot().route)
         assertFalse(runtime.snapshot().navigationActive)
+        elapsed += 1_000
+        fix()
+        assertEquals(0, executor.tasks.size)
+        assertEquals(1, requests.size)
+    }
+
+    @Test fun weakGpsWaitsWithoutSendingARouteUntilAPreciseFixArrives() {
+        runtime.onServiceStarted()
+        fix(accuracy = 100.0)
+        runtime.selectDestination(destination("A"))
+        assertEquals("WAITING_FOR_LOCATION", runtime.snapshot().phase.name)
+        assertEquals(LocationAccess.WEAK, runtime.snapshot().locationAccess)
+        assertNull(runtime.snapshot().location.speedKmh)
+        assertEquals(0, executor.tasks.size)
+        assertTrue(requests.isEmpty())
+        elapsed += 1_000
+        fix()
+        assertEquals(NavigationPhase.CALCULATING, runtime.snapshot().phase)
+        assertEquals(1, executor.tasks.size)
+    }
+
+    @Test fun staleSnapshotWaitsForAFixNoMoreThanFiveSecondsOld() {
+        runtime.onServiceStarted()
+        fix()
+        elapsed += 5_001
+        runtime.selectDestination(destination("A"))
+        assertEquals("WAITING_FOR_LOCATION", runtime.snapshot().phase.name)
+        assertEquals(0, executor.tasks.size)
+        assertTrue(requests.isEmpty())
+        fix()
+        assertEquals(NavigationPhase.CALCULATING, runtime.snapshot().phase)
+        assertEquals(1, executor.tasks.size)
+    }
+
+    @Test fun disabledLocationWaitsUntilProvidersRecoverBeforeRequestingARoute() {
+        runtime.onServiceStarted()
+        fix()
+        runtime.onLocationProvidersChanged(false)
+        runtime.selectDestination(destination("A"))
+        assertEquals("WAITING_FOR_LOCATION", runtime.snapshot().phase.name)
+        assertEquals(0, executor.tasks.size)
+        runtime.onLocationProvidersChanged(true)
+        assertEquals(NavigationPhase.CALCULATING, runtime.snapshot().phase)
+        assertEquals(1, executor.tasks.size)
+    }
+
+    @Test fun returningToThePhoneRestartsGpsForThePendingDestinationAfterAnIdleStop() {
+        val detachPhone = runtime.attachClient("phone")
+        runtime.selectDestination(destination("A"))
+        runtime.onServiceStarted()
+        detachPhone()
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(6))
+        runtime.onServiceStopped()
+        assertEquals("WAITING_FOR_LOCATION", runtime.snapshot().phase.name)
+        assertEquals(LocationAccess.NEEDS_PHONE_START, runtime.snapshot().locationAccess)
+        val detachCar = runtime.attachClient("android-auto-main")
+        assertEquals(1, serviceStarts)
+        val detachReturningPhone = runtime.attachClient("phone")
+        assertEquals(2, serviceStarts)
+        assertEquals(LocationAccess.WAITING, runtime.snapshot().locationAccess)
+        runtime.onServiceStarted()
+        fix()
+        assertEquals(1, executor.tasks.size)
+        executor.runAt(0)
+        assertEquals(NavigationPhase.PREVIEW, runtime.snapshot().phase)
+        detachReturningPhone()
+        detachCar()
+    }
+
+    @Test fun grantingPrecisePermissionOnThePhoneRestartsThePendingGpsWait() {
+        runtime.setLocationPermission(fine = false, coarse = false)
+        val detachPhone = runtime.attachClient("phone")
+        runtime.selectDestination(destination("A"))
+        assertEquals("WAITING_FOR_LOCATION", runtime.snapshot().phase.name)
+        assertEquals(0, serviceStarts)
+        runtime.setLocationPermission(fine = true, coarse = true)
+        assertEquals(1, serviceStarts)
+        runtime.onServiceStarted()
+        fix()
+        assertEquals(NavigationPhase.CALCULATING, runtime.snapshot().phase)
+        detachPhone()
+    }
+
+    @Test fun coarseOnlyPermissionKeepsThePrecisePermissionActionWhileWaitingWithoutAService() {
+        runtime.setLocationPermission(fine = false, coarse = true)
+        runtime.selectDestination(destination("A"))
+        runtime.onServiceStopped()
+        runtime.setLocationPermission(fine = false, coarse = true)
+        assertEquals(NavigationPhase.WAITING_FOR_LOCATION, runtime.snapshot().phase)
+        assertEquals(LocationAccess.WEAK, runtime.snapshot().locationAccess)
+        fix()
+        assertEquals(NavigationPhase.WAITING_FOR_LOCATION, runtime.snapshot().phase)
+        assertEquals(0, executor.tasks.size)
+        assertTrue(requests.isEmpty())
+        assertNull(runtime.snapshot().location.speedKmh)
+    }
+
+    @Test fun invalidProviderKeyRemainsAnErrorAfterFurtherGpsFixes() {
+        runtime.onServiceStarted()
+        fix()
+        response = { HttpResponse(401, "") }
+        runtime.selectDestination(destination("A"))
+        executor.runAt(0)
+        val errorMessage = runtime.snapshot().message
+        assertEquals(NavigationPhase.ERROR, runtime.snapshot().phase)
+        repeat(3) { elapsed += 1_000; fix() }
+        assertEquals(NavigationPhase.ERROR, runtime.snapshot().phase)
+        assertEquals(errorMessage, runtime.snapshot().message)
+        assertEquals(0, executor.tasks.size)
+        assertEquals(1, requests.size)
+    }
+
+    @Test fun routeFailureAfterRetryDuringTheRequestDoesNotAutomaticallyRetryOnGpsFixes() {
+        runtime.onServiceStarted()
+        fix()
+        response = { HttpResponse(503, "") }
+        runtime.selectDestination(destination("A"))
+        runtime.retryRoute()
+        assertEquals(1, executor.tasks.size)
+        executor.runAt(0)
+        val errorMessage = runtime.snapshot().message
+        repeat(3) { elapsed += 1_000; fix() }
+        assertEquals(NavigationPhase.ERROR, runtime.snapshot().phase)
+        assertEquals(errorMessage, runtime.snapshot().message)
+        assertEquals(0, executor.tasks.size)
+        assertEquals(1, requests.size)
     }
 
     @Test fun supersededDestinationResponseCannotReplaceTheNewPreview() {
@@ -177,6 +313,9 @@ class NavigationRuntimeTest {
         assertEquals(0, executor.tasks.size)
         elapsed += 31_000L
         fix()
+        assertEquals(NavigationPhase.ERROR, runtime.snapshot().phase)
+        assertEquals(0, executor.tasks.size)
+        assertEquals(1, requests.size)
         response = ::normalResponse
         runtime.retryRoute()
         executor.runAt(0)

@@ -155,7 +155,7 @@ public final class NavigationSession {
     }
 
     public func retryRoute() {
-        guard snapshot.destination != nil, !snapshot.simulation else { return }
+        guard routeInFlight == nil, snapshot.destination != nil, !snapshot.simulation else { return }
         let recalculation = snapshot.navigationActive
         if !recalculation { pendingPreview = true }
         requestRoute(recalculation: recalculation)
@@ -214,6 +214,8 @@ public final class NavigationSession {
         if !visible {
             if snapshot.simulation { stopReplay() }
             else if !snapshot.navigationActive { locationRequested = false; stopLocation?() }
+        } else if snapshot.phase == .waitingForLocation {
+            activateGPS()
         }
     }
 
@@ -232,7 +234,7 @@ public final class NavigationSession {
             if wasRecalculating { $0.phase = .rerouteFailed; $0.progress = nil }
         }
         if wasRecalculating { requestRoute(recalculation: true) }
-        else { calculatePendingPreview() }
+        else if pendingPreview { requestRoute(recalculation: false) }
     }
 
     /// The app exposes this only in DEBUG. Production HTTP is never replaced by replay fixtures.
@@ -280,11 +282,19 @@ public final class NavigationSession {
 
     private func requestRoute(recalculation: Bool) {
         guard routeInFlight == nil, !snapshot.simulation, let destination = snapshot.destination else { return }
+        if let block = requestBlockMessage() {
+            change { $0.phase = recalculation ? .rerouteFailed : .error; $0.progress = nil; $0.message = block }
+            return
+        }
         let fix = snapshot.location.fix
         let gpsReady = snapshot.location.quality == .good && fix.map(isFresh) == true &&
             sourceAccess != .denied && sourceAccess != .disabled && sourceAccess != .weak && sourceAccess != .notRequested
-        if let block = requestBlockMessage() ?? (gpsReady ? nil : "Aguarde uma posição GPS atual e precisa para calcular a rota.") {
-            change { $0.phase = recalculation ? .rerouteFailed : .error; $0.progress = nil; $0.message = block }
+        guard gpsReady else {
+            if !recalculation { pendingPreview = true }
+            change {
+                $0.phase = recalculation ? .rerouteFailed : .waitingForLocation; $0.progress = nil
+                $0.message = locationLifecycleMessage ?? "Aguardando uma posição GPS atual e precisa para calcular a rota."
+            }
             return
         }
         guard let origin = fix?.point else { return }
@@ -367,7 +377,7 @@ public final class NavigationSession {
 
     private func calculatePendingPreview() {
         if pendingPreview, !snapshot.simulation, snapshot.providerConfigured, snapshot.location.quality == .good,
-           routeInFlight == nil, [.idle, .error].contains(snapshot.phase) { requestRoute(recalculation: false) }
+           routeInFlight == nil, snapshot.phase == .waitingForLocation { requestRoute(recalculation: false) }
     }
     private func accessFor(_ location: LocationState) -> LocationAccess {
         if !snapshot.simulation {

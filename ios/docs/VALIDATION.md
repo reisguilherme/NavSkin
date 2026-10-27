@@ -1,40 +1,12 @@
-# Validação NavSkin iOS 0.7.0 · 27/10/2026
+# Validação NavSkin iOS 0.7.1 · 27/10/2026
 
-Projeto pronto para abrir em um Mac: `ios/NavSkin.xcodeproj`, esquema **NavSkin**, pacote **NavSkinCore**, recursos locais e [README para quem vai compilar](../README.md#para-quem-vai-compilar-no-mac).
+A correção separa espera pelo primeiro GPS de falha de rota. O estado waitingForLocation só dispara HTTP quando a origem é atual e precisa. A interface mostra espera/progresso; ETA válido mantém apenas tempo, distância e chegada.
 
-**Sem compilação com SDK Apple, IPA, simulador iOS ou teste em iPhone nesta entrega.** O usuário escolheu usar o Mac de um amigo. O GitHub Actions continua manual; o bloqueio anterior da conta está registrado no [relatório 0.6](VALIDATION-v0.6.md).
+- **92 testes SwiftCore passaram**, incluindo origem fraca/antiga, aquisição inicial, cancelamento, retorno ao app, chave ausente/alterada, 401/429/503 e retry concorrente. São fixtures controladas, sem chave pessoal ou consulta real Geoapify.
+- **62 testes Node passaram** para recursos e contratos de empacotamento compartilhados.
+- Foundation ProjectProbe e parser Swift passaram com versão0.7.1, recursos, referências Xcode, aplicativo e testes Apple.
+- A revisão independente conferiu os guards de requests, epoch e reativação da fonte no foreground.
 
-## Mudanças desta versão
+Não houve build/typecheck com SDK Apple, simulador iOS, IPA ou iPhone. O projeto continua pronto para o [Mac do amigo](../README.md#para-quem-vai-compilar-no-mac). Os resultados de cartografia/UI0.7 e seus limites estão no [relatório anterior](VALIDATION-v0.7.md).
 
-- Topo compacto com NavSkin, Temas, Filtros e menu retrátil; salvos, GPS, opções, orientação, zoom e atribuições ficam no menu.
-- Busca inferior centralizada, círculos de velocidade/recentralização e mapa ocupando a tela até a borda. O card da viagem contém tempo, distância e horário de chegada; precisão e velocidade não são duplicadas nele.
-- Rótulos GTA maiores: vias 14,5 e nomes de POIs 15. Famílias autênticas mantidas, com fallback por caractere.
-- Marcador GTA padrão usa radar_centre original no ID arrow, com pixels e origem preservados. Os outros IDs não mudam.
-- Mundo também carrega os 729 tiles Overture locais na cobertura de Goiânia; fora dela continua OpenFreeMap. Os prédios mundiais dentro da cobertura são substituídos para evitar sobreposição.
-
-## Verificações executadas
-
-- **62 testes Node passaram**, incluindo recursos iOS, estilos, categorias, fonte/glyphs, cobertura de prédios e identidade de cada pixel do marcador original.
-- **Preflight dos recursos passou:** hashes das três fontes, glifos, atlas e marcador GTA original/preparado.
-- **Foundation ProjectProbe passou** com os fontes reais de AppTypes/MapResourceRepository: recursos, 12 estilos, URLs locais/HTTPS, catálogos e referências OpenStep/XML do Xcode.
-- **Parser Swift passou** para aplicativo e cinco testes Apple após a revisão final de ETA/alinhamento. Parse não verifica os tipos de SwiftUI, UIKit, CoreLocation ou MapLibre.
-- NavSkinCore e o empacotador unsigned não foram alterados. Os resultados anteriores de **85 XCTest Core** e **31 testes Python** constam do [relatório 0.6](VALIDATION-v0.6.md); não são testes Apple da interface 0.7.
-
-Android foi usado para evidência GPU do mapa compartilhado e da navegação simulada; [relatório Android](../../android/docs/VALIDATION-v0.7.md). Capturas Android não comprovam renderização iOS.
-
-## Limites e teste no Mac
-
-Mundo precisa de internet para tiles e glifos adicionais. Goiânia offline cobre só o recorte incluído; ensino, cultura e culto ainda não constam desse snapshot. Busca/rotas/recálculo usam conexão e chave Geoapify do usuário. Sem trânsito ao vivo, voz ou CarPlay.
-
-```bash
-bash scripts/build-ios.sh doctor
-swift test --package-path ios/Packages/NavSkinCore
-bash scripts/build-ios.sh simulator
-xcrun simctl list devices available
-bash scripts/build-ios.sh test SIMULATOR_UDID
-RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh
-```
-
-O último comando usa o Mac local e gera o IPA unsigned após testes e build. O amigo envia IPA/JSON para a assinatura pessoal do usuário no Windows; veja [instalação](SEM-MAC.md).
-
-No Xcode/iPhone ainda é necessário verificar typecheck/build, os cinco testes Apple, URLProtocol dos glifos, os 12 estilos, gestos, rotação/Dynamic Type, recálculo, GPS real, permissões e tela bloqueada. O ZIP completo inclui os recursos originais com avisos e [procedência](../../docs/game-assets-provenance.md), sem senha, certificado, perfil pessoal ou chave do usuário.
+O pacote de fontes/ícones é o mesmo da0.7. A atualização não apaga preferências, salvos ou a chave guardada no Keychain. Hardware GPS e integração de serviços ainda precisam de teste em iPhone; não há voz, trânsito ao vivo ou CarPlay.

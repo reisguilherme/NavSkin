@@ -6,7 +6,7 @@ import br.com.gamemap.navigation.model.NavRoute
 import br.com.gamemap.navigation.model.RouteProgress
 
 enum class NavigationPhase {
-    IDLE, CALCULATING, PREVIEW, NAVIGATING, RECALCULATING, REROUTE_FAILED,
+    IDLE, WAITING_FOR_LOCATION, CALCULATING, PREVIEW, NAVIGATING, RECALCULATING, REROUTE_FAILED,
     ARRIVED, ERROR, RESUME_AVAILABLE,
 }
 

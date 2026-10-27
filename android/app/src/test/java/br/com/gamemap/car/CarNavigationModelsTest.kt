@@ -65,6 +65,15 @@ class CarNavigationModelsTest {
         assertTrue(CarNavigationModels.trip(state).steps.isEmpty())
     }
 
+    @Test fun initialGpsWaitExplainsThatTheRouteWillBeCalculatedAutomatically() {
+        val state = NavigationSnapshot(phase = NavigationPhase.WAITING_FOR_LOCATION,
+            destination = destination, locationAccess = LocationAccess.WAITING)
+        assertEquals("Aguardando posição GPS", CarNavigationModels.statusTitle(state))
+        assertTrue(CarNavigationModels.statusText(state).contains("automaticamente"))
+        assertTrue(CarNavigationModels.navigationInfo(state) is MessageInfo)
+        assertNull(CarNavigationModels.destinationEstimate(state))
+    }
+
     @Test fun carReplayIsExplicitAndHasBoundedSmallGpsSteps() {
         val fixes = CarNavigationReplay.fixes(route)
         assertTrue(fixes.size > 20)

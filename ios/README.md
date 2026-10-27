@@ -1,6 +1,8 @@
-# NavSkin para iPhone · 0.7.0
+# NavSkin para iPhone · 0.7.1
 
-Aplicativo nativo em SwiftUI e MapLibre Native/Metal 6.31.0 para iPhone e iPad com iOS 17 ou posterior. A versão 0.7.0 usa **mapa mundial online por padrão**, mantém **Goiânia offline** como opção e preserva GPS, busca, rotas, manobras visuais, ETA, velocidade, recálculo, favoritos, Casa/Trabalho e recentes. Acrescenta nove filtros e as fontes Pricedown, Hapna e RDR Lino conforme o tema.
+Hotfix 0.7.1: espera pelo primeiro GPS é apresentada como preparação, com cálculo automático após posição atual/precisa. O retorno ao app retoma a aquisição pendente; falhas reais mantêm a explicação e a tentativa explícita. O núcleo tem92 testes aprovados; a interface ainda precisa ser compilada no Mac.
+
+Aplicativo nativo em SwiftUI e MapLibre Native/Metal 6.31.0 para iPhone e iPad com iOS 17 ou posterior. A versão 0.7.1 usa **mapa mundial online por padrão**, mantém **Goiânia offline** como opção e preserva GPS, busca, rotas, manobras visuais, ETA, velocidade, recálculo, favoritos, Casa/Trabalho e recentes. Acrescenta nove filtros e as fontes Pricedown, Hapna e RDR Lino conforme o tema.
 
 O repositório é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin). O projeto está preparado para um amigo compilar no Mac e enviar o IPA ao Guilherme, que fará a assinatura pessoal no Windows. A compilação Apple e os testes no iPhone ainda precisam ser executados; consulte o [relatório de validação](docs/VALIDATION.md).
 
@@ -10,7 +12,7 @@ Na 0.7, Temas/Filtros ficam no topo ao lado de NavSkin, e salvos/opções/crédi
 
 Você precisa de um **Mac com Xcode completo**, SDK compatível e um simulador de iPhone com iOS 17 ou posterior instalado. O projeto usa Swift 5 mode. O Swift Package Manager baixa o **MapLibre 6.31.0** pela internet; `NavSkinCore` é local. O empacotador usa `python3` no Terminal. Confira os [requisitos do Xcode](https://developer.apple.com/xcode/system-requirements/).
 
-1. Obtenha o repositório completo com o pacote local de recursos ou extraia `NavSkin-ios-0.7.0-source.zip`. Preserve as pastas `ios`, `scripts` e `tests` juntas.
+1. Obtenha o repositório completo com o pacote local de recursos ou extraia `NavSkin-ios-0.7.1-source.zip`. Preserve as pastas `ios`, `scripts` e `tests` juntas.
 2. Abra **`ios/NavSkin.xcodeproj`** no Xcode e aguarde a resolução dos pacotes.
 3. Selecione o esquema **NavSkin** e um **simulador de iPhone com iOS 17+** como destino.
 4. Clique em **Run**. Os recursos em `ios/NavSkin/Resources` já estão preparados; o mapa mundial precisa de internet durante o uso.
@@ -49,7 +51,7 @@ Envie esses dois arquivos ao Guilherme. O IPA será assinado e instalado no Wind
 
 Para rodar em um iPhone físico com iOS 17+, o responsável pela instalação precisa configurar sua própria Apple Account, Team e perfis de provisionamento em **Signing & Capabilities**. A [Personal Team](https://developer.apple.com/help/account/basics/about-your-developer-account) tem validade e limites de teste. Isso é opcional para o amigo: gerar o IPA unsigned pelo comando acima não exige essa assinatura.
 
-O identificador padrão é `br.com.navskin.ios`, versão 0.7.0, build 1. Para assinatura própria, copie `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e configure Team ID e bundle próprio; esse arquivo é ignorado pelo Git. Para criar um archive assinado no Mac:
+O identificador padrão é `br.com.navskin.ios`, versão 0.7.1, build 1. Para assinatura própria, copie `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e configure Team ID e bundle próprio; esse arquivo é ignorado pelo Git. Para criar um archive assinado no Mac:
 
 ```bash
 bash scripts/build-ios.sh archive YOUR_APPLE_TEAM_ID

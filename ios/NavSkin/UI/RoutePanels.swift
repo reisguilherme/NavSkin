@@ -13,6 +13,9 @@ struct CompactRouteSummary: View {
 
     var body: some View {
         HStack(spacing: 10) {
+            if [.waitingForLocation, .calculating, .recalculating].contains(store.snapshot.phase) {
+                ProgressView().accessibilityLabel("Aguardando rota")
+            }
             Button(action: openDetails) {
                 Text(summary).gameFont(.subheadline, weight: .bold).lineLimit(2).monospacedDigit()
                 .multilineTextAlignment(.center)
@@ -41,6 +44,7 @@ struct CompactRouteSummary: View {
 
     private var summary: String {
         let snapshot = store.snapshot
+        if snapshot.phase == .waitingForLocation { return "Aguardando GPS preciso…" }
         if snapshot.phase == .calculating { return "Calculando rota…" }
         if snapshot.phase == .recalculating { return "Recalculando rota…" }
         if snapshot.phase == .arrived { return "Toque para concluir" }
@@ -117,7 +121,11 @@ struct RoutePanel: View {
                 arrivedPanel
             } else {
                 destinationHeading
-                if store.snapshot.phase == .calculating {
+                if store.snapshot.phase == .waitingForLocation {
+                    HStack { ProgressView(); Text("Aguardando GPS preciso…").gameFont(.subheadline) }
+                    Text("A rota será calculada automaticamente quando houver uma posição atual e precisa.")
+                        .gameFont(.caption).foregroundStyle(palette.muted)
+                } else if store.snapshot.phase == .calculating {
                     HStack { ProgressView(); Text("Calculando rota…").gameFont(.subheadline) }
                 } else if store.snapshot.phase == .preview, let route = store.snapshot.route {
                     routeSummary(route)
@@ -199,7 +207,8 @@ struct RoutePanel: View {
             } else if store.snapshot.phase == .error || store.snapshot.phase == .rerouteFailed {
                 Button("Tentar novamente") { store.retryRoute() }.buttonStyle(.borderedProminent)
             }
-            if store.snapshot.locationAccess != .available && !store.snapshot.navigationActive {
+            if store.snapshot.locationAccess != .available && !store.snapshot.navigationActive &&
+                !(store.snapshot.phase == .waitingForLocation && store.snapshot.serviceRunning) {
                 Button("Ativar GPS") { store.activateGPS() }.buttonStyle(.bordered)
             }
             Button(store.snapshot.navigationActive ? "Encerrar" : "Cancelar", role: .destructive) { store.stopNavigation() }

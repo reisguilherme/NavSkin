@@ -18,7 +18,7 @@ struct NavSkinRootView: View {
     private var palette: ThemePalette { store.theme.palette }
     private var compact: Bool { verticalSizeClass == .compact }
     private var showsRoutePanel: Bool {
-        store.snapshot.navigationActive || [.arrived, .calculating, .preview, .error, .resumeAvailable].contains(store.snapshot.phase) ||
+        store.snapshot.navigationActive || [.arrived, .waitingForLocation, .calculating, .preview, .error, .resumeAvailable].contains(store.snapshot.phase) ||
             store.snapshot.resumeDestination != nil
     }
     private var speedText: String {

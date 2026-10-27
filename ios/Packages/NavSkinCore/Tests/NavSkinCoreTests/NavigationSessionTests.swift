@@ -5,19 +5,165 @@ import XCTest
 final class NavigationSessionTests: XCTestCase {
     @MainActor
     func testSelectedDestinationWaitsForCurrentGPSAndAutomaticallyPreviews() async throws {
-        let context = try SessionContext()
+        let transport = SessionHTTPFixture()
+        let context = try SessionContext(provider: GeoapifyProvider(apiKey: "fixture-test-key", transport: transport))
         var starts = 0
         context.session.startLocation = { starts += 1 }
         context.session.selectDestination(context.destination("A"))
+        await settle()
         XCTAssertEqual(starts, 1)
         XCTAssertEqual(context.session.snapshot.destination?.id, "A")
+        XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
         XCTAssertNil(context.session.snapshot.route)
+        XCTAssertNil(context.session.snapshot.progress)
+        var urls = await transport.requestedURLs()
+        XCTAssertTrue(urls.isEmpty)
         context.session.setLocationStatus(access: .waiting, running: true)
+        context.session.tick()
+        XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
         context.fix()
         await settle()
         XCTAssertEqual(context.session.snapshot.phase, .preview)
         XCTAssertEqual(context.session.snapshot.route?.destination.id, "A")
         XCTAssertFalse(context.session.snapshot.navigationActive)
+        context.elapsed += 1000; context.fix()
+        context.session.tick()
+        await settle()
+        urls = await transport.requestedURLs()
+        XCTAssertEqual(urls.count, 1)
+    }
+
+    @MainActor
+    func testStaleAndImpreciseGPSKeepSelectedDestinationWaitingWithoutHTTP() async throws {
+        let transport = SessionHTTPFixture()
+        let context = try SessionContext(provider: GeoapifyProvider(apiKey: "fixture-test-key", transport: transport))
+        context.ready()
+        context.elapsed += 6000
+        context.session.selectDestination(context.destination("A"))
+        XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
+        var imprecise = context.locationFix()
+        imprecise.accuracyMeters = 100
+        context.session.acceptFix(imprecise)
+        context.session.tick()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
+        XCTAssertNil(context.session.snapshot.route)
+        var urls = await transport.requestedURLs()
+        XCTAssertTrue(urls.isEmpty)
+        context.elapsed += 1000; context.fix()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .preview)
+        urls = await transport.requestedURLs()
+        XCTAssertEqual(urls.count, 1)
+    }
+
+    @MainActor
+    func testStoppingWhileWaitingForGPSDoesNotCalculateWhenLocationArrives() async throws {
+        let transport = SessionHTTPFixture()
+        let context = try SessionContext(provider: GeoapifyProvider(apiKey: "fixture-test-key", transport: transport))
+        context.session.selectDestination(context.destination("A"))
+        XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
+        context.session.stopNavigation()
+        context.ready()
+        context.session.tick()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .idle)
+        XCTAssertNil(context.session.snapshot.destination)
+        let urls = await transport.requestedURLs()
+        XCTAssertTrue(urls.isEmpty)
+    }
+
+    @MainActor
+    func testReturningToForegroundRestartsGPSForTheWaitingDestination() async throws {
+        let context = try SessionContext()
+        let session = try XCTUnwrap(context.session)
+        var starts = 0
+        session.startLocation = { [weak session] in
+            starts += 1
+            session?.setLocationStatus(access: .waiting, running: true)
+        }
+        session.stopLocation = { [weak session] in session?.setLocationStatus(access: .waiting, running: false) }
+        session.selectDestination(context.destination("A"))
+        session.setForeground(false)
+        XCTAssertFalse(session.snapshot.serviceRunning)
+        session.setForeground(true)
+        XCTAssertEqual(starts, 2)
+        XCTAssertTrue(session.snapshot.serviceRunning)
+        context.fix()
+        await settle()
+        XCTAssertEqual(session.snapshot.phase, .preview)
+    }
+
+    @MainActor
+    func testHTTPFailuresRemainErrorsWhenFreshGPSUpdatesArrive() async throws {
+        for statusCode in [401, 429, 503] {
+            let transport = SessionHTTPFixture(statusCode: statusCode)
+            let context = try SessionContext(provider: GeoapifyProvider(apiKey: "fixture-test-key", transport: transport))
+            context.session.selectDestination(context.destination("A"))
+            XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
+            context.ready()
+            await settle()
+            XCTAssertEqual(context.session.snapshot.phase, .error, "HTTP \(statusCode)")
+            let message = context.session.snapshot.message
+            XCTAssertNotNil(message)
+            context.elapsed += 1000; context.fix()
+            context.session.tick()
+            await settle()
+            XCTAssertEqual(context.session.snapshot.phase, .error, "HTTP \(statusCode)")
+            XCTAssertEqual(context.session.snapshot.message, message)
+            let urls = await transport.requestedURLs()
+            XCTAssertEqual(urls.count, 1)
+        }
+    }
+
+    @MainActor
+    func testRetryDuringInFlightRequestDoesNotAutomaticallyRetryItsFailure() async throws {
+        let provider = DelayedSessionProvider()
+        let context = try SessionContext(provider: provider)
+        context.ready()
+        context.session.selectDestination(context.destination("A"))
+        await settle()
+        context.session.retryRoute()
+        await provider.failRoute(id: "A")
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .error)
+        context.elapsed += 1000; context.fix()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .error)
+        let count = await provider.routeCount()
+        XCTAssertEqual(count, 1)
+    }
+
+    @MainActor
+    func testMissingConfigurationRemainsAnErrorBeforeGPSIsReady() async throws {
+        let transport = SessionHTTPFixture()
+        let context = try SessionContext(provider: GeoapifyProvider(apiKey: "fixture-test-key", transport: transport))
+        context.key = ""
+        context.session.keyChanged()
+        context.session.selectDestination(context.destination("A"))
+        XCTAssertEqual(context.session.snapshot.phase, .error)
+        let message = context.session.snapshot.message
+        context.ready()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .error)
+        XCTAssertEqual(context.session.snapshot.message, message)
+        let urls = await transport.requestedURLs()
+        XCTAssertTrue(urls.isEmpty)
+    }
+
+    @MainActor
+    func testConfiguringTheKeyResumesTheSelectedDestinationWaitingForGPS() async throws {
+        let context = try SessionContext()
+        context.key = ""
+        context.session.keyChanged()
+        context.session.selectDestination(context.destination("A"))
+        XCTAssertEqual(context.session.snapshot.phase, .error)
+        context.key = "replacement-fixture-key"
+        context.session.keyChanged()
+        XCTAssertEqual(context.session.snapshot.phase.rawValue, "waitingForLocation")
+        context.ready()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .preview)
     }
 
     @MainActor
@@ -381,11 +527,17 @@ private struct ImmediateSessionProvider: NavigationProviding {
 private actor DelayedSessionProvider: NavigationProviding {
     private var routes: [String: (Destination, CheckedContinuation<NavRoute, Error>)] = [:]
     private var searches: [String: CheckedContinuation<[Destination], Error>] = [:]
+    private var routeRequests = 0
     func search(query: String, bias: GeoPoint?) async throws -> [Destination] {
         try await withCheckedThrowingContinuation { searches[query] = $0 }
     }
     func route(origin: GeoPoint, destination: Destination) async throws -> NavRoute {
-        try await withCheckedThrowingContinuation { routes[destination.id] = (destination, $0) }
+        routeRequests += 1
+        return try await withCheckedThrowingContinuation { routes[destination.id] = (destination, $0) }
+    }
+    func routeCount() -> Int { routeRequests }
+    func failRoute(id: String) {
+        routes.removeValue(forKey: id)?.1.resume(throwing: TypedProviderException(kind: .unavailable))
     }
     func completeRoute(id: String) {
         guard let (destination, continuation) = routes.removeValue(forKey: id) else { return }
@@ -414,9 +566,11 @@ private actor RecoveringSessionProvider: NavigationProviding {
 
 private actor SessionHTTPFixture: HTTPTransport {
     private var urls: [URL] = []
+    private let statusCode: Int
+    init(statusCode: Int = 200) { self.statusCode = statusCode }
     func get(_ url: URL) async throws -> HTTPResponse {
         urls.append(url)
-        return HTTPResponse(statusCode: 200, body: Data(#"{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"MultiLineString","coordinates":[[[0.0001,0],[0.001,0]]]},"properties":{"distance":100,"time":60,"legs":[{"distance":100,"time":60,"steps":[{"from_index":0,"to_index":1,"distance":100,"time":60,"instruction":{"type":"StartAt","text":"Siga em frente."}}]}]}}]}"#.utf8))
+        return HTTPResponse(statusCode: statusCode, body: Data(#"{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"MultiLineString","coordinates":[[[0.0001,0],[0.001,0]]]},"properties":{"distance":100,"time":60,"legs":[{"distance":100,"time":60,"steps":[{"from_index":0,"to_index":1,"distance":100,"time":60,"instruction":{"type":"StartAt","text":"Siga em frente."}}]}]}}]}"#.utf8))
     }
     func requestedURLs() -> [URL] { urls }
 }

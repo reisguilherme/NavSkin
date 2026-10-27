@@ -103,6 +103,7 @@ class NavigationRuntime(
             clients[id] = (clients[id] ?: 0) + 1
             main.removeCallbacks(stopUnusedService)
             idleStopScheduled = false
+            if (id == "phone") activatePendingPhoneLocation()
         }
         var attached = true
         return {
@@ -129,7 +130,10 @@ class NavigationRuntime(
                 phase = if (state.navigationActive) NavigationPhase.RESUME_AVAILABLE else state.phase,
                 message = locationNotice("Permita o acesso à localização no celular.")))
             serviceStopper(appContext)
-        } else applyEngine(engine.onTick(elapsedClock(), wallClock()))
+        } else {
+            applyEngine(engine.onTick(elapsedClock(), wallClock()))
+            activatePendingPhoneLocation()
+        }
     }
 
     /** Call from a visible phone screen; Android may reject starting from a car-only background. */
@@ -235,7 +239,7 @@ class NavigationRuntime(
     }
 
     fun retryRoute() = onMain {
-        if (state.destination != null && !state.simulation) {
+        if (state.destination != null && !state.simulation && routeInFlight == null) {
             if (!state.navigationActive) pendingPreview = true
             requestRoute(state.navigationActive)
         }
@@ -260,6 +264,13 @@ class NavigationRuntime(
             publish(state.copy(serviceRunning = false, phase = NavigationPhase.RESUME_AVAILABLE,
                 locationAccess = LocationAccess.NEEDS_PHONE_START, progress = null, route = null,
                 message = locationNotice("GPS interrompido. Abra o celular e recalcule o destino para retomar.")))
+        } else if (pendingPreview && state.phase == NavigationPhase.WAITING_FOR_LOCATION) {
+            publish(state.copy(serviceRunning = false, locationAccess = when {
+                !finePermission && !coarsePermission -> LocationAccess.DENIED
+                !providersEnabled -> LocationAccess.DISABLED
+                !finePermission -> LocationAccess.WEAK
+                else -> LocationAccess.NEEDS_PHONE_START
+            }, message = locationNotice("GPS interrompido. Ative a localização no celular para calcular a rota.")))
         } else publish(state.copy(serviceRunning = false))
     }
 
@@ -314,12 +325,19 @@ class NavigationRuntime(
         if (routeInFlight != null || state.simulation) return
         val destination = state.destination ?: return
         val fix = state.location.fix
-        val block = requestBlockMessage() ?: if (state.location.quality != LocationQuality.GOOD ||
-            fix == null || elapsedClock() - fix.elapsedRealtimeMs !in 0L..5_000L || !providersEnabled)
-            "Aguarde uma posição GPS atual e precisa para calcular a rota." else null
+        val block = requestBlockMessage()
         if (block != null) {
+            pendingPreview = false
             publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.ERROR,
                 progress = null, message = block))
+            return
+        }
+        if (!finePermission || state.location.quality != LocationQuality.GOOD || fix == null ||
+            elapsedClock() - fix.elapsedRealtimeMs !in 0L..5_000L || !providersEnabled) {
+            if (!recalculation) pendingPreview = true
+            publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.WAITING_FOR_LOCATION,
+                progress = null, message = if (recalculation) "Aguarde uma posição GPS atual e precisa para calcular a rota."
+                    else "A rota será calculada automaticamente quando o GPS tiver uma posição atual e precisa."))
             return
         }
         val generation = ++routeEpoch
@@ -385,7 +403,12 @@ class NavigationRuntime(
     private fun calculatePendingPreview() {
         if (pendingPreview && !state.simulation && state.providerConfigured && providersEnabled &&
             state.location.quality == LocationQuality.GOOD && routeInFlight == null &&
-            state.phase in setOf(NavigationPhase.IDLE, NavigationPhase.ERROR)) requestRoute(recalculation = false)
+            state.phase == NavigationPhase.WAITING_FOR_LOCATION) requestRoute(recalculation = false)
+    }
+
+    private fun activatePendingPhoneLocation() {
+        if (pendingPreview && state.phase == NavigationPhase.WAITING_FOR_LOCATION && clients.containsKey("phone") &&
+            finePermission && !state.serviceRunning && !serviceRequested) activateLocation()
     }
 
     private fun accessFor(location: LocationState): LocationAccess = when {
@@ -397,8 +420,11 @@ class NavigationRuntime(
         }
         !finePermission && !coarsePermission -> LocationAccess.DENIED
         !providersEnabled -> LocationAccess.DISABLED
+        !finePermission -> LocationAccess.WEAK
+        pendingPreview && state.phase == NavigationPhase.WAITING_FOR_LOCATION &&
+            !state.serviceRunning && !serviceRequested -> LocationAccess.NEEDS_PHONE_START
         location.quality == LocationQuality.LOST -> LocationAccess.LOST
-        location.quality == LocationQuality.WEAK || !finePermission -> LocationAccess.WEAK
+        location.quality == LocationQuality.WEAK -> LocationAccess.WEAK
         location.quality == LocationQuality.GOOD -> LocationAccess.AVAILABLE
         else -> LocationAccess.WAITING
     }

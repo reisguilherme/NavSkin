@@ -73,7 +73,7 @@ enum ProjectProbe {
         for object in objects.values where object["isa"] as? String == "XCBuildConfiguration" {
             guard let settings = object["buildSettings"] as? [String: Any], settings["PRODUCT_NAME"] as? String == "NavSkin" else { continue }
             try require(settings["PRODUCT_MODULE_NAME"] as? String == "NavSkin", "Renamed app module")
-            try require(settings["MARKETING_VERSION"] as? String == "0.7.0", "Marketing version")
+            try require(settings["MARKETING_VERSION"] as? String == "0.7.1", "Marketing version")
             try require(settings["CURRENT_PROJECT_VERSION"] as? String == "1", "Build version")
         }
         for (_, object) in objects where object["isa"] as? String == "PBXFileReference" {

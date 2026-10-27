@@ -73,7 +73,7 @@ internal object CarNavigationModels {
         state.locationAccess == LocationAccess.LOST -> "Sinal GPS perdido"
         state.locationAccess == LocationAccess.WEAK -> "Sinal GPS impreciso"
         state.progress?.onRoute == false -> "Verificando trajeto"
-        state.navigationActive -> "Aguardando posição GPS"
+        state.navigationActive || state.phase == NavigationPhase.WAITING_FOR_LOCATION -> "Aguardando posição GPS"
         state.phase == NavigationPhase.CALCULATING -> "Calculando rota"
         state.phase == NavigationPhase.RESUME_AVAILABLE -> "Retomar destino"
         state.phase == NavigationPhase.ERROR -> "Não foi possível calcular"
@@ -82,6 +82,8 @@ internal object CarNavigationModels {
 
     fun statusText(state: NavigationSnapshot): String = when {
         state.phase == NavigationPhase.REROUTE_FAILED -> state.message ?: "Tente recalcular quando houver conexão."
+        state.phase == NavigationPhase.WAITING_FOR_LOCATION -> state.message
+            ?: "A rota será calculada automaticamente quando o GPS tiver uma posição atual e precisa."
         state.locationAccess == LocationAccess.LOST -> "Última posição conhecida. Aguarde um novo sinal."
         state.locationAccess == LocationAccess.WEAK -> "Aguardando precisão para atualizar as instruções."
         state.progress?.onRoute == false -> "As instruções serão retomadas após confirmar a posição."

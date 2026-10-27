@@ -1,8 +1,10 @@
 # NavSkin — configurar e testar a navegação
 
-Versão do código **0.7.0**, `versionCode 6`. Instale o APK por cima da versão anterior, com a mesma assinatura, para manter favoritos, destinos, temas e filtros. O pacote de desenvolvimento continua `br.com.gamemap.goiania.dev`; o nome exibido é **NavSkin**. Os três estilos, os dados de Goiânia offline e os catálogos acompanham o APK. O padrão é **Mundo online**; a escolha entre os dois modos fica salva no aparelho e é compartilhada com o Android Auto.
+Versão do código **0.7.1**, `versionCode 7`. Instale o APK por cima da versão anterior, com a mesma assinatura, para manter favoritos, destinos, temas e filtros. O pacote de desenvolvimento continua `br.com.gamemap.goiania.dev`; o nome exibido é **NavSkin**. Os três estilos, os dados de Goiânia offline e os catálogos acompanham o APK. O padrão é **Mundo online**; a escolha entre os dois modos fica salva no aparelho e é compartilhada com o Android Auto.
 
 ## Primeira utilização
+
+Ao escolher um destino, **Buscando sua localização…** significa que falta uma posição GPS atual e precisa. A prévia será calculada automaticamente quando ela chegar; **Calculando rota…** indica a consulta em andamento. Não é preciso tocar repetidamente para tentar. Se falta permissão ou a localização do aparelho está desativada, o card oferece a ação correspondente. Falhas reais mostram a mensagem e **Tentar novamente**.
 
 1. Abra o aplicativo, escolha **Mundo · online** ou **Goiânia · offline**, escolha um dos temas GTA SA, Rosa Pop ou RDR2 e toque em **Explorar mapa**. Mundo é a opção inicial e requer internet, sem chave para carregar o mapa.
 2. Abra o **menu no canto superior direito → Configurar chave Geoapify**. Insira a chave da sua conta e salve. A chave não acompanha o projeto.

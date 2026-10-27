@@ -1,8 +1,10 @@
-# NavSkin · 0.7.0
+# NavSkin · 0.7.1
 
-Mapas com os temas GTA SA, Rosa Pop e RDR2, GPS e navegação em aplicativos nativos para Android e iOS. O **NavSkin 0.7.0** abre com **mapa mundial online** e mantém o recorte de **Goiânia offline** como alternativa. O repositório do projeto é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin).
+Mapas com os temas GTA SA, Rosa Pop e RDR2, GPS e navegação em aplicativos nativos para Android e iOS. O **NavSkin 0.7.1** abre com **mapa mundial online** e mantém o recorte de **Goiânia offline** como alternativa. O repositório do projeto é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin).
 
 Os dois modos oferecem temas dia/noite, filtros de lugares, favoritos, Casa/Trabalho, recentes e marcadores de veículo. Busca e rotas de automóvel usam a chave Geoapify configurada pelo usuário. A navegação inclui manobras visuais, velocidade, distância e tempo restantes, chegada e recálculo por desvio; trocar o estilo preserva a sessão.
+
+A 0.7.1 corrige o falso erro ao escolher destino antes do primeiro GPS: mostra **Buscando sua localização…**, depois **Calculando rota…**, e retoma automaticamente quando a posição está atual e precisa. Falhas reais mostram a causa e a ação de tentar novamente. [Validação do hotfix](android/docs/VALIDATION-v0.7.1.md).
 
 Na 0.7, Temas/Filtros ficam ao lado do card NavSkin no topo; o botão de menu reúne salvos, configurações, orientação, zoom e créditos. A busca fica embaixo, com velocidade e recentralização em círculos nos cantos acima dela. O card da viagem mostra somente tempo, distância e chegada, com conteúdo centralizado; os rótulos GTA foram aumentados. O mapa deixa de mostrar o card de posição, N/Rumo e a faixa inferior de fontes. Em Goiânia, o modo Mundo também usa os 269.728 footprints Overture incluídos no app; fora do recorte, conserva a densidade do provedor mundial. O marcador padrão GTA passa a usar radar_centre original.
 
@@ -35,7 +37,7 @@ cd NavSkin
 
 O Android usa Gradle. Para o iOS, o caminho desta entrega é **um amigo compilar no Mac com Xcode**, seguindo o [README preparado para ele](ios/README.md#para-quem-vai-compilar-no-mac). O comando `RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh` também roda nesse Mac local: testa, compila e gera `ios/artifacts/cloud/NavSkin-unsigned.ipa` sem login Apple. O amigo envia o IPA ao Guilherme, que usa sua própria Apple Account no AltServer do Windows para assinar e instalar. [Passos no Windows](ios/docs/SEM-MAC.md).
 
-APKs, AABs, IPAs e saídas de build não fazem parte do código versionado. O nome local previsto para o APK desta versão é `NavSkin-v0.7.0-debug.apk`. O projeto iOS está preparado, mas a compilação Apple ainda precisa ser executada no Mac. O [workflow do GitHub Actions](.github/workflows/ios-cloud.yml) permanece como alternativa manual; sua execução nesta conta foi bloqueada pelo GitHub e não é necessária para esse caminho. Consulte a [documentação Android](android/README.md) e a [validação iOS](ios/docs/VALIDATION.md) para as evidências e os testes ainda pendentes.
+APKs, AABs, IPAs e saídas de build não fazem parte do código versionado. O nome local previsto para o APK desta versão é `NavSkin-v0.7.1-debug.apk`. O projeto iOS está preparado, mas a compilação Apple ainda precisa ser executada no Mac. O [workflow do GitHub Actions](.github/workflows/ios-cloud.yml) permanece como alternativa manual; sua execução nesta conta foi bloqueada pelo GitHub e não é necessária para esse caminho. Consulte a [documentação Android](android/README.md) e a [validação iOS](ios/docs/VALIDATION.md) para as evidências e os testes ainda pendentes.
 
 Os [catálogos de ícones](docs/navigation-icon-catalogs.md) são locais e editáveis. Os registros da [versão Android 0.4.0](android/docs/VALIDATION-v0.4.md), da [0.3.0](android/docs/VALIDATION-v0.3.md) e suas capturas permanecem como histórico.
 
