@@ -25,7 +25,6 @@ import br.com.gamemap.navigation.NavigationPreferences
 import br.com.gamemap.navigation.NavigationSnapshot
 import br.com.gamemap.navigation.storage.SavedPlace
 import br.com.gamemap.preferences.MapTheme
-import org.json.JSONObject
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.Style

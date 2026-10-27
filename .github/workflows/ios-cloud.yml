@@ -1,13 +1,6 @@
 name: NavSkin iOS - gerar IPA para Windows
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'ios/**'
-      - 'scripts/*ios*'
-      - 'tests/test_ios_unsigned_package.py'
-      - '.github/workflows/ios-cloud.yml'
   workflow_dispatch:
     inputs:
       apple_tests:
@@ -27,7 +20,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 45
     env:
-      RUN_APPLE_TESTS: ${{ (github.event_name == 'push' || inputs.apple_tests) && 'true' || 'false' }}
+      RUN_APPLE_TESTS: ${{ inputs.apple_tests && 'true' || 'false' }}
     steps:
       - name: Obter o projeto
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -56,6 +49,6 @@ jobs:
           path: |
             ios/artifacts/cloud/*.log
             ios/artifacts/cloud/*.json
-            ios/artifacts/cloud/AppleTests.xcresult
+            ios/artifacts/cloud/AppleTests-*.xcresult
           if-no-files-found: warn
           retention-days: 3

@@ -72,7 +72,7 @@ internal class CarNavigationScreen(
                 val arrival = SimpleDateFormat("HH:mm", Locale.getDefault())
                     .format(Date(System.currentTimeMillis() + (route.durationSeconds * 1_000).toLong()))
                 pane.addRow(Row.Builder().setTitle("${formatDistance(route.distanceMeters)} · $minutes min · chegada $arrival")
-                    .addText(mapNotice() ?: state.message ?: "Estimativa sem trânsito em tempo real.").build())
+                    .addText(mapContext(state.message, "Estimativa sem trânsito em tempo real.")).build())
                 pane.addAction(action("Iniciar", R.drawable.phone_arrow) { startTrip() })
             } else {
                 pane.addRow(Row.Builder().setTitle(CarNavigationModels.statusTitle(state))
@@ -84,7 +84,7 @@ internal class CarNavigationScreen(
         } else {
             val title = if (state.phase == NavigationPhase.ARRIVED) "Você chegou ao destino" else "Escolha seu destino"
             pane.addRow(Row.Builder().setTitle(title)
-                .addText(mapNotice() ?: state.message ?: "Salvos, recentes e pesquisa de endereços e lugares.").build())
+                .addText(mapContext(state.message, "Salvos, recentes e pesquisa de endereços e lugares.")).build())
             pane.addAction(action("Destinos", R.drawable.phone_map) { showDestinations() })
             pane.addAction(action("GPS", R.drawable.phone_reset, parked = true) { requestCarLocation(carContext, app) })
         }
@@ -126,6 +126,9 @@ internal class CarNavigationScreen(
 
     private fun appearanceTitle() = if (app.preferences.snapshot().baseMapMode == MapBaseMode.WORLD &&
         !app.mapConnectivity.isOnline) "Mapa sem rede" else "Aparência"
+
+    private fun mapContext(message: String?, fallback: String): String =
+        listOfNotNull(message, mapNotice()).joinToString(" · ").ifBlank { fallback }
 
     private fun action(title: String, icon: Int, parked: Boolean = false, click: () -> Unit): Action {
         val listener = OnClickListener { click() }

@@ -16,6 +16,7 @@ swift test --package-path "$taskRoot/ios/Packages/NavSkinCore" \
   --scratch-path "$taskRoot/ios/DerivedData/Core" 2>&1 | tee "$output/core-tests.log"
 
 if [[ "${RUN_APPLE_TESTS:-true}" == true ]]; then
+  appleResult="$output/AppleTests-$(date +%Y%m%d-%H%M%S)-$$.xcresult"
   xcrun simctl list devices available --json > "$output/simulators.json"
   simulatorID="$(python3 - "$output/simulators.json" <<'PY'
 import json
@@ -42,7 +43,7 @@ PY
   xcodebuild -project "$project" -scheme NavSkin -configuration Debug \
     -destination "platform=iOS Simulator,id=$simulatorID" \
     -derivedDataPath "$taskRoot/ios/DerivedData/Simulator" \
-    -resultBundlePath "$output/AppleTests.xcresult" \
+    -resultBundlePath "$appleResult" \
     CODE_SIGNING_ALLOWED=NO test 2>&1 | tee "$output/apple-tests.log"
 fi
 

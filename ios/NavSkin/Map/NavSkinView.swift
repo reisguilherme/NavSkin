@@ -130,6 +130,9 @@ struct NavSkinView: UIViewRepresentable {
 
         // MapLibre calls this only for a user gesture, never for our programmatic camera updates.
         func mapView(_ mapView: MLNMapView, shouldChangeFrom oldCamera: MLNMapCamera, to newCamera: MLNMapCamera) -> Bool {
+            // A gesture during style loading supersedes the camera captured before the reload.
+            pendingCamera = nil
+            pendingZoom = nil
             mode = .manual
             reportFollowing(false)
             return true

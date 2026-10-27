@@ -17,3 +17,5 @@ public/data/buildings.geojson
 data/overture/buildings.raw.geojson
 data/overture/buildings.raw.geojson.state
 data/overture/building-collection.json
+docs/brief.txt
+docs/*-brief.txt

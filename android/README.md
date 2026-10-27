@@ -2,7 +2,7 @@
 
 Aplicativo nativo em Kotlin com mapas mundiais, GPS do Android e navegação visual para automóvel no telefone e no Android Auto. A integração usa a categoria **Navegação** da Car App Library. MapLibre Native renderiza **Mundo online**, padrão, com mapas OpenFreeMap / OpenStreetMap por HTTPS, ou **Goiânia offline**, com o recorte cartográfico incluído no APK. Geoapify fornece busca e rotas pela internet com a chave do usuário.
 
-Versão do código: **0.5.0**, `versionCode 4`. Consulte [configuração e uso](docs/NAVIGATION.md). A marca pública e o nome do projeto agora são NavSkin. O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico; seus resultados não comprovam a validação da v0.5.
+Versão do código: **0.5.0**, `versionCode 4`. Consulte [configuração e uso](docs/NAVIGATION.md) e [validação da v0.5](docs/VALIDATION-v0.5.md). A marca pública e o nome do projeto agora são NavSkin. O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico; seus resultados não comprovam a validação da v0.5.
 
 ## Funcionalidades implementadas
 
@@ -14,7 +14,7 @@ Versão do código: **0.5.0**, `versionCode 4`. Consulte [configuração e uso](
 - Sessão única entre telefone e central, mantida por foreground service com notificação. Após encerramento do processo, o destino pode ser retomado com uma nova rota.
 - Mapa ocupando a tela, controles flutuantes e menus retráteis para cobertura, temas e filtros. **Mundo online** usa rede; **Goiânia offline** usa somente o recorte incluído. A escolha é compartilhada e persistida entre telefone e central.
 - Carrossel inicial com prévias reais e locais de **GTA SA**, **Rosa Pop** e **RDR2**. Cada tema tem variante noturna selecionada pelo modo do sistema no telefone e pelo host no carro.
-- Rosa Pop com interface clara, rosa vivo, menta e turquesa; RDR2 com papel sépia, tinta e letras serifadas. Os ícones são editáveis e não foram extraídos dos jogos.
+- Rosa Pop com interface clara, rosa vivo, menta e turquesa; RDR2 com papel sépia e tinta; as letras serifadas são usadas no recorte offline, e o mapa mundial usa Noto Sans Bold para ampliar a cobertura de caracteres. Os ícones são editáveis e não foram extraídos dos jogos.
 - Seis filtros independentes: parques; combustível; alimentação; estacionamento; saúde; mercados e conveniências.
 - Locais salvos editáveis no telefone, atalhos Casa/Trabalho e destinos recentes, persistidos localmente. A visibilidade dos salvos é independente dos filtros de POI.
 - Catálogo próprio com 12 ícones de locais e seis marcadores de veículo por tema, prévias reais e IDs semânticos preservados ao trocar tema. O desenho de moto ou veículo temático é uma preferência visual; a rota continua sendo de automóvel.
@@ -47,7 +47,7 @@ Consulte [NAVIGATION.md](docs/NAVIGATION.md) para permissões, recuperação, co
 | Interface do telefone | Views Kotlin e Material Components 1.13.0 |
 | Host do carro | Car App API 7 ou superior |
 
-O manifesto declara `androidx.car.app.category.NAVIGATION`, `NAVIGATION_TEMPLATES`, `MAP_TEMPLATES` e `ACCESS_SURFACE`, além das permissões de localização precisa/aproximada, foreground service de localização, notificações e estado da rede. Não solicita localização permanente. `LocationManager` obtém GPS sem depender do provedor Google Play Services. Estilos, fontes e sprites acompanham o APK. Mundo usa tiles vetoriais OpenFreeMap por HTTPS; Goiânia offline usa os dados locais. Busca e rotas usam HTTPS.
+O manifesto declara `androidx.car.app.category.NAVIGATION`, `NAVIGATION_TEMPLATES`, `MAP_TEMPLATES` e `ACCESS_SURFACE`, além das permissões de localização precisa/aproximada, foreground service de localização, notificações e estado da rede. Não solicita localização permanente. `LocationManager` obtém GPS sem depender do provedor Google Play Services. Estilos, sprites e fontes do modo offline acompanham o APK. Mundo usa tiles vetoriais e fontes OpenFreeMap por HTTPS; Goiânia offline usa os dados locais. Busca e rotas usam HTTPS.
 
 No telefone, há uma view nativa de mapa. No carro, `CarSurfaceRenderer` recebe a Surface do host e cria um `VirtualDisplay` com uma `Presentation` contendo outro `MapView` em modo `TextureView`. A interface do telefone não é espelhada. Consulte o [contrato e a prova mínima de Surface](docs/surface-probe.md).
 
@@ -126,7 +126,7 @@ O recorte de **Goiânia offline** é `[-49.325, -16.755, -49.205, -16.640]`, em 
 | `app/src/main/assets/maps/` | Dados gerados e incluídos no APK |
 | `app/src/main/assets/navigation-icons/` | Catálogos e imagens gerados, incluídos no APK |
 
-No modo mundial, o fornecedor de tiles é OpenFreeMap e os dados são OpenStreetMap. No recorte offline, vias, áreas e POIs vêm de OpenStreetMap; edificações incluem Overture e suas fontes Google/Microsoft. Contornos inferidos de imagens não equivalem a cadastro municipal. Fontes, ícones e dados locais têm créditos e licenças em `app/src/main/assets/maps/credits/`, incluindo `sources.json`, `attribution.html` e `asset-manifest.json` com hashes. O app apresenta a atribuição correspondente ao mapa selecionado e os créditos Geoapify de busca/rotas.
+No modo mundial, o fornecedor de tiles é OpenFreeMap, no esquema OpenMapTiles, e os dados são OpenStreetMap. No recorte offline, vias, áreas e POIs vêm de OpenStreetMap; edificações incluem Overture e suas fontes Google/Microsoft. Contornos inferidos de imagens não equivalem a cadastro municipal. Fontes, ícones e dados locais têm créditos e licenças em `app/src/main/assets/maps/credits/`, incluindo `sources.json`, `attribution.html` e `asset-manifest.json` com hashes. O app apresenta a atribuição correspondente ao mapa selecionado e os créditos Geoapify de busca/rotas.
 
 Em **Goiânia offline**, rotas podem ultrapassar o recorte local; nesses trechos faltam detalhes dos tiles empacotados e a prévia informa essa limitação. Em **Mundo online**, a cobertura usa os tiles mundiais, sem essa restrição geográfica local. Nenhum modo oferece cálculo offline de rotas.
 

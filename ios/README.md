@@ -2,7 +2,60 @@
 
 Aplicativo nativo em SwiftUI e MapLibre Native/Metal 6.31.0 para iPhone e iPad com iOS 17 ou posterior. A versão 0.5.0 usa **mapa mundial online por padrão**, mantém **Goiânia offline** como opção e preserva GPS, busca, rotas, manobras visuais, ETA, velocidade, recálculo, favoritos, Casa/Trabalho e recentes.
 
-O repositório é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin). Para gerar e instalar pelo Windows, siga [Sem Mac: GitHub Actions e AltServer](docs/SEM-MAC.md). O workflow está preparado para compilar em macOS; confira o resultado da execução e o [relatório de validação](docs/VALIDATION.md) antes de considerar o build ou os testes Apple aprovados.
+O repositório é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin). O projeto está preparado para um amigo compilar no Mac e enviar o IPA ao Guilherme, que fará a assinatura pessoal no Windows. A compilação Apple e os testes no iPhone ainda precisam ser executados; consulte o [relatório de validação](docs/VALIDATION.md).
+
+## Para quem vai compilar no Mac
+
+Você precisa de um **Mac com Xcode completo**, SDK compatível e um simulador de iPhone com iOS 17 ou posterior instalado. O projeto usa Swift 5 mode. O Swift Package Manager baixa o **MapLibre 6.31.0** pela internet; `NavSkinCore` é local. O empacotador usa `python3` no Terminal. Confira os [requisitos do Xcode](https://developer.apple.com/xcode/system-requirements/).
+
+1. Obtenha o repositório completo ou extraia `NavSkin-ios-0.5.0-source.zip`. Preserve as pastas `ios`, `scripts` e `tests` juntas.
+2. Abra **`ios/NavSkin.xcodeproj`** no Xcode e aguarde a resolução dos pacotes.
+3. Selecione o esquema **NavSkin** e um **simulador de iPhone com iOS 17+** como destino.
+4. Clique em **Run**. Os recursos em `ios/NavSkin/Resources` já estão preparados; o mapa mundial precisa de internet durante o uso.
+
+No Terminal, entre na pasta que contém `ios` e `scripts`. Estes comandos verificam o ambiente, compilam para simulador e executam a suíte no dispositivo simulado escolhido:
+
+```bash
+bash scripts/build-ios.sh doctor
+bash scripts/build-ios.sh simulator
+xcrun simctl list devices available
+bash scripts/build-ios.sh test SIMULATOR_UDID
+```
+
+Substitua `SIMULATOR_UDID` pelo identificador listado no comando anterior. O último comando executa os testes do núcleo e `NavSkinTests`, com verificações de recursos, estilos e Keychain. Confira a saída para confirmar o resultado.
+
+### Gerar o IPA para enviar ao Guilherme
+
+Ainda nessa pasta, execute:
+
+```bash
+RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh
+```
+
+Apesar do nome, esse script **também roda localmente no Mac**. Ele executa testes, compila o aplicativo para iPhone físico arm64 e empacota o resultado **sem assinatura pessoal**. Não usa GitHub e não exige login Apple, Team ou certificado do amigo.
+
+Se todas as etapas terminarem com sucesso, os arquivos serão:
+
+```text
+ios/artifacts/cloud/NavSkin-unsigned.ipa
+ios/artifacts/cloud/NavSkin-unsigned.json
+```
+
+Envie esses dois arquivos ao Guilherme. O IPA será assinado e instalado no Windows com a conta Apple do próprio Guilherme, seguindo [AltServer no Windows](docs/SEM-MAC.md#2-preparar-o-windows). Não inclua credenciais, certificados ou perfis pessoais do amigo no pacote. Se a compilação falhar, os logs ficam em `ios/artifacts/cloud`; corrija a falha antes de enviar o IPA como pronto.
+
+### Instalar diretamente pelo Xcode, se preferir
+
+Para rodar em um iPhone físico com iOS 17+, o responsável pela instalação precisa configurar sua própria Apple Account, Team e perfis de provisionamento em **Signing & Capabilities**. A [Personal Team](https://developer.apple.com/help/account/basics/about-your-developer-account) tem validade e limites de teste. Isso é opcional para o amigo: gerar o IPA unsigned pelo comando acima não exige essa assinatura.
+
+O identificador padrão é `br.com.navskin.ios`, versão 0.5.0, build 1. Para assinatura própria, copie `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e configure Team ID e bundle próprio; esse arquivo é ignorado pelo Git. Para criar um archive assinado no Mac:
+
+```bash
+bash scripts/build-ios.sh archive YOUR_APPLE_TEAM_ID
+```
+
+A exportação do archive fica no Organizer do Xcode e depende dos perfis da conta. TestFlight e publicação usam o fluxo de distribuição correspondente à conta.
+
+O [workflow GitHub Actions](../.github/workflows/ios-cloud.yml) permanece como alternativa manual. A execução nesta conta foi bloqueada pelo GitHub; ela não é necessária para entregar o projeto ao amigo nem comprova compilação Apple aprovada. O [guia do Windows](docs/SEM-MAC.md) explica como receber o IPA e fazer a assinatura pessoal.
 
 ## Mapa, temas e navegação
 
@@ -30,32 +83,9 @@ Durante uma viagem ativa, o aplicativo pode continuar recebendo localização co
 
 O modo mundial não baixa países para uso offline. O recorte de Goiânia não inclui busca nem cálculo de rota offline. O ETA não usa trânsito ao vivo; esta versão não inclui instruções por voz nem CarPlay. Não há conta NavSkin, sincronização de favoritos ou gravação contínua do trajeto. As consultas ao mapa mundial acessam OpenFreeMap; as consultas de busca e rota acessam Geoapify.
 
-## Abrir no Mac
+## Regenerar recursos e projeto
 
-1. Obtenha o repositório completo ou o pacote-fonte `NavSkin-ios-0.5.0-source.zip`, quando disponibilizado.
-2. Abra `ios/NavSkin.xcodeproj`, selecione o esquema **NavSkin** e um simulador com iOS 17 ou posterior. Use um Xcode com SDK compatível com o dispositivo; o projeto usa Swift 5 mode. Consulte os [requisitos do Xcode](https://developer.apple.com/xcode/system-requirements/).
-3. Aguarde a resolução do pacote remoto MapLibre, fixado em 6.31.0. `ios/Packages/NavSkinCore` é o pacote local.
-4. Execute **Run**. Os recursos preparados ficam em `ios/NavSkin/Resources`; o mapa mundial continuará dependendo de internet durante o uso.
-5. Para iPhone físico, selecione sua conta e Team em Signing & Capabilities. Se preferir configuração por arquivo, copie `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e informe Team ID e bundle próprio. Esse arquivo é ignorado pelo Git.
-
-O identificador padrão é `br.com.navskin.ios`; a versão é 0.5.0, build 1. A [Personal Team da Apple](https://developer.apple.com/help/account/basics/about-your-developer-account) permite testes pessoais com provisionamento temporário. TestFlight e publicação exigem o fluxo de distribuição correspondente à conta. Senhas Apple, certificados privados e chaves Geoapify ficam fora dos arquivos de configuração do projeto.
-
-## Build e testes
-
-Na raiz do repositório, em um Mac:
-
-```bash
-bash scripts/build-ios.sh doctor
-bash scripts/build-ios.sh simulator
-swift test --package-path ios/Packages/NavSkinCore
-xcrun simctl list devices available
-bash scripts/build-ios.sh test SIMULATOR_UDID
-bash scripts/build-ios.sh archive YOUR_APPLE_TEAM_ID
-```
-
-O esquema contém `NavSkinTests`, com testes Apple de recursos, estilos locais/mundiais e Keychain. O núcleo portátil tem sua própria suíte XCTest. O comando `archive` exige assinatura configurada; a exportação fica no Organizer do Xcode. O caminho sem Mac usa o [workflow dedicado](../.github/workflows/ios-cloud.yml) para gerar um IPA de dispositivo sem assinatura pessoal, seguido de assinatura no Windows.
-
-Para regenerar recursos e projeto no workspace completo:
+Esta etapa serve para atualizar os recursos no workspace completo. Ela não é necessária para abrir o pacote-fonte já preparado no Xcode:
 
 ```bash
 npm ci

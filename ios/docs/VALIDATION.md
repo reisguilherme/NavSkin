@@ -1,28 +1,40 @@
-# Verificação do port iOS — 27/10/2026
+# Validação NavSkin iOS 0.5.0 · 27/10/2026
 
-**Entrega:** fontes SwiftUI/CoreLocation/Keychain/MapLibre, projeto Xcode e esquema de testes, pacote Swift puro, recursos locais preparados e instruções de build/assinatura. **Não foi gerado IPA.** Não há macOS/Xcode/Apple SDK neste host; Swift Linux não compila esses frameworks.
+Entrega preparada para compilar em um Mac com Xcode: `ios/NavSkin.xcodeproj`, esquema **NavSkin**, pacote local **NavSkinCore**, recursos preparados, testes e guia [para quem vai compilar no Mac](../README.md#para-quem-vai-compilar-no-mac).
 
-## Verificado neste ambiente
+**A interface ainda não foi compilada pelo SDK Apple. Não há IPA gerado nem teste em simulador/iPhone nesta entrega.** O GitHub não iniciou o runner por um bloqueio de cobrança da conta, antes de qualquer etapa do job. [Execução registrada](https://github.com/reisguilherme/NavSkin/actions/runs/40559033001). O usuário escolheu compilar no Mac de um amigo; Actions permanece somente manual.
 
-- **80 testes XCTest aprovados**, zero falhas: geometria/progresso/ETA, GPS/rumo/velocidade, chegada no acesso viário, desvios/recálculo, respostas antigas/cancelamento, provider HTTPS/erros/quota, storage atômico/migração/recuperação e sessão/simulação. Executados com Swift 6.4.1 Ubuntu 24.04 no WSL local, linguagem Swift 5. O provedor usa fixtures nesses testes; nenhuma chave pessoal ou chamada autenticada foi usada.
-- **Três testes Node de empacotamento iOS aprovados:** bytes originais de GeoJSON/PBF, 729 tiles, seis estilos, 12 ícones salvos e seis veículos por tema, prévias PNG e vínculo de todos os fontes/recursos no projeto.
-- A suíte npm completa também passou: **42 testes**, incluindo as regressões existentes de cartografia/arte Android e web. [Log Node](logs/node-tests.txt), [log XCTest](logs/core-tests.txt), [verificação estrutural/sintaxe](logs/source-checks.txt), [requisito do build Apple](logs/apple-build-prerequisite.txt).
-- Compilação e execução de `Validation/ProjectProbe.swift` junto com os fontes reais Foundation de AppTypes/MapResourceRepository: seis estilos resolvidos para `file://`, fontes/sprites/GeoJSON e catálogos encontrados, templates de tiles/glyphs preservados; projeto OpenStep e XMLs de configuração lidos por Foundation com referências válidas.
-- Todos os fontes do app e dos testes Apple passaram pelo parser Swift em modo 5. **Parse não é typecheck dos frameworks Apple.** Revisão independente conferiu seletores/propriedades no SDK MapLibre 6.31.0 e os contratos de CoreLocation/Keychain.
-- O script de build identifica o host incompatível e informa que requer macOS/Xcode, sem produzir arquivo com extensão IPA.
+## Verificações executadas
 
-O compilador portátil e a biblioteca de sistema necessária foram instalados apenas em `.runtime`, com assinatura PGP/checksums oficiais verificados, sem instalar pacotes no sistema. A configuração inicial SwiftBuild não propagou uma dependência local ao linker; o backend `--build-system native` permitiu compilar/testar. Ele emite aviso de depreciação sob Swift 6.4.1. [Pesquisa e comandos do ambiente](../../docs/ios-platform-research.md).
+- **80 testes XCTest do NavSkinCore passaram** no Swift 6.4.1/Linux, modo Swift 5. Incluem geometria, progresso, ETA, qualidade do GPS, chegada, desvio, recálculo, respostas antigas, erros/quota do provedor, persistência e sessão. Consultas Geoapify usam fixtures; nenhuma chave pessoal foi fornecida.
+- **48 testes Node passaram**, incluindo 6 estilos mundiais, 6 offline, categorias, geometria e recursos. Os três testes de recursos iOS confirmam 729 tiles locais, bytes geográficos originais, prévias, ícones e referências do projeto.
+- **31 testes Python passaram** para o empacotador unsigned. São arquivos Mach-O sintéticos de teste; não são um aplicativo iOS. O empacotador rejeita simulador/Mac Catalyst e valida arm64 iPhoneOS, framework MapLibre, Payload, modos de arquivo, links internos e manifesto SHA256.
+- O `ProjectProbe.swift` foi compilado com os fontes reais Foundation de AppTypes/MapResourceRepository. Confirmou modo mundial padrão, cache separado por cobertura, URLs HTTPS intactas, templates de tiles/fontes, resolução dos seis estilos offline, catálogos, projeto OpenStep, XML e nomes NavSkin.
+- Todos os fontes do aplicativo e dos quatro testes Apple passaram pelo parser Swift em modo 5. **Parse não verifica tipos de UIKit, CoreLocation, Keychain, SwiftUI ou MapLibre.**
+- Os scripts Bash e o workflow YAML foram verificados estruturalmente. O script identifica Windows/Linux como ambiente sem Xcode e não produz IPA nesses hosts. Os resultados `.xcresult` usam nomes únicos para permitir repetir o build no mesmo Mac.
+- Revisão independente encontrou e corrigiu a restauração indevida de câmera após gesto durante troca de estilo. A validação desse gesto com o renderer iOS ainda precisa ser feita no Mac.
 
-## Dependências externas e pendências
+O compilador Linux e sua dependência local ficam somente em `.runtime`. O backend SwiftPM `--build-system native` emite aviso de depreciação; os 80 testes são XCTest executados, não o resumo separado de zero testes Swift Testing. O [relatório 0.4](VALIDATION-v0.4.md) e seus logs permanecem identificados como histórico.
 
-1. **Mac com Xcode e SDK iOS:** compilar a interface e os testes GameMapTests, resolver o XCFramework, executar simulador e inspecionar pixels/permissões/rotação. O projeto foi validado estruturalmente, mas ainda pode exigir correções na primeira compilação Apple.
-2. **Conta/team e iPhone:** provisionamento/assinatura e instalação no dispositivo. Não há certificado, senha ou conta configurada no projeto; `Local.xcconfig` é privado e excluído do pacote de entrega.
-3. **Chave Geoapify do usuário:** testar endereços/estabelecimentos/rotas reais, quota e instruções em Goiânia. Nenhuma consulta autenticada foi alegada.
-4. **Teste de navegação real:** precisão/rumo/velocidade, desvios/recálculo, chegada, perda/recuperação, continuidade com tela bloqueada e retomada controlada. Não houve teste em iPhone, trânsito ou CarPlay. CarPlay não integra este escopo.
-5. **Distribuição:** revisão de privacidade/provedor, licenças, SDKs e regras Apple antes de TestFlight/App Store; nenhum upload ou publicação ocorreu.
+## Cobertura e limites
 
-Mapa e arte são os mesmos do Android, com cobertura cartográfica parcial de Goiânia. Buscar/calcular fora desse recorte não fornece cartografia mundial. O debug inclui reprodução identificada como SIMULAÇÃO; não serve como evidência de navegação real.
+NavSkin 0.5 usa OpenFreeMap mundial online por padrão, com OpenMapTiles/OSM. Tiles e fontes precisam de internet; a disponibilidade de detalhes depende dos dados de cada região. Goiânia offline continua uma opção com os recursos locais anteriores. Busca/cálculo/recálculo Geoapify exigem conexão e a chave configurada pelo usuário nos dois modos. Não há trânsito ao vivo, voz, CarPlay ou navegação totalmente offline.
 
-## Reprodução
+Os testes do serviço mundial incluem respostas TileJSON e MVT de São Paulo e Tóquio, além de glifos latinos, árabes e CJK. Isso confirma os recursos do provedor; não comprova renderização iOS. Consulte [fontes e cobertura](../../docs/world-maps.md).
 
-No Mac, siga [README](../README.md) e execute `swift test --package-path ios/Packages/GameMapCore`, depois o esquema GameMap no Xcode. `bash scripts/check-ios-source.sh` valida Foundation/projeto/sintaxe quando Swift estiver no PATH. Os comandos Apple não foram substituídos por capturas de navegador ou mockups.
+## Executar no Mac
+
+Na raiz do repositório:
+
+```bash
+bash scripts/build-ios.sh doctor
+swift test --package-path ios/Packages/NavSkinCore
+bash scripts/build-ios.sh simulator
+xcrun simctl list devices available
+bash scripts/build-ios.sh test SIMULATOR_UDID
+RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh
+```
+
+O último comando usa o Xcode local, sem GitHub ou login Apple, e só conclui após testes, build para dispositivo e validação do pacote. Após sucesso, envia-se `ios/artifacts/cloud/NavSkin-unsigned.ipa` e `.json` para assinatura pessoal pelo usuário no Windows. Não é um IPA diretamente instalável sem assinatura. Veja [instalação no Windows](SEM-MAC.md).
+
+Pendentes no ambiente Apple: typecheck/build completo, quatro testes NavSkinTests, renderização dos 12 estilos, gestos durante carga, câmera/rotação e ícones; no iPhone, permissões, precisão reduzida, bloqueio de tela, interrupções e navegação real com chave Geoapify. O pacote não contém senha, certificado, perfil pessoal nem chave do usuário.

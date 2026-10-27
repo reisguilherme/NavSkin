@@ -14,6 +14,8 @@ Durante a viagem, **Opções da viagem** abre visão geral, recálculo, salvamen
 
 Em **Temas** ou **Filtros**, **Cobertura do mapa** alterna os modos sem encerrar o GPS, cancelar a rota ou apagar favoritos. Também é acessível em **Para onde? → Cobertura do mapa**. Os três temas e suas variantes noturnas, as seis categorias e os marcadores funcionam nos dois modos. Os filtros mudam apenas os ícones dos pontos de interesse; os dados cartográficos e a rota continuam visíveis. As prévias do carrossel usam capturas reais do recorte offline para mostrar as paletas.
 
+Se a câmera estiver fora do recorte ao selecionar Goiânia offline, **Ver região offline** move explicitamente a câmera para a área incluída e fecha o seletor. A troca de cobertura sozinha preserva o enquadramento. Mesmo durante uma viagem, esse comando apenas explora o mapa; **Recentralizar** volta a acompanhar o GPS.
+
 ETA usa os tempos dos segmentos da rota. Não inclui trânsito ao vivo nem limites de velocidade. Com sinal ruim, posição antiga ou rota abandonada, as instruções e o ETA deixam de ser apresentados como válidos. O marcador antigo fica atenuado. Um desvio precisa de evidência consistente de GPS antes do recálculo; falhas e limite de consultas têm mensagem e tentativa explícita.
 
 ## Chave e serviço externo

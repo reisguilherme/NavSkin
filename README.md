@@ -7,8 +7,8 @@ Os dois modos oferecem temas dia/noite, filtros de lugares, favoritos, Casa/Trab
 | Plataforma | Projeto e instalação |
 |---|---|
 | Android / Android Auto | [Aplicativo Kotlin e instruções de build](android/README.md) |
-| iPhone e iPad com iOS 17+ | [Aplicativo SwiftUI e projeto Xcode](ios/README.md) |
-| iPhone usando um PC Windows | [Gerar IPA no GitHub e instalar com AltServer](ios/docs/SEM-MAC.md) |
+| iPhone e iPad com iOS 17+ | [Projeto preparado para compilar no Mac](ios/README.md#para-quem-vai-compilar-no-mac) |
+| iPhone usando um PC Windows | [Receber o IPA de um amigo e instalar com AltServer](ios/docs/SEM-MAC.md) |
 
 ## Cobertura e conexão
 
@@ -27,9 +27,9 @@ git clone https://github.com/reisguilherme/NavSkin.git
 cd NavSkin
 ```
 
-O Android usa Gradle. O iOS pode ser compilado em Mac com Xcode ou pelo [workflow do GitHub Actions](.github/workflows/ios-cloud.yml); um IPA sem assinatura pessoal precisa ser assinado antes da instalação no iPhone. A Apple Account é usada localmente pelo instalador no Windows, conforme o [guia sem Mac](ios/docs/SEM-MAC.md).
+O Android usa Gradle. Para o iOS, o caminho desta entrega é **um amigo compilar no Mac com Xcode**, seguindo o [README preparado para ele](ios/README.md#para-quem-vai-compilar-no-mac). O comando `RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh` também roda nesse Mac local: testa, compila e gera `ios/artifacts/cloud/NavSkin-unsigned.ipa` sem login Apple. O amigo envia o IPA ao Guilherme, que usa sua própria Apple Account no AltServer do Windows para assinar e instalar. [Passos no Windows](ios/docs/SEM-MAC.md).
 
-APKs, AABs, IPAs e saídas de build não fazem parte do código versionado. Use os artefatos de uma execução concluída ou gere os arquivos localmente. O nome local previsto para o APK desta versão é `NavSkin-v0.5.0-debug.apk`; o workflow iOS publica `NavSkin-unsigned.ipa` após compilar e empacotar com sucesso. A disponibilidade de um workflow não comprova o resultado do build. Consulte [validação Android](android/docs/VALIDATION-v0.5.md) e [validação iOS](ios/docs/VALIDATION.md) para as evidências e os testes ainda pendentes.
+APKs, AABs, IPAs e saídas de build não fazem parte do código versionado. O nome local previsto para o APK desta versão é `NavSkin-v0.5.0-debug.apk`. O projeto iOS está preparado, mas a compilação Apple ainda precisa ser executada no Mac. O [workflow do GitHub Actions](.github/workflows/ios-cloud.yml) permanece como alternativa manual; sua execução nesta conta foi bloqueada pelo GitHub e não é necessária para esse caminho. Consulte a [documentação Android](android/README.md) e a [validação iOS](ios/docs/VALIDATION.md) para as evidências e os testes ainda pendentes.
 
 Os [catálogos de ícones](docs/navigation-icon-catalogs.md) são locais e editáveis. Os registros da [versão Android 0.4.0](android/docs/VALIDATION-v0.4.md), da [0.3.0](android/docs/VALIDATION-v0.3.md) e suas capturas permanecem como histórico.
 

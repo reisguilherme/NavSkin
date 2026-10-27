@@ -1,10 +1,24 @@
 # NavSkin no iPhone usando Windows
 
-Este caminho usa um Mac hospedado pelo GitHub Actions para compilar o NavSkin 0.5.0 e o AltServer no Windows para assinar e instalar no seu iPhone com iOS 17 ou posterior. Você precisa do PC, cabo USB, conta GitHub e Apple Account. A compilação ocorre no GitHub; a conta Apple é usada localmente no Windows.
+O caminho desta entrega é **um amigo compilar o NavSkin 0.5.0 no Mac e enviar o IPA ao Guilherme**. Depois, o AltServer no Windows usa a Apple Account do próprio Guilherme para assinar e instalar no iPhone com iOS 17 ou posterior. Para essa instalação, você precisa do IPA, PC, cabo USB e Apple Account.
 
-O workflow está preparado neste repositório. A existência deste guia não confirma que uma execução terminou com sucesso; confira o status, os logs e os artefatos da execução escolhida.
+As instruções de compilação estão no [README para quem vai usar o Mac](../README.md#para-quem-vai-compilar-no-mac). O projeto está preparado; a compilação Apple ainda precisa ser executada. O GitHub Actions permanece uma alternativa manual, mas a execução nesta conta foi bloqueada pelo GitHub. Isso não impede o amigo de compilar localmente.
 
-## 1. Gerar o IPA pelo GitHub
+## 1. Receber o IPA do Mac
+
+No Mac, dentro da pasta que contém `ios`, `scripts` e `tests`, o amigo executa:
+
+```bash
+RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh
+```
+
+Apesar do nome, o script roda localmente com Xcode, sem GitHub e sem login Apple. Depois de compilar e testar com sucesso, ele gera `ios/artifacts/cloud/NavSkin-unsigned.ipa` e `NavSkin-unsigned.json`. O amigo envia os dois arquivos ao Guilherme. A assinatura pessoal será feita no Windows; o pacote não precisa conter credenciais nem perfis do amigo.
+
+Com o IPA em mãos, siga para [preparar o Windows](#2-preparar-o-windows).
+
+### Alternativa manual: gerar pelo GitHub Actions
+
+Use esta alternativa somente se a conta puder executar GitHub Actions. O bloqueio atual dessa execução não altera o caminho local no Mac.
 
 1. Abra [reisguilherme/NavSkin → Actions](https://github.com/reisguilherme/NavSkin/actions).
 2. Selecione **NavSkin iOS - gerar IPA para Windows**.
@@ -25,7 +39,7 @@ Inicie o AltServer, conecte o iPhone por USB, desbloqueie o aparelho e confirme 
 ## 3. Assinar e instalar
 
 1. Segure **Shift** e clique no ícone do AltServer na área de notificação.
-2. Escolha **Sideload .ipa…**, selecione seu iPhone e abra o arquivo `NavSkin-unsigned.ipa` extraído.
+2. Escolha **Sideload .ipa…**, selecione seu iPhone e abra o arquivo `NavSkin-unsigned.ipa` recebido.
 3. Informe sua Apple Account no diálogo local do AltServer e conclua a autenticação solicitada. A documentação do AltStore informa que as credenciais são enviadas à Apple. [Autenticação no AltServer](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows).
 4. Aguarde a assinatura e a instalação. Esse menu permite instalar o IPA diretamente, sem instalar o aplicativo AltStore primeiro. [Menu de instalação direta documentado pelo AltServer](https://faq.altstore.io/release-notes/altserver#direct-ipa-sideloading).
 5. Se o iPhone pedir confiança no desenvolvedor, abra **Ajustes → Geral → VPN e Gerenciamento de Dispositivo** e confirme o perfil da sua conta; o nome do menu varia conforme o iOS. [Orientação do AltStore](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows).

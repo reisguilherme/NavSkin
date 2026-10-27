@@ -239,7 +239,7 @@ class NativeMvpRenderingTest {
                 awaitPhoneLayers(scenario, selected)
                 savePhoneScreenshot("phone-filters.png")
                 collapsePanel(device)
-                waitForDescription(device, "RDR2 · 5/6 categorias ativas")
+                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 5/6 categorias ativas")
 
                 // A different theme must not reset the user's independent POI filters.
                 for (theme in listOf(MapTheme.ROSA_POP, MapTheme.RDR2)) {
@@ -253,7 +253,7 @@ class NativeMvpRenderingTest {
                     sameCamera(camera, readPhoneCamera(scenario))
                 }
                 scenario.recreate()
-                waitForDescription(device, "RDR2 · 5/6 categorias ativas")
+                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 5/6 categorias ativas")
                 assertFalse("A collapsed panel reopened after Activity recreation",
                     device.hasObject(By.desc("Explorar mapa")))
                 PreferenceStore(context).use { reopened ->
@@ -304,7 +304,7 @@ class NativeMvpRenderingTest {
                             android.graphics.Color.blue(pixel) > 230)
                     } finally { bitmap.recycle() }
                 }
-                waitForDescription(device, "Rosa Pop · 6/6 categorias ativas")
+                waitForDescription(device, "NavSkin · Goiânia · offline · Rosa Pop · 6/6 categorias ativas")
                 waitForDescription(device, "Temas")
                 waitForDescription(device, "Filtros")
             }
