@@ -5,7 +5,7 @@ import json
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-output = root / "ios" / "artifacts" / "NavSkin-ios-0.6.0-source.zip"
+output = root / "ios" / "artifacts" / "NavSkin-ios-0.7.0-source.zip"
 output.parent.mkdir(parents=True, exist_ok=True)
 excluded_dirs = {".build", ".swiftpm", "DerivedData", "xcuserdata", "artifacts", "__pycache__"}
 files = []

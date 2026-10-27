@@ -1,9 +1,21 @@
 import SwiftUI
 import NavSkinCore
 
+enum AppearanceSection {
+    case themes, filters, options
+    var title: String {
+        switch self {
+        case .themes: return "Temas"
+        case .filters: return "Filtros"
+        case .options: return "Opções do mapa"
+        }
+    }
+}
+
 @MainActor
 struct AppearanceSheet: View {
     @ObservedObject var store: AppStore
+    var section: AppearanceSection = .themes
     @State private var settings = false
     @Environment(\.dismiss) private var dismiss
     private var palette: ThemePalette { store.theme.palette }
@@ -12,24 +24,37 @@ struct AppearanceSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    SheetHeading(title: "Do seu jeito", subtitle: "Três universos para explorar o mundo.", palette: palette).padding(.horizontal, 20)
-                    ThemeCarousel(store: store, onSelect: {})
-                    VStack(alignment: .leading, spacing: 24) {
-                        baseMapSelection
-                        categories
-                        vehicleSelection
-                        mapPreferences
-                        markerCatalog
-                        Button { settings = true } label: {
-                            Label("Chave Geoapify e localização", systemImage: "key").frame(maxWidth: .infinity, alignment: .leading)
-                        }.buttonStyle(.bordered).controlSize(.large)
-                        Text("Busca e rotas dependem de conexão com a internet. A estimativa de chegada não inclui trânsito ao vivo.")
-                            .gameFont(.footnote).foregroundStyle(palette.muted)
-                    }.padding(.horizontal, 20)
+                    switch section {
+                    case .themes:
+                        SheetHeading(title: "Do seu jeito", subtitle: "Três universos para explorar o mundo.", palette: palette).padding(.horizontal, 20)
+                        ThemeCarousel(store: store, onSelect: {})
+                        VStack(alignment: .leading, spacing: 24) {
+                            vehicleSelection
+                            markerCatalog
+                        }.padding(.horizontal, 20)
+                    case .filters:
+                        VStack(alignment: .leading, spacing: 24) {
+                            categories
+                            if store.baseMapMode == .goianiaOffline {
+                                Text("Este snapshot offline não inclui escolas, cultura e locais de culto. Use o mapa mundial para esses grupos.")
+                                    .gameFont(.caption).foregroundStyle(palette.muted)
+                            }
+                        }.padding(.horizontal, 20)
+                    case .options:
+                        VStack(alignment: .leading, spacing: 24) {
+                            baseMapSelection
+                            mapPreferences
+                            Button { settings = true } label: {
+                                Label("Chave Geoapify e localização", systemImage: "key").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            }.buttonStyle(.bordered).controlSize(.large)
+                            Text("Busca e rotas dependem de conexão com a internet. A estimativa de chegada não inclui trânsito ao vivo.")
+                                .gameFont(.footnote).foregroundStyle(palette.muted)
+                        }.padding(.horizontal, 20)
+                    }
                 }.padding(.vertical, 20)
             }
             .background(palette.surface).foregroundStyle(palette.text)
-            .gameNavigationTitle("Personalizar").navigationBarTitleDisplayMode(.inline)
+            .gameNavigationTitle(section.title).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
             .sheet(isPresented: $settings) { APIKeySheet(store: store) }
         }

@@ -12,6 +12,8 @@ O recorte é `[-49.325, -16.755, -49.205, -16.640]`, em longitude/latitude, WGS8
 
 O tema **buildings** distribuído pela Overture é **ODbL 1.0**; não é CDLA. A descrição de fontes e licenças está na [documentação oficial de atribuição](https://docs.overturemaps.org/attribution/) e no [guia oficial de edificações](https://docs.overturemaps.org/guides/buildings/). A licença da coleção está também preservada no STAC local.
 
+Os estilos nativos do modo **Mundo** também reutilizam esses tiles na cobertura declarada, substituindo os polígonos de prédios mundiais que interceptam o recorte. Na v0.6, os dados densos eram acessíveis apenas na opção Goiânia. A seleção espacial e os limites dessa reutilização estão em [Mapa mundial](world-maps.md#densidade-das-edificações-no-modo-mundo); não há expansão da cobertura Overture para outras cidades.
+
 Atribuição utilizada: **© OpenStreetMap contributors, Overture Maps Foundation; Google Open Buildings; Microsoft Global ML Building Footprints**. Manter a atribuição e os links de licença ao redistribuir os dados ou o mapa.
 
 ## Aquisição e rastreabilidade

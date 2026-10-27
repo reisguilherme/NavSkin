@@ -9,8 +9,8 @@ android {
         applicationId = "br.com.gamemap.goiania"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.6.0"
+        versionCode = 6
+        versionName = "0.7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { buildConfig = true }
@@ -55,6 +55,7 @@ val verifyGameAssets by tasks.registering {
             "maps/glyphs/NavSkinGtaRoad/0-255.pbf",
             "maps/glyphs/NavSkinRdrMap/0-255.pbf",
             "maps/sprites/gta.png", "maps/sprites/rdr2.png",
+            "navigation-icons/gta/vehicles/arrow.png", "navigation-icons/gta/vehicles/arrow@2x.png",
         )
         val missing = required.filterNot { file("src/main/assets/$it").isFile }
         check(missing.isEmpty()) {

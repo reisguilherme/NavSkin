@@ -2,6 +2,63 @@ import SwiftUI
 import NavSkinCore
 
 @MainActor
+struct CompactRouteSummary: View {
+    @ObservedObject var store: AppStore
+    let openDetails: () -> Void
+    private var palette: ThemePalette { store.theme.palette }
+    private var canResume: Bool {
+        store.snapshot.phase == .resumeAvailable || (!store.snapshot.navigationActive &&
+            store.snapshot.destination == nil && store.snapshot.resumeDestination != nil)
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Button(action: openDetails) {
+                Text(summary).gameFont(.subheadline, weight: .bold).lineLimit(2).monospacedDigit()
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(title). \(summary)")
+            .accessibilityHint("Abrir detalhes e ações da rota")
+            if store.snapshot.phase == .preview && store.snapshot.providerConfigured {
+                Button("Iniciar") { store.startNavigation() }
+                    .gameFont(.subheadline, weight: .bold)
+                    .buttonStyle(.borderedProminent).controlSize(.large)
+            }
+        }
+        .foregroundStyle(palette.text).padding(.horizontal, 14).padding(.vertical, 6)
+        .background(palette.surface, in: RoundedRectangle(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(palette.border, lineWidth: 1))
+    }
+
+    private var title: String {
+        if canResume { return "Retomar destino" }
+        if store.snapshot.phase == .arrived { return "Você chegou!" }
+        return store.snapshot.destination?.name ?? store.snapshot.resumeDestination?.name ?? "Sua rota"
+    }
+
+    private var summary: String {
+        let snapshot = store.snapshot
+        if snapshot.phase == .calculating { return "Calculando rota…" }
+        if snapshot.phase == .recalculating { return "Recalculando rota…" }
+        if snapshot.phase == .arrived { return "Toque para concluir" }
+        if canResume { return snapshot.resumeDestination?.name ?? "Recalcular com seu GPS atual" }
+        if snapshot.phase == .rerouteFailed { return snapshot.message ?? "Recálculo indisponível · ver opções" }
+        if snapshot.navigationActive {
+            guard snapshot.guidanceAvailable, let progress = snapshot.progress else { return "Aguardando GPS válido" }
+            return "\(NavSkinFormat.duration(progress.remainingSeconds)) · \(NavSkinFormat.distance(progress.remainingDistanceMeters)) · \(NavSkinFormat.arrival(progress.arrivalEpochMs))"
+        }
+        if snapshot.phase == .preview, let route = snapshot.route {
+            let arrival = Int64((Date().timeIntervalSince1970 + route.durationSeconds) * 1_000)
+            return "\(NavSkinFormat.duration(route.durationSeconds)) · \(NavSkinFormat.distance(route.distanceMeters)) · \(NavSkinFormat.arrival(arrival))"
+        }
+        return snapshot.message ?? "Toque para ver sua rota"
+    }
+}
+
+@MainActor
 struct GuidanceCard: View {
     @ObservedObject var store: AppStore
     private var palette: ThemePalette { store.theme.palette }
@@ -94,11 +151,11 @@ struct RoutePanel: View {
             }
             Spacer(minLength: 6)
             if store.snapshot.route != nil {
-                Button { store.showOverview() } label: { Image(systemName: "arrow.up.left.and.arrow.down.right").frame(width: 40, height: 40) }
+                Button { store.showOverview() } label: { Image(systemName: "arrow.up.left.and.arrow.down.right").frame(width: 44, height: 44) }
                     .accessibilityLabel("Ver rota completa")
             }
             if store.snapshot.destination != nil {
-                Button { saving = true } label: { Image(systemName: "bookmark").frame(width: 40, height: 40) }
+                Button { saving = true } label: { Image(systemName: "bookmark").frame(width: 44, height: 44) }
                     .accessibilityLabel("Salvar destino")
             }
         }

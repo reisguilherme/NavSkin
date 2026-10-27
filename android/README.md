@@ -2,7 +2,9 @@
 
 Aplicativo nativo em Kotlin com mapas mundiais, GPS do Android e navegação visual para automóvel no telefone e no Android Auto. A integração usa a categoria **Navegação** da Car App Library. MapLibre Native renderiza **Mundo online**, padrão, com mapas OpenFreeMap / OpenStreetMap por HTTPS, ou **Goiânia offline**, com o recorte cartográfico incluído no APK. Geoapify fornece busca e rotas pela internet com a chave do usuário.
 
-Versão do código: **0.6.0**, `versionCode 5`. Consulte [configuração e uso](docs/NAVIGATION.md) e [validação da v0.6](docs/VALIDATION-v0.6.md). O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.5](docs/VALIDATION-v0.5.md), [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico.
+Versão do código: **0.7.0**, `versionCode 6`. Consulte [configuração e uso](docs/NAVIGATION.md) e [validação da v0.7](docs/VALIDATION-v0.7.md). O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.6](docs/VALIDATION-v0.6.md), [v0.5](docs/VALIDATION-v0.5.md), [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico.
+
+Na 0.7, Temas/Filtros sobem para o cabeçalho. O botão de menu abre salvos, GPS, configurações, orientação, zoom e créditos. Busca inferior, velocidade e recentralização circulares substituem os painéis ociosos e a faixa de atribuição. O card de ETA mostra somente tempo, distância e chegada, centralizados; rótulos GTA estão maiores. O marcador padrão GTA usa radar_centre original, com escala lógica corrigida em telas densas. Overture local também é renderizado no modo Mundo em Goiânia, sem duplicar os prédios mundiais; fora da cobertura continua OpenFreeMap.
 
 ## Recursos visuais da versão 0.6
 
@@ -31,9 +33,9 @@ O mapa mundial depende de internet e não exige chave cartográfica. Quando falt
 
 ## Começar a usar
 
-No telefone, escolha a cobertura em **Temas** ou **Filtros**; ela também está em **Para onde? → Cobertura do mapa**. No Android Auto, use **Aparência → Cobertura do mapa**. GTA SA, Rosa Pop, RDR2 e modo noturno estão disponíveis nos dois mapas. Os nove filtros aparecem no painel; ensino, cultura e culto dependem dos dados mundiais e ainda não estão no snapshot offline. As prévias do carrossel são capturas nativas de São Paulo no mapa mundial.
+No telefone, escolha a cobertura em **Temas** ou **Filtros**; ela também está em **Menu → Cobertura do mapa**. No Android Auto, use **Aparência → Cobertura do mapa**. GTA SA, Rosa Pop, RDR2 e modo noturno estão disponíveis nos dois mapas. Os nove filtros aparecem no painel; ensino, cultura e culto dependem dos dados mundiais e ainda não estão no snapshot offline. As prévias do carrossel são capturas nativas de São Paulo no mapa mundial.
 
-Para navegar, abra **Para onde? → Configurar chave Geoapify**, salve uma chave da sua conta e ative **GPS**. Autorize localização precisa durante o uso; a notificação mantém a sessão com a tela bloqueada. A chave é criptografada com Android KeyStore e não precisa ser inserida no código ou no build. Sem chave, o mapa, GPS e dados locais continuam disponíveis; o aplicativo informa a configuração pendente ao solicitar busca ou rota.
+Para navegar, abra **Menu → Configurar chave Geoapify**, salve uma chave da sua conta e ative **GPS**. Autorize localização precisa durante o uso; a notificação mantém a sessão com a tela bloqueada. A chave é criptografada com Android KeyStore e não precisa ser inserida no código ou no build. Sem chave, o mapa, GPS e dados locais continuam disponíveis; o aplicativo informa a configuração pendente ao solicitar busca ou rota.
 
 Pesquise um destino, escolha um local salvo/recente ou mantenha pressionado um ponto do mapa. Confira a prévia e toque em **Iniciar**. Arrastar o mapa suspende o acompanhamento; **Recentralizar** retoma. Edição detalhada de favoritos e catálogos ficam no celular. No Android Auto, o teclado depende de estacionamento e a entrada/seleção segue os templates do host. Se o Android impedir ativar o GPS apenas pela central, faça a ativação no telefone quando estacionado e depois use os destinos pela multimídia.
 
@@ -138,4 +140,4 @@ Em **Goiânia offline**, rotas podem ultrapassar o recorte local; nesses trechos
 
 Consulte também [procedência e categorias POI](../docs/android-poi-categories.md), [decisão de navegação e custos](../docs/navigation-provider-decision.md), [requisitos de plataforma](../docs/android-navigation-platform.md), [viabilidade Android Auto anterior](../docs/android-auto-feasibility.md) e [ambiente emulado](../docs/emulator-status.md).
 
-O pacote local `NavSkin-game-assets-0.6.0.zip` contém a árvore de recursos preparada: extraia seu conteúdo na raiz do clone, mantendo as pastas `android` e `ios`. O ZIP iOS completo já está preparado para abrir no Mac e dispensa essa etapa. Os arquivos de assinatura pessoal continuam excluídos.
+O pacote local `NavSkin-game-assets-0.7.0.zip` contém a árvore de recursos preparada: extraia seu conteúdo na raiz do clone, mantendo as pastas `android` e `ios`. O ZIP iOS completo já está preparado para abrir no Mac e dispensa essa etapa. Os arquivos de assinatura pessoal continuam excluídos.

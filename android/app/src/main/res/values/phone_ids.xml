@@ -1,0 +1,8 @@
+<resources>
+    <item name="phone_header" type="id"/>
+    <item name="phone_search" type="id"/>
+    <item name="phone_speed" type="id"/>
+    <item name="phone_recenter" type="id"/>
+    <item name="phone_main_menu" type="id"/>
+    <item name="phone_route_summary" type="id"/>
+</resources>

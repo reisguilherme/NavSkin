@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { validateStyleMin, featureFilter, createExpression } from '@maplibre/maplibre-gl-style-spec';
+import { VectorTile } from '@mapbox/vector-tile';
+import { PbfReader } from 'pbf';
 
 const builder = await import('../scripts/prepare-world-maps.mjs').catch(() => ({}));
 const themes = ['gta', 'rosa', 'rdr2'];
@@ -9,11 +11,87 @@ const variants = themes.flatMap(theme => [theme, `${theme}-night`]);
 const categories = ['parks', 'fuel', 'food', 'parking', 'health', 'shops', 'education', 'culture', 'religion'];
 const gameCatalog = JSON.parse(await readFile(new URL('../android/maps/game-assets/catalog.json', import.meta.url), 'utf8'));
 const asset = async mode => JSON.parse(await readFile(new URL(`../android/app/src/main/assets/maps/styles/world-${mode}.json`, import.meta.url), 'utf8'));
+const buildingMetadata = JSON.parse(await readFile(new URL('../public/data/buildings-metadata.json', import.meta.url), 'utf8'));
 const evaluate = (expression, properties, zoom = 17) => {
   const compiled = createExpression(expression, 'layers[0].layout.icon-image');
   assert.equal(compiled.result, 'success');
   return compiled.value.evaluate({ zoom }, { type: 2, properties });
 };
+
+test('world styles load the existing dense local building tiles within their declared coverage', () => {
+  for (const mode of variants) {
+    const style = builder.buildWorldStyle(mode);
+    const local = style.layers.find(layer => layer.id === 'building-footprints-local');
+    assert.ok(local, 'the world map must expose the bundled Overture footprints');
+    const source = style.sources[local.source];
+    assert.deepEqual(source.tiles, ['asset://maps/tiles/buildings/{z}/{x}/{y}.pbf']);
+    assert.deepEqual(source.bounds, [-49.325, -16.755, -49.205, -16.64]);
+    assert.equal(source.minzoom, 11);
+    assert.equal(source.maxzoom, 16);
+    assert.equal(local['source-layer'], 'buildings');
+    assert.equal(local.minzoom, style.layers.find(layer => layer.id === 'building-footprints').minzoom);
+    assert.deepEqual(local.paint, style.layers.find(layer => layer.id === 'building-footprints').paint);
+    assert.ok(style.layers.indexOf(local) < style.layers.findIndex(layer => layer.metadata?.road));
+    assert.equal(style.metadata.navskin.bundledBuildings.count, buildingMetadata.counts.total);
+    assert.equal(style.metadata.navskin.bundledBuildings.release, buildingMetadata.release);
+    for (const credit of ['Overture', 'Google Open Buildings', 'Microsoft']) {
+      assert.match(source.attribution, new RegExp(credit));
+      assert.match(style.metadata.navskin.attribution, new RegExp(credit));
+    }
+  }
+});
+
+test('world building coverage replaces real polygons in Goiânia and retains buildings beyond every edge', () => {
+  const style = builder.buildWorldStyle('gta');
+  const world = style.layers.find(layer => layer.id === 'building-footprints');
+  const matches = featureFilter(world.filter, 'world-buildings.filter').filter;
+  // MapLibre expressions consume actual polygon tile coordinates at extent8192.
+  // The fixtures deliberately use Polygon (within only supports points/lines).
+  const canonical = { z: 14, x: 5948, y: 8963 };
+  const polygon = (west, south, east, north) => ({ type: 3, properties: {}, geometry: [
+    [[west, south], [east, south], [east, north], [west, north], [west, south]].map(([lon, lat]) => ({
+      x: Math.round(((lon + 180) / 360 * 2 ** canonical.z - canonical.x) * 8192),
+      y: Math.round(((1 - Math.asinh(Math.tan(lat * Math.PI / 180)) / Math.PI) / 2 * 2 ** canonical.z - canonical.y) * 8192),
+    })),
+  ] });
+  assert.equal(matches({ zoom: 17 }, polygon(-49.26, -16.70, -49.25, -16.69), canonical), false,
+    'OSM footprints in the dense local coverage must not be drawn a second time');
+  for (const coordinates of [
+    [-49.34, -16.70, -49.33, -16.69], [-49.20, -16.70, -49.19, -16.69],
+    [-49.26, -16.77, -49.25, -16.76], [-49.26, -16.63, -49.25, -16.62],
+    [-46.64, -23.56, -46.63, -23.55],
+  ]) assert.equal(matches({ zoom: 17 }, polygon(...coordinates), canonical), true, `${coordinates}: outside coverage`);
+  // The source query keeps entire footprints that intersect the coverage.
+  // The replacement therefore uses intersection, including crossing polygons.
+  for (const coordinates of [
+    [-49.33, -16.70, -49.32, -16.69], [-49.21, -16.70, -49.20, -16.69],
+    [-49.26, -16.76, -49.25, -16.75], [-49.26, -16.645, -49.25, -16.635],
+  ]) assert.equal(matches({ zoom: 17 }, polygon(...coordinates), canonical), false, `${coordinates}: crossing coverage`);
+});
+
+test('world local building source resolves the dense university tile without stacking world footprints', async () => {
+  const style = builder.buildWorldStyle('gta');
+  const local = style.layers.find(layer => layer.id === 'building-footprints-local');
+  const source = style.sources[local.source];
+  // Praça Universitária: both production sources resolve this z14 tile.
+  const canonical = { z: 14, x: 5950, y: 8961 };
+  const relative = source.tiles[0].replace('asset://maps/', '')
+    .replace('{z}', canonical.z).replace('{x}', canonical.x).replace('{y}', canonical.y);
+  const buffer = await readFile(new URL(`../public/${relative}`, import.meta.url));
+  const tile = new VectorTile(new PbfReader(buffer));
+  const layer = tile.layers[local['source-layer']];
+  assert.ok(layer.length > 1000, 'the source must load the dense Overture layer instead of sparse OSM or empty data');
+  const worldMatches = featureFilter(style.layers.find(layer => layer.id === 'building-footprints').filter, 'world.filter').filter;
+  const localMatches = featureFilter(local.filter, 'local.filter').filter;
+  for (const index of [0, Math.floor(layer.length / 2), layer.length - 1]) {
+    const feature = layer.feature(index);
+    const input = { type: feature.type, properties: feature.properties,
+      geometry: feature.loadGeometry().map(ring => ring.map(point => ({ x: point.x * 8192 / layer.extent, y: point.y * 8192 / layer.extent }))) };
+    assert.equal(typeof input.properties.gers_id, 'string');
+    assert.ok(localMatches({ zoom: 17 }, input, canonical));
+    assert.equal(worldMatches({ zoom: 17 }, input, canonical), false);
+  }
+});
 
 test('world oneway arrows follow real directions and never infer missing road restrictions', () => {
   const style = builder.buildWorldStyle('gta');

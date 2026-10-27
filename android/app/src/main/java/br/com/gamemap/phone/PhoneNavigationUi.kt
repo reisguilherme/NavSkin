@@ -17,9 +17,11 @@ import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import br.com.gamemap.BuildConfig
 import br.com.gamemap.data.OfflineMapCoverage
 import br.com.gamemap.GameMapApplication
+import br.com.gamemap.R
 import br.com.gamemap.car.CarDestinationIntent
 import br.com.gamemap.car.CarNavigationIntents
 import br.com.gamemap.navigation.*
@@ -44,7 +46,7 @@ internal class PhoneNavigationUi(
     restoredState: android.os.Bundle?,
     private val closeAppearanceSheet: () -> Unit,
     private val openMapSettings: () -> Unit,
-    private val routeLayout: (Boolean) -> Unit,
+    private val onGuidanceChanged: (Boolean) -> Unit,
 ) {
     private val app get() = activity.application as GameMapApplication
     private val runtime get() = app.navigation
@@ -60,14 +62,31 @@ internal class PhoneNavigationUi(
     private var bottomInset = 0
     private var leftInset = 0
     private var rightInset = 0
+    private var headerBottom = 0
+    private var currentMapNotice: String? = null
     private var lastPreviewId: String? = restoredState?.getString(PREVIEW_STATE)
     private val search = label("Para onde?", 16f, true)
     private val guidance = label("", 17f, true)
     private val summary = LinearLayout(activity).apply { orientation = LinearLayout.VERTICAL }
-    private val metrics = label("", 18f, true)
-    private val status = label("", 12f)
+    private val metrics = label("", 18f, true).apply { gravity = Gravity.CENTER }
     private val primary = label("", 14f, true)
-    private val controls = LinearLayout(activity).apply { orientation = LinearLayout.HORIZONTAL }
+    private val speedNumber = label("—", 24f, true).apply { gravity = Gravity.CENTER; maxLines = 1 }
+    private val speedUnit = label("km/h", 9f).apply { gravity = Gravity.CENTER; maxLines = 1 }
+    private val speedBadge = LinearLayout(activity).apply {
+        id = R.id.phone_speed
+        orientation = LinearLayout.VERTICAL
+        gravity = Gravity.CENTER
+        isClickable = true; isFocusable = true
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
+        addView(speedNumber, LinearLayout.LayoutParams(WRAP, WRAP))
+        addView(speedUnit, LinearLayout.LayoutParams(WRAP, WRAP))
+        setOnClickListener { showOptions() }
+    }
+    private val recenter = PhoneAction(activity, R.drawable.phone_locate, "Recentralizar").apply {
+        id = R.id.phone_recenter
+        setOnClickListener { withGps { renderer.recenter() } }
+    }
     private val permission = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         val fine = granted(Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = granted(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -80,42 +99,39 @@ internal class PhoneNavigationUi(
     }
 
     init {
+        search.id = R.id.phone_search
+        search.minimumHeight = dp(56)
+        search.gravity = Gravity.CENTER
         search.setPadding(dp(18), dp(14), dp(18), dp(14))
-        search.contentDescription = "Para onde? Buscar destinos e abrir seus lugares"
+        search.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.phone_search, 0, 0, 0)
+        search.compoundDrawablePadding = dp(12)
+        search.contentDescription = "Para onde? Buscar destinos"
         search.setOnClickListener { showDestinations() }
-        add(search, Gravity.TOP, MATCH, WRAP)
+        add(search, Gravity.BOTTOM, MATCH, WRAP)
         guidance.setPadding(dp(16), dp(14), dp(16), dp(14))
         guidance.accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         guidance.visibility = View.GONE
         add(guidance, Gravity.TOP, MATCH, WRAP)
         summary.setPadding(dp(16), dp(12), dp(16), dp(10))
+        summary.id = R.id.phone_route_summary
+        summary.minimumHeight = dp(48)
         summary.addView(metrics)
-        summary.addView(status, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dp(6) })
         summary.addView(primary, LinearLayout.LayoutParams(MATCH, dp(48)).apply { topMargin = dp(6) })
         primary.gravity = Gravity.CENTER
         primary.setOnClickListener { primaryAction() }
         summary.setOnClickListener { showRoute() }
-        status.setOnClickListener {
-            if (app.preferences.snapshot().baseMapMode == MapBaseMode.WORLD && !app.mapConnectivity.isOnline) {
-                dialog?.dismiss(); openMapSettings()
-            } else showRoute()
-        }
         summary.visibility = View.GONE
         add(summary, Gravity.BOTTOM, MATCH, WRAP)
-        action(controls, "GPS") { withGps { renderer.recenter() } }
-        action(controls, "Rota") { renderer.showRouteOverview() }
-        action(controls, "N ↑") {
-            safely { app.navigationSettings.setOrientation(if (app.navigationSettings.snapshot().orientation == MapOrientation.NORTH_UP)
-                MapOrientation.MOVEMENT_UP else MapOrientation.NORTH_UP) }
+        val diameter = dp(maxOf(64, (48 * activity.resources.configuration.fontScale).roundToInt()))
+        add(speedBadge, Gravity.BOTTOM or Gravity.START, diameter, diameter)
+        add(recenter, Gravity.BOTTOM or Gravity.END, diameter, diameter)
+        search.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) position()
         }
-        add(controls, Gravity.BOTTOM or Gravity.START, WRAP, WRAP)
         renderer.setOnMapDestinationListener { point -> showPoint(point) }
         renderer.setOnCameraModeChangedListener { following ->
-            (controls.getChildAt(0) as TextView).apply {
-                text = if (following) "Seguindo" else "Recentralizar"
-                isSelected = following
-                contentDescription = if (following) "GPS acompanhando; recentralizar" else "Recentralizar e acompanhar GPS"
-            }
+            recenter.isSelected = following
+            recenter.contentDescription = if (following) "Recentralizar; GPS acompanhando" else "Recentralizar"
         }
         themeChanged()
     }
@@ -139,16 +155,24 @@ internal class PhoneNavigationUi(
     }
     fun themeChanged() {
         colors = PhonePalette.forTheme(app.preferences.snapshot().theme)
-        search.surface(colors, 22)
+        search.surface(colors, 28)
+        search.compoundDrawableTintList = android.content.res.ColorStateList.valueOf(colors.muted)
         guidance.surface(colors, 20)
         summary.surface(colors, 22)
-        controls.surface(colors, 20)
+        speedBadge.surface(colors, 100)
+        recenter.bind(colors)
+        recenter.touchSurface(colors.surface, 100)
+        recenter.elevation = dp(6).toFloat()
         listOf(search, guidance, metrics).forEach { it.setTextColor(colors.text) }
-        status.setTextColor(colors.muted)
+        speedNumber.setTextColor(colors.text)
+        speedUnit.setTextColor(colors.muted)
         primary.setTextColor(Color.WHITE)
         primary.touchSurface(colors.accent, 14)
-        for (index in 0 until controls.childCount) (controls.getChildAt(index) as? TextView)?.setTextColor(colors.text)
         render()
+    }
+    fun headerBottom(value: Int) { headerBottom = value; position() }
+    fun mapNotice(value: String?) {
+        if (currentMapNotice != value) { currentMapNotice = value; render() }
     }
     fun mapAvailabilityChanged() { render() }
     fun insets(left: Int, top: Int, right: Int, bottom: Int) {
@@ -157,50 +181,42 @@ internal class PhoneNavigationUi(
     }
     private fun position() {
         val landscape = activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        controls.orientation = if (landscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
-        controls.layoutParams = (controls.layoutParams as FrameLayout.LayoutParams).apply {
-            gravity = Gravity.BOTTOM or if (landscape) Gravity.START else Gravity.END
-        }
-        val sideWidth = dp(280).coerceAtMost((activity.resources.displayMetrics.widthPixels - leftInset - rightInset) * 2 / 5)
-        listOf(search, guidance).forEach { view ->
-            view.layoutParams = (view.layoutParams as FrameLayout.LayoutParams).apply { width = if (landscape) sideWidth else MATCH; gravity = Gravity.TOP or Gravity.START }
-        }
+        val viewportWidth = root.width.takeIf { it > 0 } ?: activity.resources.displayMetrics.widthPixels
+        val availableWidth = viewportWidth - leftInset - rightInset - dp(32)
+        val panelWidth = if (landscape) dp(360).coerceAtMost(availableWidth) else availableWidth
+        search.layoutParams = (search.layoutParams as FrameLayout.LayoutParams).apply { width = panelWidth; gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL }
+        guidance.layoutParams = (guidance.layoutParams as FrameLayout.LayoutParams).apply { width = panelWidth; gravity = Gravity.TOP or Gravity.START }
         summary.layoutParams = (summary.layoutParams as FrameLayout.LayoutParams).apply {
-            width = if (landscape) sideWidth else MATCH
-            gravity = Gravity.BOTTOM or if (landscape) Gravity.END else Gravity.CENTER_HORIZONTAL
+            width = panelWidth
+            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         }
-        guidance.maxLines = if (landscape) 4 else 5
+        guidance.maxLines = if (landscape) 2 else 5
         guidance.ellipsize = android.text.TextUtils.TruncateAt.END
-        status.maxLines = if (landscape) 3 else 4
-        status.ellipsize = android.text.TextUtils.TruncateAt.END
-        place(search, top = topInset + dp(if (landscape) 12 else 82))
-        place(guidance, top = topInset + dp(if (landscape) 74 else 142))
-        place(summary, bottom = bottomInset + dp(110))
-        place(controls, bottom = bottomInset + dp(if (landscape) 36 else 292))
+        val searchHeight = search.height.coerceAtLeast(dp(56))
+        val circleBottom = bottomInset + dp(16) + searchHeight + dp(12)
+        val circleHeight = speedBadge.layoutParams.height
+        place(search, bottom = bottomInset + dp(16))
+        place(guidance, top = maxOf(headerBottom, topInset + dp(70)) + dp(12))
+        place(summary, bottom = if (landscape) bottomInset + dp(16) + searchHeight + dp(12)
+            else circleBottom + circleHeight + dp(12))
+        if (landscape) {
+            // ETA shares the row between the circles in wide windows.
+            summary.layoutParams = (summary.layoutParams as FrameLayout.LayoutParams).apply {
+                width = minOf(dp(360), (availableWidth - 2 * circleHeight - dp(24)).coerceAtLeast(dp(120)))
+            }
+        }
+        place(speedBadge, bottom = circleBottom)
+        place(recenter, bottom = circleBottom)
     }
     private fun render() {
         renderer.updateNavigation(state, app.navigationSettings.snapshot(), app.places.snapshot().savedPlaces, app.preferences.snapshot().theme)
-        (controls.getChildAt(2) as TextView).apply {
-            val north = app.navigationSettings.snapshot().orientation == MapOrientation.NORTH_UP
-            text = if (north) "N ↑" else "Rumo ↑"
-            contentDescription = if (north) "Norte para cima; mudar orientação" else "Direção do movimento para cima; mudar orientação"
-        }
-        (controls.getChildAt(0) as TextView).text = when {
-            !renderer.isFollowing -> "Recentralizar"
-            state.locationAccess == LocationAccess.AVAILABLE -> "Seguindo"
-            else -> "GPS"
-        }
-        val visible = state.destination != null || state.resumeDestination != null || state.serviceRunning || state.simulation ||
-            state.message != null && state.locationAccess in setOf(LocationAccess.NEEDS_PHONE_START, LocationAccess.DISABLED, LocationAccess.LOST)
-        controls.getChildAt(1).visibility = if (state.route != null) View.VISIBLE else View.GONE
-        controls.getChildAt(2).visibility = if (visible) View.VISIBLE else View.GONE
+        val visible = state.destination != null || state.resumeDestination != null
         summary.visibility = if (visible) View.VISIBLE else View.GONE
-        routeLayout(visible)
         val speed = state.location.speedKmh?.takeIf { state.location.quality == LocationQuality.GOOD }?.roundToInt()?.let { "$it km/h" } ?: "— km/h"
         val progress = state.progress.takeIf { state.guidanceAvailable }
         metrics.text = when {
             progress != null -> "${duration(progress.remainingSeconds)} · ${distance(progress.remainingDistanceMeters)} · ${eta(progress.arrivalEpochMs)}"
-            state.phase == NavigationPhase.PREVIEW && state.route != null -> "${duration(state.route!!.durationSeconds)} · ${distance(state.route!!.distanceMeters)}"
+            state.phase == NavigationPhase.PREVIEW && state.route != null -> "${duration(state.route!!.durationSeconds)} · ${distance(state.route!!.distanceMeters)} · ${eta(System.currentTimeMillis() + (state.route!!.durationSeconds * 1000).toLong())}"
             state.phase == NavigationPhase.ARRIVED -> "Você chegou!"
             state.phase == NavigationPhase.RESUME_AVAILABLE -> "Retomar destino?"
             else -> state.destination?.name ?: "Sua posição"
@@ -215,10 +231,10 @@ internal class PhoneNavigationUi(
             else -> "Aguardando GPS"
         }
         val notice = if (state.simulation) "SIMULAÇÃO · " else ""
-        val mapNotice = if (app.preferences.snapshot().baseMapMode == MapBaseMode.WORLD && !app.mapConnectivity.isOnline)
-            "\nMapa mundial sem internet · toque para escolher Goiânia offline." else ""
-        status.text = "$notice$speed · $quality" + (if (state.message != null) "\n${state.message}" else "") + mapNotice
+        speedNumber.text = speed.substringBefore(" km/h")
+        speedBadge.contentDescription = "${notice}Velocidade: $speed · $quality"
         guidance.visibility = if (state.navigationActive || state.simulation) View.VISIBLE else View.GONE
+        onGuidanceChanged(guidance.visibility == View.VISIBLE)
         guidance.text = if (progress != null) {
             val step = state.route?.steps?.getOrNull(progress.stepIndex)
             "${distance(progress.distanceToManeuverMeters)}  ${step?.instruction ?: "Siga a rota"}" +
@@ -237,6 +253,7 @@ internal class PhoneNavigationUi(
             state.destination != null -> "Ver destino"
             else -> "Seus lugares e opções"
         }
+        primary.visibility = if (state.navigationActive) View.GONE else View.VISIBLE
         if (state.phase == NavigationPhase.PREVIEW && state.route?.id != lastPreviewId) {
             lastPreviewId = state.route?.id
             renderer.showRouteOverview()
@@ -300,12 +317,24 @@ internal class PhoneNavigationUi(
         lastSearch = null
         render()
         action(content, "Seus lugares · salvos e recentes") { showPlaces() }
+    }
+
+    fun showOptions() {
+        val content = sheet("Seus lugares e opções", "GPS, aparência e preferências deste aparelho")
+        note(content, speedBadge.contentDescription.toString() + state.message?.let { "\n$it" }.orEmpty())
+        currentMapNotice?.let { note(content, it) }
+        action(content, "Seus lugares · salvos e recentes") { showPlaces() }
+        if (state.destination != null || state.resumeDestination != null)
+            action(content, "Sua viagem · destino e opções") { showRoute() }
         action(content, "Minha posição · ativar GPS") { dialog?.dismiss(); withGps { renderer.recenter() } }
         action(content, "Salvar minha posição") { withGps {
             runtime.snapshot().location.takeIf { it.quality == LocationQuality.GOOD }?.fix?.point?.let { editPlace(Destination(UUID.randomUUID().toString(), "Minha posição", it)) }
                 ?: toast("Aguarde uma posição atual e precisa e toque novamente.")
         } }
         action(content, "Marcador do veículo e orientação") { showVehicle() }
+        action(content, "Aumentar zoom") { renderer.zoomBy(1.0); dialog?.dismiss() }
+        action(content, "Diminuir zoom") { renderer.zoomBy(-1.0); dialog?.dismiss() }
+        action(content, "Voltar ao enquadramento inicial") { renderer.reset(); dialog?.dismiss() }
         action(content, "Cobertura do mapa · ${app.preferences.snapshot().baseMapMode.label}") {
             dialog?.dismiss(); openMapSettings()
         }
@@ -317,6 +346,10 @@ internal class PhoneNavigationUi(
         note(content, if (app.preferences.snapshot().baseMapMode == MapBaseMode.WORLD)
             "O mapa mundial usa internet e dados OpenFreeMap / OpenStreetMap. Sem conexão, escolha Goiânia offline em Cobertura do mapa. Busca e rotas usam Geoapify. ETA sem trânsito em tempo real."
             else "Goiânia offline cobre somente o recorte incluído; fora dele, o mapa base fica sem detalhes. Busca e rotas usam internet. ETA sem trânsito em tempo real.")
+        note(content, "Dados do mapa: OpenFreeMap · OpenMapTiles · © OpenStreetMap contributors · Overture Maps Foundation · Google · Microsoft. Busca e rotas: Geoapify. Fontes e sprites dos jogos pertencem aos respectivos autores.")
+        action(content, "Sobre o NavSkin · fontes e licenças") {
+            activity.startActivity(Intent(activity, ConnectionInstructionsActivity::class.java))
+        }
     }
 
     private fun showRoute() {
@@ -497,7 +530,10 @@ internal class PhoneNavigationUi(
         action(content, "Fechar") { newDialog.dismiss() }.gravity = Gravity.END
         content.addView(label(title, 26f, true))
         note(content, subtitle)
-        val scroll = ScrollView(activity).apply { addView(content); isFillViewport = false }
+        val scroll = NestedScrollView(activity).apply {
+            addView(content); isFillViewport = false
+            contentDescription = "Painel $title"
+        }
         newDialog.setContentView(scroll)
         newDialog.setOnDismissListener { if (dialog === newDialog) { dialog = null; searchStatus = null; searchResults = null } }
         newDialog.setOnShowListener {
@@ -528,6 +564,7 @@ internal class PhoneNavigationUi(
         minimumHeight = dp(48)
         setPadding(dp(12), dp(12), dp(12), dp(12))
         isClickable = true; isFocusable = true
+        contentDescription = text
         touchSurface(colors.soft, 14)
         setOnClickListener { click() }
         parent.addView(this, if (parent.orientation == LinearLayout.HORIZONTAL)
@@ -541,7 +578,15 @@ internal class PhoneNavigationUi(
     private fun add(view: View, gravity: Int, width: Int, height: Int) = root.addView(view, FrameLayout.LayoutParams(width, height, gravity))
     private fun place(view: View, top: Int = 0, bottom: Int = 0) {
         view.layoutParams = (view.layoutParams as FrameLayout.LayoutParams).apply {
-            marginStart = leftInset + dp(16); marginEnd = rightInset + dp(16); topMargin = top; bottomMargin = bottom
+            if (gravity and Gravity.HORIZONTAL_GRAVITY_MASK == Gravity.CENTER_HORIZONTAL) {
+                // FrameLayout adds the margin difference to a centered view. Half the
+                // asymmetric system inset keeps the center inside the actual map area.
+                marginStart = (leftInset - rightInset) / 2
+                marginEnd = 0
+            } else {
+                marginStart = leftInset + dp(16); marginEnd = rightInset + dp(16)
+            }
+            topMargin = top; bottomMargin = bottom
         }
     }
     private fun granted(permission: String) = ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED

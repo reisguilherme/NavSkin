@@ -197,7 +197,11 @@ class NativeWorldMapTest {
                         it.longitude() in -49.27..-49.22 && it.latitude() in -16.70..-16.65
                     } == true }
                     val labels = map.get().queryRenderedFeatures(viewport(), "road-labels").size
-                    goianiaStatus = "camera=${map.get().cameraPosition.target}, poi=${poi.size}, inCity=$inCity, roadLabels=$labels, full=${style.isFullyLoaded}, frame=${renderedFrameReady(style)}"
+                    val localBuildings = style.getSourceAs<VectorSource>("buildings-local")
+                        ?.querySourceFeatures(arrayOf("buildings"), null)?.size ?: 0
+                    val visibleBuildings = map.get().queryRenderedFeatures(viewport(), "building-footprints-local").size
+                    val duplicateBuildings = map.get().queryRenderedFeatures(viewport(), "building-footprints").size
+                    goianiaStatus = "camera=${map.get().cameraPosition.target}, poi=${poi.size}, inCity=$inCity, roadLabels=$labels, localBuildings=$localBuildings, visibleBuildings=$visibleBuildings, duplicateBuildings=$duplicateBuildings, full=${style.isFullyLoaded}, frame=${renderedFrameReady(style)}"
                     if (!goianiaSnapshotRequested && renderedFrameReady(style) && inCity) {
                         goianiaSnapshotRequested = true
                         map.get().snapshot { image ->
@@ -205,9 +209,18 @@ class NativeWorldMapTest {
                             image.recycle()
                         }
                     }
-                    renderedFrameReady(style) && inCity && labels > 0
+                    renderedFrameReady(style) && inCity && labels > 0 && localBuildings > 100 && visibleBuildings > 30 && duplicateBuildings == 0
                 }
                 saveNativeFrame("world-goiania-universitaria-gta.png", MapTheme.GTA_SA)
+                // A busy online style can delay the initial camera gesture and expose
+                // its point-selection sheet. Close it before recording the phone chrome.
+                if (device.hasObject(By.desc("Painel Ponto no mapa"))) device.pressBack()
+                assertTrue("Point selection must not cover the phone evidence",
+                    device.wait(Until.gone(By.desc("Painel Ponto no mapa")), 5_000))
+                device.waitForIdle()
+                instrumentation.uiAutomation.takeScreenshot()?.also { image ->
+                    try { savePersistentImage("phone-goiania-gta.png", image) } finally { image.recycle() }
+                }
             }
         } finally {
             instrumentation.runOnMainSync {
@@ -227,7 +240,7 @@ class NativeWorldMapTest {
         connection.readTimeout = 10_000
         connection.useCaches = false
         connection.setRequestProperty("Cache-Control", "no-cache")
-        connection.setRequestProperty("User-Agent", "NavSkin/0.5 Android-instrumentation-world-validation")
+        connection.setRequestProperty("User-Agent", "NavSkin/0.7 Android-instrumentation-world-validation")
         try {
             assertEquals("Production TileJSON unavailable; online verification cannot pass", 200, connection.responseCode)
             val tilejson = connection.inputStream.bufferedReader().use { JSONObject(it.readText()) }
@@ -333,7 +346,7 @@ class NativeWorldMapTest {
     }
 
     private fun savePersistentImage(name: String, bitmap: Bitmap) {
-        val directory = "Pictures/NavSkinWorld/v0.6/"
+        val directory = "Pictures/NavSkinWorld/v0.7/"
         val media = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         context.contentResolver.delete(media,
             "${MediaStore.Images.Media.DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.RELATIVE_PATH} = ?",

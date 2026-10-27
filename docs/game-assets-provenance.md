@@ -1,4 +1,4 @@
-# Fontes e sprites dos jogos · NavSkin 0.6
+# Fontes e sprites dos jogos · NavSkin 0.7
 
 Esta versão usa arquivos de famílias autênticas e exports públicos de sprites no pacote local solicitado. A licença do código NavSkin e a dos conversores não se estendem à arte dos jogos. Copyrights, contratos históricos e registros de origem acompanham os recursos; nenhum arquivo foi declarado CC0 por ter sido convertido.
 
@@ -32,6 +32,8 @@ O pack RDR2 e seu README de 20/11/2019 descrevem conversão a partir do jogo. Os
 Sprites originais são usados nos subtipos equivalentes, como restaurante, bar, hospital/serviço médico, loja e teatro, conforme o mapeamento de importação. Os pixels são preservados; a ampliação GTA para 32×32 usa vizinho mais próximo. Parques, combustível, educação, cultura, religião e outras categorias sem equivalente específico recebem adaptações desenhadas pelo NavSkin. Esses desenhos novos não são apresentados como arte extraída da Rockstar. A disponibilidade de um export público não muda seu copyright Rockstar.
 
 Os nove filtros agrupam parques, combustível, alimentação, estacionamento, saúde, mercados/conveniências, educação, cultura e locais de culto. Os IDs semânticos distinguem as categorias e seus subtipos. Os marcadores de veículo e a arte própria NavSkin mantêm sua procedência separada.
+
+O marcador padrão GTA SA (`vehicleId: arrow`) usa o sprite original `radar_centre` de `models/hud.txd`, [exportado pelo GTAMidori](https://gtamidori.com/textdrawsprites/hud.txd/radar_centre.png). Representa o jogador no radar, a pé ou em veículo; `radar_north` é a letra N da bússola. O PNG original 16×16 tem SHA-256 `2a7f822a3493cc0840823bc6d241ec84b2a220fafe3235637ad721dd3a7c237e`. O preparo acrescenta 4 pixels transparentes em cada lado e amplia por vizinho mais próximo para 48×48 e 96×96, preservando pixels e âncora central. Origem, hash e transformação acompanham `navigation-icons/provenance.json`. O original e seus derivados permanecem no pacote local separado, excluídos da licença CC0. As demais escolhas e seus IDs continuam preservados.
 
 ## Reproduzir a importação local
 

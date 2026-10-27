@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import tokens from '../android/maps/theme-tokens.json' with { type: 'json' };
+import buildingMetadata from '../public/data/buildings-metadata.json' with { type: 'json' };
 import { applyGameTypography } from './game-asset-typography.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -13,6 +14,16 @@ export const WORLD_VARIANTS = Object.keys(themes).flatMap(theme => [theme, `${th
 export const WORLD_BOUNDS = [-180, -85.05113, 180, 85.05113];
 export const WORLD_ATTRIBUTION = '<a href="https://openfreemap.org/">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/">© OpenMapTiles</a> · Data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
 export const WORLD_GLYPHS = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
+const buildingTiles = buildingMetadata.vectorTiles;
+const [west, south, east, north] = buildingTiles.bounds;
+const buildingCoverage = { type: 'Polygon', coordinates: [[[west, south], [east, south], [east, north], [west, north], [west, south]]] };
+const buildingAttribution = '<a href="https://docs.overturemaps.org/attribution/">Overture Maps Foundation</a> · <a href="https://sites.research.google/open-buildings/">Google Open Buildings</a> · <a href="https://github.com/microsoft/GlobalMLBuildingFootprints">Microsoft Global ML Building Footprints</a>';
+const combinedAttribution = `${WORLD_ATTRIBUTION} · ${buildingAttribution}`;
+const bundledBuildings = {
+  source: 'buildings-local', bounds: [...buildingTiles.bounds], release: buildingMetadata.release,
+  count: buildingMetadata.counts.total, metadataAsset: 'maps/data/buildings-metadata.json',
+  replacement: 'Bundled Overture footprints replace world building polygons intersecting these bounds. Outside the bounds, world buildings remain visible.',
+};
 
 // Stable visibility groups. Use the original OSM subclass, since
 // OpenMapTiles combines clinic under hospital and convenience under shop.
@@ -88,8 +99,15 @@ export function buildWorldStyle(mode) {
   layers.push({ id: 'waterways', type: 'line', source: 'world', 'source-layer': 'waterway',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     paint: { 'line-color': p.water, 'line-width': ['interpolate', ['linear'], ['zoom'], 9, 0.4, 14, 2, 17, 5] } });
-  fill('building-footprints', 'building', p.building, undefined, tokens.visibility.buildingsMinzoom);
+  // Overture already conflates OSM buildings. Replace the world footprint layer
+  // in its exact query area instead of drawing both datasets on top of each other.
+  // `within` cannot test Polygon features; distance=0 tests real intersections,
+  // matching the local query that kept whole footprints crossing its boundary.
+  fill('building-footprints', 'building', p.building, ['>', ['distance', buildingCoverage], 0], tokens.visibility.buildingsMinzoom);
   if (p.buildingOutline) layers.at(-1).paint['fill-outline-color'] = p.buildingOutline;
+  layers.push({ id: 'building-footprints-local', type: 'fill', source: bundledBuildings.source,
+    'source-layer': buildingTiles.sourceLayer, minzoom: tokens.visibility.buildingsMinzoom,
+    filter: polygonGeometry, paint: { ...layers.at(-1).paint } });
   layers.push({ id: 'administrative-boundaries', type: 'line', source: 'world', 'source-layer': 'boundary',
     filter: ['all', ['<=', ['coalesce', ['get', 'admin_level'], 99], 4], ['!=', ['get', 'maritime'], 1]],
     paint: { 'line-color': p.labelHalo, 'line-opacity': 0.3, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.5, 12, 1.2], 'line-dasharray': [3, 2] } });
@@ -167,13 +185,16 @@ export function buildWorldStyle(mode) {
     center: [-46.6333, -23.5505], zoom: 12, bearing: 0, pitch: 0,
     sprite: `asset://maps/sprites/${theme}`, glyphs: WORLD_GLYPHS,
     sources: { world: { type: 'vector', url: 'https://tiles.openfreemap.org/planet',
-      minzoom: 0, maxzoom: 14, bounds: [...WORLD_BOUNDS], attribution: WORLD_ATTRIBUTION } },
+      minzoom: 0, maxzoom: 14, bounds: [...WORLD_BOUNDS], attribution: WORLD_ATTRIBUTION },
+    [bundledBuildings.source]: { type: 'vector', tiles: ['asset://maps/tiles/buildings/{z}/{x}/{y}.pbf'],
+      minzoom: buildingTiles.minzoom, maxzoom: buildingTiles.maxzoom, bounds: [...buildingTiles.bounds], attribution: buildingAttribution } },
     metadata: { navskin: { theme, appearance: night ? 'night' : 'day', variant: mode,
       offline: false, coverage: 'world', bounds: [...WORLD_BOUNDS], sourceCoordinatesModified: false,
       categoryLayerPrefix: 'poi-', categories: tokens.categories.map(category => category.id),
-      attribution: WORLD_ATTRIBUTION, creditsAsset: 'maps/credits/world-attribution.html',
+      attribution: combinedAttribution, creditsAsset: 'maps/credits/world-attribution.html',
       provider: 'OpenFreeMap', schema: 'OpenMapTiles', font: 'Noto Sans Bold',
-      note: 'Online tiles and glyphs require network. The optional bundled Goiânia package remains separate.' } },
+      bundledBuildings: structuredClone(bundledBuildings),
+      note: 'Online base tiles and glyphs require network. In the bundled Goiânia coverage, dense local Overture building tiles replace world buildings in every theme.' } },
     layers, transition: { duration: 0, delay: 0 },
   };
   applyGameTypography(style, theme, false);
@@ -190,8 +211,10 @@ export async function prepareWorldMaps() {
   };
   for (const mode of WORLD_VARIANTS) await writeJson(`styles/world-${mode}.json`, buildWorldStyle(mode));
   const source = JSON.parse(await readFile(path.join(root, 'android/maps/world-source.json'), 'utf8'));
+  source.bundledBuildings = structuredClone(bundledBuildings);
+  source.attributionHtml = combinedAttribution;
   await writeJson('credits/world-sources.json', source);
-  await writeFile(path.join(output, 'credits/world-attribution.html'), `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>NavSkin · Créditos do mapa mundial</title><style>body{font:18px sans-serif;color:#252025;background:#fff8fc;padding:24px;line-height:1.5}a{color:#8b2058}</style><h1>Mapa mundial · NavSkin</h1><p>${WORLD_ATTRIBUTION}</p><p>Geometria mundial OpenStreetMap no esquema OpenMapTiles, distribuída por OpenFreeMap. Cobertura e atualização dependem dos dados disponíveis em cada região.</p><p>O mapa mundial usa tiles pela internet, fontes temáticas locais e Noto como fallback Unicode. Os nove filtros de POIs e preferências são locais. O pacote de Goiânia é uma opção offline separada.</p><p>Fontes e símbolos importados dos jogos preservam os direitos de seus titulares. Consulte <a href="game-assets-provenance.json">origem e avisos individuais</a>; CC0 cobre apenas adaptações vetoriais originais do NavSkin.</p><p><a href="https://openfreemap.org/tos/">Termos do serviço</a> · <a href="https://openfreemap.org/privacy/">Privacidade</a> · <a href="https://www.openstreetmap.org/copyright">ODbL e direitos dos dados</a> · <a href="Noto-OFL-1.1.md">Licença SIL OFL das fontes Noto de fallback</a></p></html>\n`);
+  await writeFile(path.join(output, 'credits/world-attribution.html'), `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>NavSkin · Créditos do mapa mundial</title><style>body{font:18px sans-serif;color:#252025;background:#fff8fc;padding:24px;line-height:1.5}a{color:#8b2058}</style><h1>Mapa mundial · NavSkin</h1><p>${combinedAttribution}</p><p>Geometria mundial OpenStreetMap no esquema OpenMapTiles, distribuída por OpenFreeMap. Cobertura e atualização dependem dos dados disponíveis em cada região.</p><p>Na cobertura local de Goiânia, os ${buildingMetadata.counts.total.toLocaleString('pt-BR')} contornos da edição Overture ${buildingMetadata.release} substituem as edificações do mapa mundial. Os tiles locais mantêm os contornos de origem, inclusive os que atravessam a borda do recorte. Fora dessa área, as edificações continuam vindo do OpenFreeMap.</p><p>O tema Overture buildings é distribuído sob <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a>; inclui dados Google Open Buildings sob <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, Microsoft e OpenStreetMap. Consulte <a href="sources.json">fontes e licenças locais</a>. Os contornos podem conter omissões, deslocamentos ou detecções antigas; não são cadastro oficial.</p><p>O mapa mundial usa a base de tiles pela internet, fontes temáticas locais e Noto como fallback Unicode. Os nove filtros de POIs e preferências são locais. A opção Goiânia mantém a base completa offline.</p><p>Fontes e símbolos importados dos jogos preservam os direitos de seus titulares. Consulte <a href="game-assets-provenance.json">origem e avisos individuais</a>; CC0 cobre apenas adaptações vetoriais originais do NavSkin.</p><p><a href="https://openfreemap.org/tos/">Termos do serviço</a> · <a href="https://openfreemap.org/privacy/">Privacidade</a> · <a href="https://www.openstreetmap.org/copyright">ODbL e direitos dos dados</a> · <a href="Noto-OFL-1.1.md">Licença SIL OFL das fontes Noto de fallback</a></p></html>\n`);
   console.log(`Prepared ${WORLD_VARIANTS.length} worldwide online styles and production service credits.`);
 }
 

@@ -52,6 +52,10 @@ class NativeNavigationTest {
         val expectedSaved = app.places.snapshot().savedPlaces.size + 1
         var savedId: String? = null
         try {
+            instrumentation.runOnMainSync {
+                app.preferences.setTheme(MapTheme.GTA_SA)
+                app.navigationSettings.setVehicleId("arrow")
+            }
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 device.wait(Until.findObject(By.desc("Explorar mapa")), 15_000)?.click()
                 val native = AtomicReference<MapLibreMap>()
@@ -70,11 +74,25 @@ class NativeNavigationTest {
                         org.maplibre.android.geometry.LatLng(app.navigation.snapshot().location.fix!!.point.latitude,
                             app.navigation.snapshot().location.fix!!.point.longitude)))
                 }
+                scenario.onActivity { activity ->
+                    val summary = activity.findViewById<ViewGroup>(br.com.gamemap.R.id.phone_route_summary)
+                    val text = (0 until summary.childCount).mapNotNull { index ->
+                        (summary.getChildAt(index) as? android.widget.TextView)?.takeIf { it.isShown }?.text?.toString()
+                    }.joinToString(" ")
+                    assertFalse("ETA card must not duplicate speed", text.contains("km/h"))
+                    assertFalse("ETA card must not show GPS precision or diagnostics", text.contains("GPS") || text.contains("SIMULAÇÃO") || text.contains("Carregando"))
+                    assertTrue("ETA card must retain trip estimates", text.contains("·") && text.contains(":"))
+                }
                 // GPS/camera controls must never hide the followed vehicle at the map center.
-                val followControl = device.findObject(By.desc("GPS acompanhando; recentralizar"))
+                val followControl = device.findObject(By.res("${instrumentation.targetContext.packageName}:id/phone_recenter"))
                 assertNotNull(followControl)
                 val vehiclePixel = projectedVehicle.get()
-                assertFalse("Camera controls cover the vehicle", followControl!!.parent.visibleBounds.contains(vehiclePixel.x.toInt(), vehiclePixel.y.toInt()))
+                assertFalse("Camera controls cover the vehicle", followControl!!.visibleBounds.contains(vehiclePixel.x.toInt(), vehiclePixel.y.toInt()))
+                await {
+                    native.get().queryRenderedFeatures(android.graphics.RectF(0f, 0f,
+                        device.displayWidth.toFloat(), device.displayHeight.toFloat()), "gamemap-nav-vehicle-symbol").isNotEmpty()
+                }
+                saveScreenshot("nav-gta-player-simulation.png")
                 var sessionId = 0L
                 scenario.onActivity {
                     sessionId = app.navigation.snapshot().sessionId
@@ -109,6 +127,7 @@ class NativeNavigationTest {
                 assertTrue(device.wait(Until.hasObject(By.descContains("recursos e renderização prontos")), 30_000))
                 scenario.onActivity { assertEquals(NavigationPhase.NAVIGATING, app.navigation.snapshot().phase); assertTrue(app.navigation.snapshot().guidanceAvailable) }
                 device.takeScreenshot(java.io.File(instrumentation.targetContext.getExternalFilesDir(null), "nav-landscape-simulation.png"))
+                saveScreenshot("nav-landscape-simulation.png")
                 instrumentation.runOnMainSync { app.navigation.stopReplay() }
                 assertFalse(app.navigation.snapshot().simulation)
                 assertNull(app.navigation.snapshot().location.fix)
@@ -168,6 +187,22 @@ class NativeNavigationTest {
             Thread.sleep(100)
         }
         fail("Native navigation overlay was not ready")
+    }
+    private fun saveScreenshot(name: String) {
+        val context = instrumentation.targetContext
+        val values = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, name)
+            put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/NavSkinWorld/v0.7/")
+            put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = checkNotNull(context.contentResolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values))
+        val screenshot = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+        try {
+            checkNotNull(context.contentResolver.openOutputStream(uri)).use { check(screenshot.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
+            values.clear(); values.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
+            context.contentResolver.update(uri, values, null, null)
+        } finally { screenshot.recycle() }
     }
     private fun findMap(view: View): MapView? {
         if (view is MapView) return view

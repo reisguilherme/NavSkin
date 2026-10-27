@@ -298,14 +298,14 @@
     "roadSize": 11.5,
     "haloWidth": 1.5,
     "gta": {
-      "roadSize": 12.5,
+      "roadSize": 14.5,
       "roadMinzoom": 14.5,
       "roadSpacing": 230,
       "roadLetterSpacing": 0.18,
       "roadHaloWidth": 1.25,
       "haloWidth": 2,
       "poiNamesMinzoom": 15,
-      "poiSize": 13,
+      "poiSize": 15,
       "poiHaloWidth": 2.25
     }
   },

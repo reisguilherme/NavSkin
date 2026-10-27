@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var root: FrameLayout
     private lateinit var navigationUi: PhoneNavigationUi
     private val insetProtections = mutableListOf<View>()
+    private lateinit var topBar: LinearLayout
     private lateinit var locationPill: LinearLayout
     private lateinit var locationTitle: TextView
     private lateinit var selection: TextView
@@ -50,10 +51,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var dock: LinearLayout
     private lateinit var themesAction: PhoneAction
     private lateinit var filtersAction: PhoneAction
-    private lateinit var zoomControls: LinearLayout
-    private lateinit var attribution: TextView
     private lateinit var renderStatus: TextView
-    private val mapActions = mutableListOf<PhoneAction>()
     private val themeCards = mutableMapOf<MapTheme, ThemeCard>()
     private val categorySwitches = mutableMapOf<PoiCategory, Switch>()
     private val mapModeChoices = mutableMapOf<MapBaseMode, RadioButton>()
@@ -67,6 +65,7 @@ class MainActivity : ComponentActivity() {
     private var removeNetworkListener: (() -> Unit)? = null
     private var removeTypography: (() -> Unit)? = null
     private var lastMapStatus = "Carregando mapa…"
+    private var navigationGuidanceVisible = false
     private var bindingPreferences = false
     private var destroying = false
     private var bottomInset = 0
@@ -115,14 +114,8 @@ class MainActivity : ComponentActivity() {
                     when (index) { 0 -> height = bars.top; 1 -> height = bars.bottom; 2 -> width = bars.left; 3 -> width = bars.right }
                 }
             }
-            locationPill.layoutParams.width = dip(214).coerceAtMost(resources.displayMetrics.widthPixels - bars.left - bars.right - dip(96))
-            position(locationPill, Gravity.TOP or Gravity.START, start = bars.left + dip(16), top = bars.top + dip(12))
-            position(info, Gravity.TOP or Gravity.END, end = bars.right + dip(16), top = bars.top + dip(12))
-            position(renderStatus, Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = bars.top + dip(142))
-            position(dock, Gravity.BOTTOM or if (landscape) Gravity.END else Gravity.CENTER_HORIZONTAL,
-                end = if (landscape) bars.right + dip(16) else 0, bottom = bars.bottom + dip(36))
-            position(zoomControls, Gravity.BOTTOM or Gravity.END, end = bars.right + dip(16), bottom = bars.bottom + dip(116))
-            position(attribution, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, bottom = bars.bottom + dip(7))
+            position(topBar, Gravity.TOP, start = bars.left + dip(12), end = bars.right + dip(12), top = bars.top + dip(10))
+            position(renderStatus, Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = bars.top + dip(88))
             if (::navigationUi.isInitialized) navigationUi.insets(bars.left, bars.top, bars.right, bars.bottom)
             root.post(::openRestoredSheet)
             insets
@@ -132,73 +125,66 @@ class MainActivity : ComponentActivity() {
         navigationUi = PhoneNavigationUi(this, root, renderer, restoredState = savedInstanceState,
             closeAppearanceSheet = { sheetMode = SheetMode.NONE; sheet?.dismiss() },
             openMapSettings = { showSheet(SheetMode.THEMES) },
-            routeLayout = { navigating -> zoomControls.visibility = if (navigating) View.GONE else View.VISIBLE })
+            onGuidanceChanged = { visible ->
+                if (navigationGuidanceVisible != visible) {
+                    navigationGuidanceVisible = visible
+                    refreshMapStatus()
+                }
+            })
+        topBar.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ ->
+            navigationUi.headerBottom(bottom)
+            position(renderStatus, Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = bottom + dip(12))
+        }
         applyPreferences(app.preferences.snapshot())
         if (savedInstanceState == null) root.post { navigationUi.handleIntent(intent) }
         ViewCompat.requestApplyInsets(root)
     }
 
     private fun buildMapControls() {
+        topBar = LinearLayout(this).apply {
+            id = R.id.phone_header
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        root.addView(topBar, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.TOP))
         locationPill = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dip(12), dip(10), dip(16), dip(10))
+            setPadding(dip(10), dip(10), dip(10), dip(10))
+            minimumHeight = dip(60)
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
             descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
         }
-        logo = phoneIcon(R.drawable.phone_map).apply { setPadding(dip(7), dip(7), dip(7), dip(7)) }
-        locationPill.addView(logo, LinearLayout.LayoutParams(dip(38), dip(38)))
-        locationTitle = phoneText("NavSkin", 17f, true).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
-        selection = phoneText("Mundo · online", 11f).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        logo = phoneIcon(R.drawable.phone_map).apply { setPadding(dip(5), dip(5), dip(5), dip(5)) }
+        locationPill.addView(logo, LinearLayout.LayoutParams(dip(30), dip(30)))
+        locationTitle = phoneText("NavSkin", 16f, true).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; gravity = Gravity.CENTER }
+        selection = phoneText("Mundo · online", 10f).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; gravity = Gravity.CENTER }
         val brand = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             addView(locationTitle)
             addView(selection, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(4) })
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         }
-        locationPill.addView(brand, LinearLayout.LayoutParams(0, WRAP, 1f).apply { marginStart = dip(10) })
-        root.addView(locationPill, FrameLayout.LayoutParams(dip(214), WRAP, Gravity.TOP or Gravity.START))
-        locationPill.visibility = if (landscape) View.GONE else View.VISIBLE
-        info = PhoneAction(this, R.drawable.phone_info, "Sobre o NavSkin").apply {
-            setOnClickListener { startActivity(Intent(this@MainActivity, ConnectionInstructionsActivity::class.java)) }
+        locationPill.addView(brand, LinearLayout.LayoutParams(0, WRAP, 1f).apply { marginStart = dip(7) })
+        topBar.addView(locationPill, if (landscape) LinearLayout.LayoutParams(dip(214), WRAP)
+            else LinearLayout.LayoutParams(0, WRAP, 1f))
+        info = PhoneAction(this, R.drawable.phone_menu, "Menu NavSkin").apply {
+            id = R.id.phone_main_menu
+            setOnClickListener { navigationUi.showOptions() }
         }
-        root.addView(info, FrameLayout.LayoutParams(dip(48), dip(48), Gravity.TOP or Gravity.END))
         dock = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            setPadding(dip(6), dip(5), dip(6), dip(5))
+            minimumHeight = dip(60)
+            setPadding(dip(2), 0, dip(2), 0)
         }
-        themesAction = PhoneAction(this, R.drawable.phone_layers, "Temas", true).apply { setOnClickListener { showSheet(SheetMode.THEMES) } }
-        filtersAction = PhoneAction(this, R.drawable.phone_filters, "Filtros", true).apply { setOnClickListener { showSheet(SheetMode.FILTERS) } }
-        dock.addView(themesAction, LinearLayout.LayoutParams(WRAP, WRAP))
-        dock.addView(View(this).apply { tag = "divider" }, LinearLayout.LayoutParams(dip(1), dip(24)).apply {
-            marginStart = dip(3); marginEnd = dip(3)
-        })
-        dock.addView(filtersAction, LinearLayout.LayoutParams(WRAP, WRAP))
-        root.addView(dock, FrameLayout.LayoutParams(WRAP, WRAP, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
-        zoomControls = LinearLayout(this).apply {
-            orientation = if (landscape) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
-            setPadding(dip(3), dip(3), dip(3), dip(3))
-        }
-        listOf(
-            Triple(R.drawable.phone_plus, "Aumentar zoom", { renderer.zoomBy(1.0) }),
-            Triple(R.drawable.phone_minus, "Diminuir zoom", { renderer.zoomBy(-1.0) }),
-            Triple(R.drawable.phone_reset, "Voltar ao enquadramento inicial", { renderer.reset() }),
-        ).forEachIndexed { index, (icon, description, action) ->
-            val control = PhoneAction(this, icon, description).apply { setOnClickListener { action() } }
-            mapActions.add(control)
-            if (index > 0) zoomControls.addView(View(this).apply { tag = "divider" },
-                LinearLayout.LayoutParams(dip(if (landscape) 1 else 24), dip(if (landscape) 24 else 1)).apply { gravity = Gravity.CENTER })
-            zoomControls.addView(control, LinearLayout.LayoutParams(dip(48), dip(48)))
-        }
-        root.addView(zoomControls, FrameLayout.LayoutParams(WRAP, WRAP, Gravity.BOTTOM or Gravity.END))
-        attribution = phoneText("OpenFreeMap · OpenMapTiles · © OpenStreetMap · Geoapify", 10f).apply {
-            gravity = Gravity.CENTER
-            setPadding(dip(9), dip(4), dip(9), dip(4))
-            contentDescription = "Créditos e licenças. Sobre o NavSkin"
-            setOnClickListener { info.performClick() }
-        }
-        root.addView(attribution, FrameLayout.LayoutParams(WRAP, WRAP, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
+        themesAction = PhoneAction(this, R.drawable.phone_layers, "Temas", true, stacked = true).apply { setOnClickListener { showSheet(SheetMode.THEMES) } }
+        filtersAction = PhoneAction(this, R.drawable.phone_filters, "Filtros", true, stacked = true).apply { setOnClickListener { showSheet(SheetMode.FILTERS) } }
+        dock.addView(themesAction, LinearLayout.LayoutParams(dip(52), WRAP))
+        dock.addView(filtersAction, LinearLayout.LayoutParams(dip(52), WRAP))
+        topBar.addView(dock, LinearLayout.LayoutParams(WRAP, WRAP).apply { marginStart = dip(8) })
+        if (landscape) topBar.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
+        topBar.addView(info, LinearLayout.LayoutParams(dip(48), dip(60)).apply { marginStart = dip(8) })
         renderStatus = phoneText("Carregando mapa…", 12f).apply {
             gravity = Gravity.CENTER
             setPadding(dip(12), dip(9), dip(12), dip(9))
@@ -238,6 +224,10 @@ class MainActivity : ComponentActivity() {
             }
             else -> renderStatus.visibility = View.GONE
         }
+        if (::navigationUi.isInitialized) navigationUi.mapNotice(
+            renderStatus.text.toString().takeIf { renderStatus.visibility == View.VISIBLE })
+        // During guidance the same notice is carried by the trip summary and menu.
+        if (navigationGuidanceVisible) renderStatus.visibility = View.GONE
     }
 
     private fun applyPreferences(preferences: MapPreferences) {
@@ -258,20 +248,8 @@ class MainActivity : ComponentActivity() {
         info.touchSurface(palette.surface, 18)
         info.elevation = dip(6).toFloat()
         dock.surface(palette, 24)
-        zoomControls.surface(palette, 20)
         themesAction.bind(palette)
         filtersAction.bind(palette)
-        mapActions.forEach { it.bind(palette) }
-        listOf(dock, zoomControls).forEach { container ->
-            for (index in 0 until container.childCount) container.getChildAt(index).let {
-                if (it.tag == "divider") it.setBackgroundColor(palette.border)
-            }
-        }
-        attribution.setTextColor(palette.muted)
-        attribution.text = if (preferences.baseMapMode == MapBaseMode.WORLD)
-            "OpenFreeMap · OpenMapTiles · © OpenStreetMap · Geoapify" else "© OpenStreetMap · Overture · Geoapify"
-        attribution.contentDescription = "Créditos: ${attribution.text}. Licenças e fontes em Sobre o NavSkin"
-        attribution.background = rounded(palette.surface, 8)
         renderStatus.setTextColor(palette.text)
         renderStatus.surface(palette, 14)
         if (::navigationUi.isInitialized) navigationUi.themeChanged()

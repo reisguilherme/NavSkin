@@ -40,7 +40,7 @@
       ]
     }
   },
-  "totalBytes": 141625660,
+  "totalBytes": 141643233,
   "buildInputs": [
     {
       "path": "scripts/prepare-android-maps.mjs",
@@ -49,13 +49,13 @@
     },
     {
       "path": "scripts/prepare-world-maps.mjs",
-      "bytes": 16309,
-      "sha256": "54308354ae0a51701f0ee9c8218dcf96854810e4059e9f3caf50e0b2e37cf745"
+      "bytes": 19306,
+      "sha256": "d3dc61923c2949afdcc1b882bfb7e8f75d9afaedf7ee7d19f6b52c7e803b88ba"
     },
     {
       "path": "android/maps/world-source.json",
-      "bytes": 4755,
-      "sha256": "1ff2939551d24ae3ae957bb1b6d4b7a07669600c262fdbe4e46a41033ab864bf"
+      "bytes": 5487,
+      "sha256": "b40864683d8cd6672ce87e90fc6ca1639016c383de92dce2c542c2dc138a97f7"
     },
     {
       "path": "src/style.js",
@@ -70,7 +70,7 @@
     {
       "path": "android/maps/theme-tokens.json",
       "bytes": 8867,
-      "sha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4"
+      "sha256": "dace2ec1951ee22484bcbc2034860f3d289482179c6ba78371757ec642f3c484"
     },
     {
       "path": "android/maps/icons/gta/poi-bar.svg",
@@ -422,12 +422,12 @@
     {
       "path": "styles/gta-night.json",
       "bytes": 603469,
-      "sha256": "54044c682415977664f691f440c4d15fc8a95defbd1e360da85e9779e7082a05"
+      "sha256": "8926b5e9195b23a3b543f6f69774e9664b701ff6d190e2a7b9c628a21ab44539"
     },
     {
       "path": "styles/gta.json",
       "bytes": 603401,
-      "sha256": "2a7da8b5532faf292dd6250382a3c2c318679010ad50e871431dece7459a5551"
+      "sha256": "24989680156b40a05c3245946fd452da7065f0710ca065ab02eb49152c728454"
     },
     {
       "path": "styles/rdr2-night.json",
@@ -452,39 +452,39 @@
     {
       "path": "styles/theme-tokens.json",
       "bytes": 8867,
-      "sha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4",
+      "sha256": "dace2ec1951ee22484bcbc2034860f3d289482179c6ba78371757ec642f3c484",
       "sourcePath": "android/maps/theme-tokens.json",
-      "sourceSha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4"
+      "sourceSha256": "dace2ec1951ee22484bcbc2034860f3d289482179c6ba78371757ec642f3c484"
     },
     {
       "path": "styles/world-gta-night.json",
-      "bytes": 126933,
-      "sha256": "b3f8bbbbdc644b4503b722034cfb3e23fb1a15b90b5d4b265b52a4bfec6a43d5"
+      "bytes": 129414,
+      "sha256": "9aa4b929330a12e3cc99a8ff8b11b2fac0c5a2c849c67f5deab96423ff777c1b"
     },
     {
       "path": "styles/world-gta.json",
-      "bytes": 126916,
-      "sha256": "c169871692807efffbc00779db1938b53643d70edd3df96041772837b57b87fe"
+      "bytes": 129397,
+      "sha256": "8a679ace12628e8706c58dd2164aa74efc1f953acaae860f4efed3dc6a62f9cf"
     },
     {
       "path": "styles/world-rdr2-night.json",
-      "bytes": 126852,
-      "sha256": "e87df9a501a03a5aae5d1f13969e6268a34ebc995b7e23fd0c69e2935642bd05"
+      "bytes": 129374,
+      "sha256": "b13104a816eaed3a3336fb055b473ee6e71711df7b3bbc921e8658a53925bd7c"
     },
     {
       "path": "styles/world-rdr2.json",
-      "bytes": 126835,
-      "sha256": "624ef8a0318e9010244e3f7fa7c8093c67277903b24234722e61f856abc1f60b"
+      "bytes": 129357,
+      "sha256": "c272acd05b1bc8bb8ca7abd0b8629bd410eaa079246bc2ce7ae3041d9c5fb26a"
     },
     {
       "path": "styles/world-rosa-night.json",
-      "bytes": 126557,
-      "sha256": "ccf4851c19e91f1b98f73d053ab67657fdb312b7960ef12b231bd8410de2d170"
+      "bytes": 129079,
+      "sha256": "a502de256c1d8d8e878ff36b5d69978493377042119918883b17a49401cbb72c"
     },
     {
       "path": "styles/world-rosa.json",
-      "bytes": 126540,
-      "sha256": "c127ef55e98b5dc828291ee6db69d4b365e84370fa35d62f8523435e97ecc465"
+      "bytes": 129062,
+      "sha256": "8a9ecaae8652fadade1c1c55cafea839aaa05ad33214486ab87060fd43e13797"
     },
     {
       "path": "data/areas.geojson",
@@ -5940,13 +5940,13 @@
     },
     {
       "path": "credits/world-attribution.html",
-      "bytes": 1427,
-      "sha256": "adf12a43455b2e0c0e6566bd1635ed77e4f74fdfd491088f8f9d2f824ed19fbe"
+      "bytes": 2444,
+      "sha256": "5d6e7e5004b9cec35169342324f8a7141d39815b284801468c1c515430cda336"
     },
     {
       "path": "credits/world-sources.json",
-      "bytes": 5501,
-      "sha256": "16f5f704f14b0dc6fdc9e847b7e447561fa36bbb54876eb4834eb1f49b054045"
+      "bytes": 7007,
+      "sha256": "4a02b894285b3280cdbf9ebf2feb1f05bb97388c782bb58e4125e252ddc13035"
     }
   ]
 }

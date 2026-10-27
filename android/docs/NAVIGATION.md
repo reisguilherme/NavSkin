@@ -1,18 +1,18 @@
 # NavSkin — configurar e testar a navegação
 
-Versão do código **0.5.0**, `versionCode 4`. Instale o APK por cima da v0.4, com a mesma assinatura, para manter favoritos, destinos, temas e filtros. O pacote de desenvolvimento continua intencionalmente `br.com.gamemap.goiania.dev`; o nome exibido é **NavSkin**. Os três estilos, os dados de Goiânia offline e os catálogos acompanham o APK. O padrão de cobertura é **Mundo online**; a escolha entre os dois modos fica salva no aparelho e é compartilhada com o Android Auto.
+Versão do código **0.7.0**, `versionCode 6`. Instale o APK por cima da versão anterior, com a mesma assinatura, para manter favoritos, destinos, temas e filtros. O pacote de desenvolvimento continua `br.com.gamemap.goiania.dev`; o nome exibido é **NavSkin**. Os três estilos, os dados de Goiânia offline e os catálogos acompanham o APK. O padrão é **Mundo online**; a escolha entre os dois modos fica salva no aparelho e é compartilhada com o Android Auto.
 
 ## Primeira utilização
 
 1. Abra o aplicativo, escolha **Mundo · online** ou **Goiânia · offline**, escolha um dos temas GTA SA, Rosa Pop ou RDR2 e toque em **Explorar mapa**. Mundo é a opção inicial e requer internet, sem chave para carregar o mapa.
-2. Toque em **Para onde? → Configurar chave Geoapify**. Insira a chave da sua conta e salve. A chave não acompanha o projeto.
-3. Ative **GPS** e permita **localização precisa durante o uso**. Se o aparelho oferecer apenas localização aproximada, altere para precisa para navegar. A notificação permite acompanhar e encerrar o serviço; no Android 13+, sua permissão pode ser concedida pelo painel de destinos.
+2. Abra o **menu no canto superior direito → Configurar chave Geoapify**. Insira a chave da sua conta e salve. A chave não acompanha o projeto.
+3. No mesmo menu, toque em **Minha posição · ativar GPS**, ou use o círculo de recentralização no canto inferior direito, e permita **localização precisa durante o uso**. Se o aparelho oferecer apenas localização aproximada, altere para precisa para navegar. A notificação permite acompanhar e encerrar o serviço; no Android 13+, sua permissão pode ser concedida pelo menu.
 4. Pesquise um endereço ou estabelecimento e toque em um resultado. Outra opção é manter pressionado um ponto do mapa ou abrir **Seus lugares**. Aguarde uma posição atual e o cálculo da rota.
 5. Confira distância e duração na prévia. Toque em **Iniciar navegação**. A viagem mostra próxima manobra, via, distância restante, tempo, chegada estimada e velocidade em km/h. O aplicativo não fala instruções.
 
-Durante a viagem, **Opções da viagem** abre visão geral, recálculo, salvamento do destino e encerramento. Arrastar ou ampliar o mapa libera a câmera; **Recentralizar** volta a acompanhar. **N ↑ / Rumo ↑** alterna norte e direção do movimento. Cada tela mantém sua própria câmera, mesmo com uma sessão compartilhada.
+Durante a viagem, tocar no resumo de ETA ou em **Menu → Sua viagem** abre visão geral, recálculo, salvamento do destino e encerramento. Arrastar ou ampliar o mapa libera a câmera; o círculo de recentralização volta a acompanhar. **Menu → Marcador do veículo e orientação** alterna norte e direção do movimento. A velocidade fica no círculo inferior esquerdo. Cada tela mantém sua própria câmera, mesmo com uma sessão compartilhada.
 
-Em **Temas** ou **Filtros**, **Cobertura do mapa** alterna os modos sem encerrar o GPS, cancelar a rota ou apagar favoritos. Também é acessível em **Para onde? → Cobertura do mapa**. Os três temas e suas variantes noturnas, as seis categorias e os marcadores funcionam nos dois modos. Os filtros mudam apenas os ícones dos pontos de interesse; os dados cartográficos e a rota continuam visíveis. As prévias do carrossel usam capturas reais do recorte offline para mostrar as paletas.
+Em **Temas** ou **Filtros**, no topo, **Cobertura do mapa** alterna os modos sem encerrar GPS, rota ou apagar favoritos. Também é acessível em **Menu → Cobertura do mapa**. Os três temas, suas variantes noturnas e os marcadores funcionam nos dois modos. Há nove filtros; ensino, cultura e culto ainda não estão no snapshot offline. Os filtros mudam apenas os ícones dos pontos de interesse; cartografia e rota continuam visíveis. As prévias do carrossel usam capturas nativas de São Paulo no modo mundial.
 
 Se a câmera estiver fora do recorte ao selecionar Goiânia offline, **Ver região offline** move explicitamente a câmera para a área incluída e fecha o seletor. A troca de cobertura sozinha preserva o enquadramento. Mesmo durante uma viagem, esse comando apenas explora o mapa; **Recentralizar** volta a acompanhar o GPS.
 
@@ -58,7 +58,7 @@ Chave ausente/inválida, sem conexão, quota esgotada, nenhum resultado/rota, lo
 
 ## Reprodução de desenvolvimento
 
-No APK debug, **Para onde? → Desenvolvimento · simulação GPS** reproduz um trajeto original fixo, sem consulta HTTP. **SIMULAÇÃO** aparece no telefone, no indicador do carro e nos metadados. Parar a reprodução limpa suas posições antes de voltar a usar GPS real. Ela não exige permissão de localização e não substitui teste de rua.
+No APK debug, **Menu → Desenvolvimento · simulação GPS** reproduz um trajeto original fixo, sem consulta HTTP. **SIMULAÇÃO** aparece no telefone, no indicador do carro e nos metadados. Parar a reprodução limpa suas posições antes de voltar a usar GPS real. Ela não exige permissão de localização e não substitui teste de rua.
 
 Os cenários instrumentados históricos de cartografia, câmera e navegação selecionam explicitamente Goiânia offline e restauram a preferência ao terminar; assim, a prova de GPS e renderização local independe de conexão ao provedor mundial. Os relatórios v0.4 e anteriores são históricos e não comprovam a execução dos cenários da v0.5.
 

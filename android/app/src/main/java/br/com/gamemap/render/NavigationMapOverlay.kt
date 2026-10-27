@@ -185,7 +185,11 @@ internal class NavigationMapOverlay(context: Context) {
     private fun ensureImage(loaded: Style, path: String) {
         if (loaded.getImage(path) != null) return
         val bitmap = bitmaps.get(path) ?: assets.open(path).use {
-            checkNotNull(BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inScaled = false }))
+            checkNotNull(BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inScaled = false })).apply {
+                // Catalog PNGs are authored at 48 logical pixels. Asset decoding otherwise
+                // inherits the phone DPI, which makes MapLibre shrink them on dense screens.
+                density = android.util.DisplayMetrics.DENSITY_DEFAULT
+            }
         }.also { bitmaps.put(path, it) }
         loaded.addImage(path, bitmap)
     }

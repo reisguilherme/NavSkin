@@ -9,6 +9,18 @@ To the extent possible under law, the contributors dedicate this original
 navigation artwork to the public domain under CC0 1.0 Universal.
 License: https://creativecommons.org/publicdomain/zero/1.0/
 
-The original art is editable SVG. Raster PNGs are derived from those SVG files.
+The original NavSkin art is editable SVG. Its raster PNGs are derived from those
+SVG files. The explicit rasterSource for gta/vehicles/arrow takes precedence
+over its legacy NavSkin SVG when preparing the runtime PNGs.
+
+Exception: gta/vehicles/arrow-original.png is the original GTA San Andreas
+radar_centre sprite exported from models/hud.txd. Copyright Rockstar Games.
+Its source and the PNG derivatives gta/vehicles/arrow.png and arrow@2x.png
+are excluded from the CC0 dedication. No outside-game redistribution license
+has been verified; keep these resources in the local private asset pack.
+Source, exact SHA-256 and the pixel-preserving transformation are recorded in
+catalog.json and the generated provenance.json. Other vehicle choices retain
+the original NavSkin geometry and their semantic IDs.
+
 No Maki geometry is included in this catalog. Existing POI icons elsewhere in
 the repository keep their own licenses and attribution.

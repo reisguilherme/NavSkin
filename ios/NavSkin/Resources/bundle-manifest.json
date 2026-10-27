@@ -100,7 +100,7 @@
     {
       "path": "maps/credits/asset-manifest.json",
       "bytes": 266201,
-      "sha256": "aca5dee284cdc02df520aaa3d489e0a9ec2ffb25fbd2bd3652dca8aa3037d2fc"
+      "sha256": "50dd424c9eda96b25391c3e634773ffe54582cca69ed621443a5b962c636106c"
     },
     {
       "path": "maps/credits/attribution.html",
@@ -119,13 +119,13 @@
     },
     {
       "path": "maps/credits/world-attribution.html",
-      "bytes": 1427,
-      "sha256": "adf12a43455b2e0c0e6566bd1635ed77e4f74fdfd491088f8f9d2f824ed19fbe"
+      "bytes": 2444,
+      "sha256": "5d6e7e5004b9cec35169342324f8a7141d39815b284801468c1c515430cda336"
     },
     {
       "path": "maps/credits/world-sources.json",
-      "bytes": 5501,
-      "sha256": "16f5f704f14b0dc6fdc9e847b7e447561fa36bbb54876eb4834eb1f49b054045"
+      "bytes": 7007,
+      "sha256": "4a02b894285b3280cdbf9ebf2feb1f05bb97388c782bb58e4125e252ddc13035"
     },
     {
       "path": "maps/data/areas.geojson",
@@ -435,12 +435,12 @@
     {
       "path": "maps/styles/gta-night.json",
       "bytes": 603469,
-      "sha256": "54044c682415977664f691f440c4d15fc8a95defbd1e360da85e9779e7082a05"
+      "sha256": "8926b5e9195b23a3b543f6f69774e9664b701ff6d190e2a7b9c628a21ab44539"
     },
     {
       "path": "maps/styles/gta.json",
       "bytes": 603401,
-      "sha256": "2a7da8b5532faf292dd6250382a3c2c318679010ad50e871431dece7459a5551"
+      "sha256": "24989680156b40a05c3245946fd452da7065f0710ca065ab02eb49152c728454"
     },
     {
       "path": "maps/styles/rdr2-night.json",
@@ -465,37 +465,37 @@
     {
       "path": "maps/styles/theme-tokens.json",
       "bytes": 8867,
-      "sha256": "b15fb4db1b530352da17fadde6d862596702c7f1783cce6d67bdcd073e04b1c4"
+      "sha256": "dace2ec1951ee22484bcbc2034860f3d289482179c6ba78371757ec642f3c484"
     },
     {
       "path": "maps/styles/world-gta-night.json",
-      "bytes": 126933,
-      "sha256": "b3f8bbbbdc644b4503b722034cfb3e23fb1a15b90b5d4b265b52a4bfec6a43d5"
+      "bytes": 129414,
+      "sha256": "9aa4b929330a12e3cc99a8ff8b11b2fac0c5a2c849c67f5deab96423ff777c1b"
     },
     {
       "path": "maps/styles/world-gta.json",
-      "bytes": 126916,
-      "sha256": "c169871692807efffbc00779db1938b53643d70edd3df96041772837b57b87fe"
+      "bytes": 129397,
+      "sha256": "8a679ace12628e8706c58dd2164aa74efc1f953acaae860f4efed3dc6a62f9cf"
     },
     {
       "path": "maps/styles/world-rdr2-night.json",
-      "bytes": 126852,
-      "sha256": "e87df9a501a03a5aae5d1f13969e6268a34ebc995b7e23fd0c69e2935642bd05"
+      "bytes": 129374,
+      "sha256": "b13104a816eaed3a3336fb055b473ee6e71711df7b3bbc921e8658a53925bd7c"
     },
     {
       "path": "maps/styles/world-rdr2.json",
-      "bytes": 126835,
-      "sha256": "624ef8a0318e9010244e3f7fa7c8093c67277903b24234722e61f856abc1f60b"
+      "bytes": 129357,
+      "sha256": "c272acd05b1bc8bb8ca7abd0b8629bd410eaa079246bc2ce7ae3041d9c5fb26a"
     },
     {
       "path": "maps/styles/world-rosa-night.json",
-      "bytes": 126557,
-      "sha256": "ccf4851c19e91f1b98f73d053ab67657fdb312b7960ef12b231bd8410de2d170"
+      "bytes": 129079,
+      "sha256": "a502de256c1d8d8e878ff36b5d69978493377042119918883b17a49401cbb72c"
     },
     {
       "path": "maps/styles/world-rosa.json",
-      "bytes": 126540,
-      "sha256": "c127ef55e98b5dc828291ee6db69d4b365e84370fa35d62f8523435e97ecc465"
+      "bytes": 129062,
+      "sha256": "8a9ecaae8652fadade1c1c55cafea839aaa05ad33214486ab87060fd43e13797"
     },
     {
       "path": "maps/tiles/buildings/11/743/1120.pbf",
@@ -4154,13 +4154,13 @@
     },
     {
       "path": "navigation-icons/LICENSE.txt",
-      "bytes": 748,
-      "sha256": "73c8a1d31874853142d01f14cc0e196537e0f8a08a06e78721ad956d8e5ade76"
+      "bytes": 1474,
+      "sha256": "b3d903361410b90477655e456bd344fcc1d6697039914f0f296399afa1986aca"
     },
     {
       "path": "navigation-icons/catalog.json",
-      "bytes": 10850,
-      "sha256": "8200bf4d5ae10b08e1d77ed1ae0a9e4fea320a45a529a37cf2611d22987c8595"
+      "bytes": 11483,
+      "sha256": "d35f1bc895067c99413f51664125f9c95c41adc020de290fc6a9fab8007455bc"
     },
     {
       "path": "navigation-icons/gta/saved/cafe.png",
@@ -4343,9 +4343,14 @@
       "sha256": "adc6b8694a6df8337b03435e065005935bf62c0e952b39823db3564a3d5245d8"
     },
     {
+      "path": "navigation-icons/gta/vehicles/arrow-original.png",
+      "bytes": 310,
+      "sha256": "2a7f822a3493cc0840823bc6d241ec84b2a220fafe3235637ad721dd3a7c237e"
+    },
+    {
       "path": "navigation-icons/gta/vehicles/arrow.png",
-      "bytes": 1664,
-      "sha256": "0092a65766cea380aad834d20536dc91edf6d0f5cbd01f3918fe2911ca9d7eb7"
+      "bytes": 383,
+      "sha256": "e5c13057f9753c8906bcee523000f3beb2e4697416af0edec3db663fdfc3d13d"
     },
     {
       "path": "navigation-icons/gta/vehicles/arrow.svg",
@@ -4354,8 +4359,8 @@
     },
     {
       "path": "navigation-icons/gta/vehicles/arrow@2x.png",
-      "bytes": 2931,
-      "sha256": "59b9f5b9604ad9ffcbf0e68e23f0d18849a1e6024754b7dea1fc6328dc5f6f7f"
+      "bytes": 523,
+      "sha256": "40ad0106067bb3527a5bffb1f54c386b18e54537e40b78fa387ef9c09bbab569"
     },
     {
       "path": "navigation-icons/gta/vehicles/compact.png",
@@ -4431,6 +4436,11 @@
       "path": "navigation-icons/gta/vehicles/themed@2x.png",
       "bytes": 2835,
       "sha256": "c6661b7b195852b48310ac1caf1b93ec27d3df80192e6eab51afecb49cbe2cc6"
+    },
+    {
+      "path": "navigation-icons/provenance.json",
+      "bytes": 1034,
+      "sha256": "40b15f11d5250434d4cf061ebf74fcce66c3d4b9e78795d9d61c068558d2bc7c"
     },
     {
       "path": "navigation-icons/rdr2/saved/cafe.png",

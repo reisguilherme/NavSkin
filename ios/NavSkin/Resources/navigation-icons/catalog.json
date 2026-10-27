@@ -267,7 +267,19 @@
         "gta": {
           "image": "gta/vehicles/arrow.png",
           "preview": "gta/vehicles/arrow@2x.png",
-          "svg": "gta/vehicles/arrow.svg"
+          "svg": "gta/vehicles/arrow.svg",
+          "rasterSource": {
+            "file": "gta/vehicles/arrow-original.png",
+            "sha256": "2a7f822a3493cc0840823bc6d241ec84b2a220fafe3235637ad721dd3a7c237e",
+            "width": 16,
+            "height": 16,
+            "padding": 4,
+            "originalDictionary": "models/hud.txd",
+            "originalTexture": "radar_centre",
+            "sourceUrl": "https://gtamidori.com/textdrawsprites/hud.txd/radar_centre.png",
+            "copyright": "Rockstar Games",
+            "licenseStatus": "Original game artwork; no outside-game redistribution license verified. Local private pack only; not CC0."
+          }
         },
         "rosa": {
           "image": "rosa/vehicles/arrow.png",

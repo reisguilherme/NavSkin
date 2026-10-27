@@ -80,7 +80,7 @@ class ConnectionInstructionsActivity : ComponentActivity() {
         content.addView(connection, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(14); bottomMargin = dip(10) })
         content.addView(details, LinearLayout.LayoutParams(MATCH, WRAP))
         paragraph("Sobre os dados", """
-            No modo Mundo online, os mapas são fornecidos pelo OpenFreeMap a partir de dados OpenStreetMap. A cobertura e os pontos de interesse variam conforme os dados disponíveis em cada lugar.
+            No modo Mundo online, os mapas são fornecidos pelo OpenFreeMap a partir de dados OpenStreetMap. Em Goiânia, a camada de prédios Overture incluída no aplicativo complementa esse mapa. Fora do recorte, a densidade depende do provedor mundial. A cobertura e os pontos de interesse variam conforme os dados disponíveis em cada lugar.
 
             O modo Goiânia offline inclui vias, áreas e pontos de interesse OpenStreetMap, além de edificações Overture Maps Foundation com Google Open Buildings e Microsoft Global ML Building Footprints. Ele cobre somente o recorte incluído de Goiânia. Os locais podem estar incompletos ou desatualizados; contornos inferidos de imagens não equivalem a cadastro municipal.
         """.trimIndent())

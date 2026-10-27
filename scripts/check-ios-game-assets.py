@@ -19,4 +19,13 @@ for theme, profile in catalog["themes"].items():
             raise SystemExit(f"Missing map glyphs: {stack}. Prepare the original asset pack.")
     if not (resources / "maps/sprites" / f"{theme}.png").is_file():
         raise SystemExit(f"Missing original sprite atlas: {theme}.")
-print("PASS: original game font hashes, glyphs and sprite atlases are present")
+navigation = json.loads((resources / "navigation-icons/catalog.json").read_text(encoding="utf-8"))
+player = next(icon for icon in navigation["vehicles"] if icon["id"] == "arrow")["themeAssets"]["gta"]
+original = player["rasterSource"]
+player_file = resources / "navigation-icons" / original["file"]
+if not player_file.is_file() or hashlib.sha256(player_file.read_bytes()).hexdigest() != original["sha256"]:
+    raise SystemExit("Missing or changed original GTA player sprite. Restore the complete asset pack.")
+for key in ["image", "preview"]:
+    if not (resources / "navigation-icons" / player[key]).is_file():
+        raise SystemExit(f"Missing prepared GTA player sprite: {player[key]}")
+print("PASS: original game font hashes, glyphs, sprite atlases and GTA player marker are present")

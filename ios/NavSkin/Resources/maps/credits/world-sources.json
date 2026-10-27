@@ -28,7 +28,7 @@
     "privacy": "https://openfreemap.org/privacy/",
     "fontServiceSource": "https://github.com/hyperknot/openfreemap-styles/tree/main/fonts"
   },
-  "attributionHtml": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>",
+  "attributionHtml": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a> · <a href=\"https://docs.overturemaps.org/attribution/\">Overture Maps Foundation</a> · <a href=\"https://sites.research.google/open-buildings/\">Google Open Buildings</a> · <a href=\"https://github.com/microsoft/GlobalMLBuildingFootprints\">Microsoft Global ML Building Footprints</a>",
   "sources": [
     {
       "name": "OpenFreeMap public production service",
@@ -43,6 +43,21 @@
     {
       "name": "OpenStreetMap contributors",
       "url": "https://www.openstreetmap.org/copyright",
+      "license": "ODbL-1.0"
+    },
+    {
+      "name": "Bundled Goiânia building tiles: Overture Maps Foundation",
+      "url": "https://docs.overturemaps.org/attribution/",
+      "license": "ODbL-1.0"
+    },
+    {
+      "name": "Google Open Buildings",
+      "url": "https://sites.research.google/open-buildings/",
+      "license": "CC-BY-4.0"
+    },
+    {
+      "name": "Microsoft Global ML Building Footprints",
+      "url": "https://github.com/microsoft/GlobalMLBuildingFootprints",
       "license": "ODbL-1.0"
     },
     {
@@ -87,8 +102,8 @@
       "convenience"
     ]
   },
-  "coverage": "Worldwide Web Mercator map coverage, with detail limited to available source data. Online rendering uses the same geography for every visual theme.",
-  "offline": "No worldwide offline pack is downloaded. The existing bundled Goiânia package is a separate optional map.",
+  "coverage": "Worldwide Web Mercator map coverage, with detail limited to available source data. In the bundled Goiânia query bounds, dense local Overture building tiles replace intersecting world building polygons; world buildings remain elsewhere. Every visual theme uses the same geography.",
+  "offline": "No worldwide offline pack is downloaded. Bundled Goiânia building tiles are also used in world mode; the separate Goiânia map provides the complete local offline base. Building coverage, release and count come from maps/data/buildings-metadata.json and are recorded by the style builder.",
   "serviceAvailability": "Public service offered as-is without an SLA. No API key, registration or map-view/request charge according to the provider homepage checked on 2026-10-27.",
   "offlineDownloadPolicy": "No offline downloader is implemented here. Provider terms permit at most 3000 tiles or 50 MB per download, at most four concurrent requests, and a unique app User-Agent; larger downloads require contacting the provider.",
   "fontDecision": "OpenFreeMap serves Noto Sans Bold including sampled Latin, Arabic and CJK glyphs. Noto Serif Bold returned HTTP 404 there. All online themes use the verified sans font; the separate offline RDR2 style retains its bundled serif font.",
@@ -180,5 +195,18 @@
       }
     ],
     "scope": "HTTP responses, decoded MVT layers and individual glyph IDs were verified. This does not establish Android Auto, CarPlay or native screen rendering."
+  },
+  "bundledBuildings": {
+    "source": "buildings-local",
+    "bounds": [
+      -49.325,
+      -16.755,
+      -49.205,
+      -16.64
+    ],
+    "release": "2026-10-21.0",
+    "count": 269728,
+    "metadataAsset": "maps/data/buildings-metadata.json",
+    "replacement": "Bundled Overture footprints replace world building polygons intersecting these bounds. Outside the bounds, world buildings remain visible."
   }
 }

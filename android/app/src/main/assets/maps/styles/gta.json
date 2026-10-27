@@ -28348,7 +28348,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -28464,7 +28464,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -28579,7 +28579,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -28664,7 +28664,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -28781,7 +28781,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -28866,7 +28866,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -28985,7 +28985,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -29070,7 +29070,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -29155,7 +29155,7 @@
           ],
           0,
           15,
-          13
+          15
         ],
         "text-optional": true,
         "text-offset": [
@@ -29287,7 +29287,7 @@
         "text-font": [
           "NavSkinGtaRoad"
         ],
-        "text-size": 12.5,
+        "text-size": 14.5,
         "text-max-angle": 30,
         "text-transform": "uppercase",
         "text-letter-spacing": 0.18

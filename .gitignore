@@ -55,3 +55,12 @@ android/maps/icons/rdr2/poi-theatre.svg
 
 # Historical duplicate screenshots from isolated emulator runs.
 android/screenshots/v0.6/* (*).png
+
+# Original GTA player sprite and its runtime derivatives: local private pack only.
+android/maps/catalogs/gta/vehicles/arrow-original.png
+android/app/src/main/assets/navigation-icons/gta/vehicles/arrow-original.png
+android/app/src/main/assets/navigation-icons/gta/vehicles/arrow.png
+android/app/src/main/assets/navigation-icons/gta/vehicles/arrow@2x.png
+ios/NavSkin/Resources/navigation-icons/gta/vehicles/arrow-original.png
+ios/NavSkin/Resources/navigation-icons/gta/vehicles/arrow.png
+ios/NavSkin/Resources/navigation-icons/gta/vehicles/arrow@2x.png

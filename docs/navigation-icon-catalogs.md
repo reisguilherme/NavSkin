@@ -1,8 +1,8 @@
 # Catálogos de locais e veículos
 
-O projeto inclui três conjuntos próprios: **GTA SA**, **Rosa Pop** e **RDR2**. Cada tema tem 12 ícones de locais salvos e seis marcadores de veículo. Os 54 desenhos são SVGs originais e editáveis, com 108 PNGs RGBA derivados, em 48 × 48 e 96 × 96 pixels. Todos os arquivos necessários ao seletor e ao mapa são empacotados localmente.
+O projeto inclui três conjuntos: **GTA SA**, **Rosa Pop** e **RDR2**. Cada tema tem 12 ícones de locais salvos e seis marcadores de veículo. Há 54 SVGs próprios editáveis e 108 PNGs RGBA em 48×48 e 96×96. A partir da 0.7, os dois PNGs do marcador padrão GTA usam o sprite original `radar_centre`; o SVG verde anterior fica como alternativa legada. Os recursos necessários ao seletor e ao mapa são empacotados localmente.
 
-Não foram usados emojis, fontes de ícones, imagens remotas, logotipos, sprites extraídos de jogos ou geometria Maki neste catálogo. A linguagem do GTA acompanha os contornos fortes e cores vivas dos POIs existentes. O Rosa Pop combina formas arredondadas, corações, flores e laços próprios. O RDR2 usa tinta escura e tons de pergaminho, incluindo cacto e carroça originais.
+O marcador GTA original é a exceção documentada no manifesto `rasterSource` e em [procedência dos jogos](game-assets-provenance.md). Os outros 53 desenhos são próprios, sem emojis, fontes de ícones, imagens remotas ou geometria Maki. O Rosa Pop combina formas arredondadas, corações, flores e laços próprios. O RDR2 usa tinta escura e tons de pergaminho, incluindo cacto e carroça próprios.
 
 ## Fontes e geração
 
@@ -16,7 +16,7 @@ node --test tests/navigation-icons.test.mjs
 node android/maps/catalogs/preview-catalogs.mjs
 ```
 
-O primeiro comando copia os SVGs e gera os PNGs; preserva as alterações feitas nos SVGs de origem. A geração não depende de rede, Android SDK ou Gradle. Usa a dependência `sharp` já instalada no projeto. O terceiro comando atualiza as três pranchas de prévia em `android/maps/catalogs/previews/`.
+O primeiro comando copia os SVGs e gera os PNGs; preserva as alterações feitas nos SVGs de origem. Para `gta/vehicles/arrow`, valida o hash do raster local original e usa padding + nearest, em vez do SVG. A geração não depende de rede, Android SDK ou Gradle. Usa `sharp` já instalado. As pranchas geradas pelo terceiro comando mostram os SVGs de autoria; a prévia usada no seletor nativo vem do PNG final.
 
 `android/maps/catalogs/author-original-icons.mjs` é uma ferramenta opcional de autoria, que recria a primeira versão dos 54 SVGs e do catálogo a partir de formas vetoriais. Executá-la substitui edições manuais nos SVGs. Ela não faz parte do preparo normal dos assets; use o comando `prepare-navigation-icons.mjs` para publicar edições próprias.
 
@@ -69,7 +69,7 @@ Persista somente o identificador semântico da escolha, como `home` ou `motorcyc
 
 | ID de veículo | Desenho |
 | --- | --- |
-| `arrow` | Seta clássica / fallback |
+| `arrow` | Jogador original radar_centre no GTA; seta própria nos outros temas / fallback |
 | `compact` | Carro compacto visto de cima |
 | `sport` | Carro esportivo com faixas e aerofólio |
 | `suv` | SUV com teto e barras próprios |

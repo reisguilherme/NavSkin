@@ -23,6 +23,21 @@
         85.05113
       ],
       "attribution": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>"
+    },
+    "buildings-local": {
+      "type": "vector",
+      "tiles": [
+        "asset://maps/tiles/buildings/{z}/{x}/{y}.pbf"
+      ],
+      "minzoom": 11,
+      "maxzoom": 16,
+      "bounds": [
+        -49.325,
+        -16.755,
+        -49.205,
+        -16.64
+      ],
+      "attribution": "<a href=\"https://docs.overturemaps.org/attribution/\">Overture Maps Foundation</a> · <a href=\"https://sites.research.google/open-buildings/\">Google Open Buildings</a> · <a href=\"https://github.com/microsoft/GlobalMLBuildingFootprints\">Microsoft Global ML Building Footprints</a>"
     }
   },
   "metadata": {
@@ -51,12 +66,25 @@
         "culture",
         "religion"
       ],
-      "attribution": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>",
+      "attribution": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a> · <a href=\"https://docs.overturemaps.org/attribution/\">Overture Maps Foundation</a> · <a href=\"https://sites.research.google/open-buildings/\">Google Open Buildings</a> · <a href=\"https://github.com/microsoft/GlobalMLBuildingFootprints\">Microsoft Global ML Building Footprints</a>",
       "creditsAsset": "maps/credits/world-attribution.html",
       "provider": "OpenFreeMap",
       "schema": "OpenMapTiles",
       "font": "Noto Sans Bold",
-      "note": "Online tiles and glyphs require network. The optional bundled Goiânia package remains separate.",
+      "bundledBuildings": {
+        "source": "buildings-local",
+        "bounds": [
+          -49.325,
+          -16.755,
+          -49.205,
+          -16.64
+        ],
+        "release": "2026-10-21.0",
+        "count": 269728,
+        "metadataAsset": "maps/data/buildings-metadata.json",
+        "replacement": "Bundled Overture footprints replace world building polygons intersecting these bounds. Outside the bounds, world buildings remain visible."
+      },
+      "note": "Online base tiles and glyphs require network. In the bundled Goiânia coverage, dense local Overture building tiles replace world buildings in every theme.",
       "typography": {
         "profile": "rdr2",
         "roles": {
@@ -444,7 +472,60 @@
             "geometry-type"
           ],
           "Polygon"
+        ],
+        [
+          ">",
+          [
+            "distance",
+            {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -49.325,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.755
+                  ]
+                ]
+              ]
+            }
+          ],
+          0
         ]
+      ],
+      "paint": {
+        "fill-color": "#B19B75",
+        "fill-opacity": 1,
+        "fill-outline-color": "#6A573D"
+      }
+    },
+    {
+      "id": "building-footprints-local",
+      "type": "fill",
+      "source": "buildings-local",
+      "source-layer": "buildings",
+      "minzoom": 13.4,
+      "filter": [
+        "==",
+        [
+          "geometry-type"
+        ],
+        "Polygon"
       ],
       "paint": {
         "fill-color": "#B19B75",

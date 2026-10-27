@@ -24,6 +24,7 @@ import androidx.test.uiautomator.UiScrollable
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
 import br.com.gamemap.GameMapApplication
+import br.com.gamemap.R
 import br.com.gamemap.data.MapStyleRepository
 import br.com.gamemap.phone.MainActivity
 import br.com.gamemap.preferences.*
@@ -60,6 +61,85 @@ class NativeMvpRenderingTest {
     @After fun restoreMapCoverage() {
         instrumentation.runOnMainSync {
             (context.applicationContext as GameMapApplication).preferences.setBaseMapMode(previousCoverage)
+        }
+    }
+
+    @Test fun phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu() {
+        val application = context.applicationContext as GameMapApplication
+        val previousTheme = application.preferences.snapshot().theme
+        val device = UiDevice.getInstance(instrumentation)
+        instrumentation.runOnMainSync {
+            application.navigation.stopNavigation()
+            application.preferences.setTheme(MapTheme.ROSA_POP)
+        }
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                waitForDescription(device, "Explorar mapa")
+                captureSheetSafeBottom(scenario, device)
+                collapsePanel(device)
+                assertTrue("Wait for real cartography before capturing phone chrome",
+                    device.wait(Until.hasObject(By.descContains("recursos e renderização prontos")), 30_000))
+                device.waitForIdle()
+                fun checkChrome() = scenario.onActivity { activity ->
+                    fun bounds(id: Int) = android.graphics.Rect().also {
+                        assertTrue("Missing phone control $id", activity.findViewById<View>(id).getGlobalVisibleRect(it))
+                    }
+                    val header = bounds(R.id.phone_header)
+                    val search = bounds(R.id.phone_search)
+                    val speed = bounds(R.id.phone_speed)
+                    val recenter = bounds(R.id.phone_recenter)
+                    val menu = bounds(R.id.phone_main_menu)
+                    val width = activity.window.decorView.width
+                    val height = activity.window.decorView.height
+                    assertTrue("Search must stay at the bottom", search.top > height * .65)
+                    val insets = checkNotNull(androidx.core.view.ViewCompat.getRootWindowInsets(activity.window.decorView))
+                        .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+                    val center = (insets.left + width - insets.right) / 2
+                    assertTrue("Search must be centered inside the safe map area", abs(search.centerX() - center) <= 2)
+                    assertTrue("Search overlaps system navigation", search.bottom <= sheetSafeBottom)
+                    assertTrue("Menu moved away from the upper bar", header.contains(menu))
+                    assertTrue("Speed must be on the left", speed.centerX() < width / 2)
+                    assertTrue("Recenter must be on the right", recenter.centerX() > width / 2)
+                    assertEquals("Speed must be circular", speed.width(), speed.height())
+                    assertEquals("Recenter must be circular", recenter.width(), recenter.height())
+                    assertTrue("Speed overlaps search", speed.bottom < search.top)
+                    assertTrue("Recenter overlaps search", recenter.bottom < search.top)
+                    assertFalse("Idle GPS should not show a large route card", activity.findViewById<View>(R.id.phone_route_summary).isShown)
+                    assertFalse(android.graphics.Rect.intersects(header, search))
+                }
+                checkChrome()
+                for (description in listOf("Temas", "Filtros")) {
+                    assertTrue("$description must be beside NavSkin at the top",
+                        waitForDescription(device, description).visibleBounds.bottom < device.displayHeight / 3)
+                }
+                assertFalse(device.hasObject(By.text("N ↑")))
+                assertFalse(device.hasObject(By.text("Rumo ↑")))
+                assertFalse(device.hasObject(By.textContains("OpenFreeMap")))
+                assertFalse(device.hasObject(By.text("Seus lugares e opções")))
+                savePhoneScreenshot("phone-v07-rosa-clean.png")
+                waitForDescription(device, "Para onde? Buscar destinos").click()
+                waitForDescription(device, "Painel Para onde?")
+                assertFalse("Configuration should live in its own menu", device.hasObject(By.desc("Marcador do veículo e orientação")))
+                device.pressBack()
+                waitForDescription(device, "Menu NavSkin").click()
+                waitForDescription(device, "Painel Seus lugares e opções")
+                assertNotNull(device.findObject(By.desc("Seus lugares · salvos e recentes")))
+                revealOptionsAction(device, "Sobre o NavSkin · fontes e licenças")
+                assertTrue("Map credits must remain available inside the menu", device.hasObject(By.textContains("Dados do mapa:")))
+                savePhoneScreenshot("phone-v07-options.png")
+                device.pressBack()
+                scenario.onActivity { it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+                val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(8)
+                while (device.displayWidth < device.displayHeight && System.nanoTime() < deadline) Thread.sleep(100)
+                waitForDescription(device, "Menu NavSkin")
+                assertTrue(device.wait(Until.hasObject(By.descContains("recursos e renderização prontos")), 30_000))
+                device.waitForIdle()
+                captureSheetSafeBottom(scenario, device)
+                checkChrome()
+                savePhoneScreenshot("phone-v07-landscape-clean.png")
+            }
+        } finally {
+            instrumentation.runOnMainSync { application.preferences.setTheme(previousTheme) }
         }
     }
 
@@ -191,7 +271,7 @@ class NativeMvpRenderingTest {
                 }
                 awaitPhonePixels(Palette.GTA).also { saveImage(context, "phone-gta.png", it); it.recycle() }
                 val beforeZoom = readPhoneCamera(scenario)
-                waitForDescription(device, "Aumentar zoom").click()
+                clickMapMenuAction(device, "Aumentar zoom")
                 val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10)
                 var afterZoom = readPhoneCamera(scenario)
                 while (afterZoom.zoom < beforeZoom.zoom + .9 && System.nanoTime() < deadline) {
@@ -201,9 +281,9 @@ class NativeMvpRenderingTest {
                 assertTrue("The zoom control did not zoom the real native map", afterZoom.zoom >= beforeZoom.zoom + .9)
                 assertEquals(beforeZoom.target!!.latitude, afterZoom.target!!.latitude, 0.00001)
                 assertEquals(beforeZoom.target!!.longitude, afterZoom.target!!.longitude, 0.00001)
-                waitForDescription(device, "Diminuir zoom").click()
+                clickMapMenuAction(device, "Diminuir zoom")
                 awaitPhoneCamera(scenario, beforeZoom)
-                waitForDescription(device, "Voltar ao enquadramento inicial").click()
+                clickMapMenuAction(device, "Voltar ao enquadramento inicial")
                 awaitPhoneCamera(scenario, NativeMapRenderer.defaultCamera())
                 val camera = readPhoneCamera(scenario)
 
@@ -361,7 +441,31 @@ class NativeMvpRenderingTest {
         explore.click()
         if (!device.wait(Until.gone(By.desc("Explorar mapa")), 5000))
             failSheetScroll(device, "Explorar mapa", "The panel did not retract after clicking the pinned footer")
-        waitForDescription(device, "Aumentar zoom")
+        waitForDescription(device, "Menu NavSkin")
+    }
+
+    private fun clickMapMenuAction(device: UiDevice, description: String) {
+        waitForDescription(device, "Menu NavSkin").click()
+        waitForDescription(device, "Painel Seus lugares e opções")
+        revealOptionsAction(device, description).click()
+        assertTrue("Options menu should retract after changing zoom",
+            device.wait(Until.gone(By.desc("Painel Seus lugares e opções")), 5000))
+    }
+
+    private fun revealOptionsAction(device: UiDevice, description: String): UiObject2 {
+        repeat(12) {
+            val panel = device.findObject(By.desc("Painel Seus lugares e opções"))
+                ?: failSheetScroll(device, description, "Options menu disappeared")
+            val target = device.findObject(By.desc(description))
+            val bounds = target?.visibleBounds
+            if (target != null && bounds != null && bounds.height() >= context.resources.displayMetrics.density * 47 &&
+                panel.visibleBounds.contains(bounds)) return target
+            panel.setGestureMarginPercentage(.12f)
+            // Do not rewind at the top: a downward rewind would retract the sheet.
+            panel.scroll(Direction.DOWN, .3f, (context.resources.displayMetrics.density * 280).toInt())
+            device.waitForIdle(500)
+        }
+        failSheetScroll(device, description, "Cannot reach option after bounded forward scrolls")
     }
 
     private fun revealSheetControl(device: UiDevice, description: String, container: String): UiObject2 {

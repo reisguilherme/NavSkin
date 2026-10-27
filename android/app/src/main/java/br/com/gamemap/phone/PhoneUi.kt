@@ -76,22 +76,29 @@ internal fun Context.phoneIcon(resource: Int, description: String? = null) = Ima
 }
 
 /** A small native action with a generous touch target and no platform button bezel. */
-internal class PhoneAction(context: Context, iconResource: Int, label: String, showLabel: Boolean = false) :
+internal class PhoneAction(context: Context, iconResource: Int, label: String, showLabel: Boolean = false,
+                          stacked: Boolean = false) :
     LinearLayout(context) {
     private val icon = context.phoneIcon(iconResource)
     private val caption = context.phoneText(label, 14f, true)
     init {
-        orientation = HORIZONTAL
+        orientation = if (stacked) VERTICAL else HORIZONTAL
         gravity = Gravity.CENTER
         minimumHeight = context.dip(48)
         minimumWidth = context.dip(48)
         isClickable = true
         isFocusable = true
         contentDescription = label
-        setPadding(context.dip(12), context.dip(8), context.dip(12), context.dip(8))
+        val horizontalPadding = context.dip(if (stacked) 6 else 12)
+        setPadding(horizontalPadding, context.dip(8), horizontalPadding, context.dip(8))
         addView(icon, LayoutParams(context.dip(22), context.dip(22)))
-        if (showLabel) addView(caption, LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT).apply { marginStart = context.dip(9) })
+        if (showLabel) {
+            if (stacked) caption.textSize = 10f
+            addView(caption, LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                if (stacked) topMargin = context.dip(4) else marginStart = context.dip(9)
+            })
+        }
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
         caption.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
