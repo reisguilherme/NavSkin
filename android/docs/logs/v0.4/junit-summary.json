@@ -1,0 +1,104 @@
+[
+  {
+    "Suite": "br.com.gamemap.car.CarNavigationBridgeTest",
+    "Tests": 3,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.car.CarNavigationIntentsTest",
+    "Tests": 3,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.car.CarNavigationModelsTest",
+    "Tests": 4,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.car.CarScreensTest",
+    "Tests": 6,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.data.MapStyleRepositoryTest",
+    "Tests": 4,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.core.GeoMathTest",
+    "Tests": 4,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.core.NavigationEngineTest",
+    "Tests": 26,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.provider.GeoapifyProviderTest",
+    "Tests": 16,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.runtime.AndroidLocationSourceTest",
+    "Tests": 3,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.runtime.NavigationRuntimeTest",
+    "Tests": 18,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.runtime.PhoneReplayIntegrationTest",
+    "Tests": 1,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.storage.IconCatalogRepositoryTest",
+    "Tests": 1,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.storage.LocalPlacesStoreTest",
+    "Tests": 8,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.navigation.storage.NavigationSettingsTest",
+    "Tests": 2,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.preferences.PreferenceStoreTest",
+    "Tests": 4,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.render.NavigationRenderStateTest",
+    "Tests": 5,
+    "Failures": 0,
+    "Errors": 0
+  },
+  {
+    "Suite": "br.com.gamemap.render.NavigationStyleVisibilityTest",
+    "Tests": 3,
+    "Failures": 0,
+    "Errors": 0
+  }
+]

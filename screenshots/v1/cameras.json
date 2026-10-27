@@ -1,0 +1,32 @@
+[
+  {
+    "name": "01-geral-gta",
+    "zoom": "ZOOM 12.8",
+    "coordinates": "16.6912° S / 49.2650° O"
+  },
+  {
+    "name": "01-geral-neutro",
+    "zoom": "ZOOM 12.8",
+    "coordinates": "16.6912° S / 49.2650° O"
+  },
+  {
+    "name": "02-centro-gta",
+    "zoom": "ZOOM 15.1",
+    "coordinates": "16.6809° S / 49.2563° O"
+  },
+  {
+    "name": "02-centro-neutro",
+    "zoom": "ZOOM 15.1",
+    "coordinates": "16.6809° S / 49.2563° O"
+  },
+  {
+    "name": "03-vaca-brava-gta",
+    "zoom": "ZOOM 15.4",
+    "coordinates": "16.7097° S / 49.2708° O"
+  },
+  {
+    "name": "03-vaca-brava-neutro",
+    "zoom": "ZOOM 15.4",
+    "coordinates": "16.7097° S / 49.2708° O"
+  }
+]

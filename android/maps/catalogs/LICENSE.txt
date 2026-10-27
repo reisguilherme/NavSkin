@@ -1,0 +1,14 @@
+GameMap original navigation icon artwork
+
+All SVG geometry in this directory was created specifically for this project.
+It contains no copied game artwork, logos, sprites, emoji, fonts or external images.
+The theme names describe visual inspiration only. No affiliation or endorsement
+by the owners of any game franchise is claimed.
+
+To the extent possible under law, the contributors dedicate this original
+navigation artwork to the public domain under CC0 1.0 Universal.
+License: https://creativecommons.org/publicdomain/zero/1.0/
+
+The original art is editable SVG. Raster PNGs are derived from those SVG files.
+No Maki geometry is included in this catalog. Existing POI icons elsewhere in
+the repository keep their own licenses and attribution.

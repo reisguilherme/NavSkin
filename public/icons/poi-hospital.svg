@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Hospitais">
+  <title>Hospitais</title>
+  <!-- Maki 8.2.0 (hospital), Mapbox, CC0-1.0. Adapted colors and outline. -->
+  <defs><g id="glyph"><path id="rect4194" d="M7,1C6.4,1,6,1.4,6,2v4H2C1.4,6,1,6.4,1,7v1&#xA;&#x9;c0,0.6,0.4,1,1,1h4v4c0,0.6,0.4,1,1,1h1c0.6,0,1-0.4,1-1V9h4c0.6,0,1-0.4,1-1V7c0-0.6-0.4-1-1-1H9V2c0-0.6-0.4-1-1-1H7z"/></g></defs>
+  <g transform="translate(4 4) scale(1.2)" stroke-linecap="round" stroke-linejoin="round">
+    <use xlink:href="#glyph" fill="#ffffff" stroke="#ffffff" stroke-width="3"/>
+    <use xlink:href="#glyph" fill="#171511" stroke="#171511" stroke-width="1.55"/>
+    <use xlink:href="#glyph" fill="#ff5f72"/>
+  </g>
+</svg>

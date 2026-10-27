@@ -1,0 +1,192 @@
+{
+  "title": "Goiânia — OpenStreetMap local vector extract",
+  "bounds": {
+    "west": -49.325,
+    "south": -16.755,
+    "east": -49.205,
+    "north": -16.64
+  },
+  "bbox": [
+    -49.325,
+    -16.755,
+    -49.205,
+    -16.64
+  ],
+  "center": [
+    -49.264,
+    -16.693
+  ],
+  "crs": "EPSG:4326",
+  "attribution": "© OpenStreetMap contributors",
+  "attributionUrl": "https://www.openstreetmap.org/copyright",
+  "license": "ODbL-1.0",
+  "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "source": "OpenStreetMap via Overpass API",
+  "endpoint": "https://overpass-api.de/api/interpreter",
+  "fetchedAt": "2026-10-26T23:49:07.859Z",
+  "dataTimestamp": "2026-10-26T23:47:59Z",
+  "discovery": {
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "fetchedAt": "2026-10-26T23:46:54.830Z",
+    "dataTimestamp": "2026-10-26T23:45:51Z",
+    "queryFile": "data/osm/places.overpassql",
+    "elements": 5,
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "generatedAt": "2026-10-26T23:49:57.221Z",
+  "verifiedLocations": [
+    {
+      "name": "Centro",
+      "osmName": "Setor Central",
+      "osmId": "node/2805034408",
+      "coordinates": [
+        -49.2581783,
+        -16.6748672
+      ],
+      "coordinateSource": "OSM node coordinate",
+      "osmUrl": "https://www.openstreetmap.org/node/2805034408",
+      "tags": {
+        "name": "Setor Central",
+        "place": "suburb"
+      }
+    },
+    {
+      "name": "Praça Cívica",
+      "osmName": "Praça Cívica",
+      "osmId": "way/670650221",
+      "coordinates": [
+        -49.2562748,
+        -16.6809224
+      ],
+      "coordinateSource": "centroid derived from complete OSM polygon",
+      "osmUrl": "https://www.openstreetmap.org/way/670650221",
+      "tags": {
+        "addr:street": "Rua 82",
+        "leisure": "park",
+        "name": "Praça Cívica"
+      }
+    },
+    {
+      "name": "Setor Bueno",
+      "osmName": "Setor Bueno",
+      "osmId": "node/3561431327",
+      "coordinates": [
+        -49.277922,
+        -16.697876
+      ],
+      "coordinateSource": "OSM node coordinate",
+      "osmUrl": "https://www.openstreetmap.org/node/3561431327",
+      "tags": {
+        "name": "Setor Bueno",
+        "place": "suburb",
+        "wikidata": "Q10370748",
+        "wikimedia_commons": "Category:Bueno (Goiânia)",
+        "wikipedia": "pt:Bueno (Goiânia)"
+      }
+    },
+    {
+      "name": "Parque Vaca Brava",
+      "osmName": "Parque Vaca Brava",
+      "osmId": "way/159590062",
+      "coordinates": [
+        -49.2707999,
+        -16.709665
+      ],
+      "coordinateSource": "centroid derived from complete OSM polygon",
+      "osmUrl": "https://www.openstreetmap.org/way/159590062",
+      "tags": {
+        "leisure": "park",
+        "name": "Parque Vaca Brava",
+        "wikidata": "Q10345388",
+        "wikimedia_commons": "Category:Parque Vaca Brava",
+        "wikipedia": "pt:Parque Vaca Brava"
+      }
+    },
+    {
+      "name": "Parque Flamboyant",
+      "osmName": "Parque Flamboyant",
+      "osmId": "way/220688361",
+      "coordinates": [
+        -49.2379532,
+        -16.7035326
+      ],
+      "coordinateSource": "centroid derived from complete OSM polygon",
+      "osmUrl": "https://www.openstreetmap.org/way/220688361",
+      "tags": {
+        "leisure": "park",
+        "name": "Parque Flamboyant",
+        "source": "Bing"
+      }
+    }
+  ],
+  "counts": {
+    "roads": {
+      "total": 23075,
+      "byKind": {
+        "tertiary": 2126,
+        "residential": 10215,
+        "service": 4583,
+        "busway": 244,
+        "path": 1670,
+        "primary": 1743,
+        "secondary": 2176,
+        "motorway": 168,
+        "trunk": 124,
+        "track": 22,
+        "rail": 4
+      }
+    },
+    "areas": {
+      "total": 4448,
+      "byKind": {
+        "scrub": 6,
+        "building": 2963,
+        "residential": 132,
+        "sports_centre": 13,
+        "wood": 172,
+        "park": 574,
+        "grass": 147,
+        "industrial": 26,
+        "water": 69,
+        "pitch": 268,
+        "retail": 33,
+        "commercial": 5,
+        "playground": 16,
+        "recreation_ground": 5,
+        "wetland": 1,
+        "farmland": 10,
+        "brownfield": 1,
+        "cemetery": 3,
+        "square": 4
+      }
+    },
+    "waterways": {
+      "total": 398,
+      "byKind": {
+        "stream": 356,
+        "river": 36,
+        "canal": 4,
+        "ditch": 1,
+        "dam": 1
+      }
+    },
+    "places": {
+      "total": 544,
+      "byKind": {
+        "district": 273,
+        "city": 1,
+        "park": 267,
+        "square": 3
+      }
+    }
+  },
+  "warnings": [],
+  "processing": {
+    "coordinates": "Original full OSM way/member coordinates; longitude,latitude. No road or polygon simplification.",
+    "clipping": "Query selects features intersecting the bounding box. Full selected geometries are preserved, so some coordinates extend beyond viewport bounds.",
+    "labels": "Named OSM place nodes and centroids derived from selected OSM polygons. Centro is the display alias for OSM Setor Central.",
+    "areaRelations": "Multipolygon member segments joined by identical endpoints; inner rings retained. Incomplete rings are omitted and reported.",
+    "buildings": "Actual OSM building footprints, without generated blocks or generalization; coverage depends on OSM mapping.",
+    "unmappedLand": "No inferred city blocks, generated buildings, or invented land-use polygons."
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "attribution": "© OpenStreetMap contributors · Overture Maps Foundation · Google Open Buildings · Microsoft Global ML Building Footprints",
+  "sources": [
+    {
+      "name": "OpenStreetMap contributors",
+      "license": "ODbL-1.0",
+      "url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "name": "Overture Maps Foundation",
+      "license": "ODbL-1.0",
+      "url": "https://docs.overturemaps.org/attribution/"
+    },
+    {
+      "name": "Google Open Buildings",
+      "license": "CC-BY-4.0",
+      "url": "https://sites.research.google/open-buildings/"
+    },
+    {
+      "name": "Microsoft Global ML Building Footprints",
+      "license": "ODbL-1.0",
+      "url": "https://github.com/microsoft/GlobalMLBuildingFootprints"
+    },
+    {
+      "name": "Maki 8.2.0 / Mapbox",
+      "license": "CC0-1.0",
+      "url": "https://github.com/mapbox/maki"
+    },
+    {
+      "name": "Rosa Pop original GameMap geometric artwork",
+      "license": "CC0-1.0"
+    },
+    {
+      "name": "RDR2-inspired original GameMap pen artwork",
+      "license": "CC0-1.0"
+    },
+    {
+      "name": "Noto Sans Bold (unmodified PBFs, local GameMapSans URL alias)",
+      "license": "SIL-OFL-1.1",
+      "url": "https://github.com/maplibre/demotiles/tree/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold"
+    },
+    {
+      "name": "Noto Serif Bold (unmodified OSM US PBFs, local GameMapSerif URL alias)",
+      "license": "SIL-OFL-1.1",
+      "url": "https://tiles.openstreetmap.us/fonts/"
+    }
+  ],
+  "fonts": {
+    "alias": "GameMapSans",
+    "upstream": "Noto Sans Bold",
+    "repository": "https://github.com/maplibre/demotiles",
+    "commit": "601ae60796ceceda2cbd2ed3d2ea92d17a84be4b",
+    "downloadTemplate": "https://raw.githubusercontent.com/maplibre/demotiles/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold/{range}.pbf",
+    "ranges": [
+      "0-255",
+      "8192-8447"
+    ],
+    "codepoints": [
+      32,
+      33,
+      34,
+      38,
+      39,
+      40,
+      41,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      170,
+      176,
+      180,
+      186,
+      193,
+      194,
+      195,
+      199,
+      200,
+      201,
+      202,
+      205,
+      209,
+      210,
+      211,
+      212,
+      213,
+      218,
+      225,
+      226,
+      227,
+      231,
+      232,
+      233,
+      234,
+      237,
+      241,
+      242,
+      243,
+      244,
+      245,
+      250,
+      8217
+    ],
+    "coverage": "All road/place/POI names in bundled source plus uppercase variants. Re-run after data changes; missing input ranges fail the build."
+  },
+  "serifFont": {
+    "alias": "GameMapSerif",
+    "upstream": "Noto Serif Bold",
+    "provider": "OpenStreetMap US",
+    "upstreamFont": "https://github.com/notofonts/noto-fonts/tree/main/hinted/ttf/NotoSerif",
+    "downloadTemplate": "https://tiles.openstreetmap.us/fonts/Noto%20Serif%20Bold/{range}.pbf",
+    "licenseSource": "https://raw.githubusercontent.com/notofonts/noto-fonts/main/LICENSE",
+    "licenseSha256": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+    "inputs": [
+      {
+        "range": "0-255",
+        "sha256": "76f0ac6cbf7e5289be2e1a47472b686efa7b6085099fd0fe3446750d74a78fc1"
+      },
+      {
+        "range": "8192-8447",
+        "sha256": "9c1d14ddf7cb0313e09350438ce7e90fca409bb27a422a82a1d05f774f50ed18"
+      }
+    ],
+    "coverage": "Unmodified MapLibre-compatible glyph blocks; all bundled road/place/POI codepoints including uppercase verified by tests. Local inputs make preparation fully offline."
+  },
+  "designReferences": [
+    {
+      "theme": "rdr2",
+      "title": "Red Dead Redemption 2 — The Complete Official Guide / Charting the Wilds",
+      "url": "https://www.piggyback.com/us/guide/red-dead-redemption-2/",
+      "usage": "Visual inspiration only: parchment palette, dark ink and selective red. No downloaded game art, map geometry, contours or extracted symbols are bundled."
+    }
+  ],
+  "pois": {
+    "count": 1571,
+    "byCategory": {
+      "parks": 571,
+      "fuel": 201,
+      "food": 308,
+      "parking": 152,
+      "health": 245,
+      "shops": 94
+    },
+    "mappings": {
+      "parks": {
+        "leisure": [
+          "park",
+          "garden"
+        ]
+      },
+      "fuel": {
+        "amenity": [
+          "fuel"
+        ]
+      },
+      "food": {
+        "amenity": [
+          "restaurant",
+          "cafe",
+          "fast_food"
+        ]
+      },
+      "parking": {
+        "amenity": [
+          "parking"
+        ]
+      },
+      "health": {
+        "amenity": [
+          "hospital",
+          "clinic",
+          "doctors",
+          "pharmacy"
+        ]
+      },
+      "shops": {
+        "shop": [
+          "supermarket",
+          "convenience"
+        ]
+      }
+    }
+  }
+}

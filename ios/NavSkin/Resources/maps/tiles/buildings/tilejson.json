@@ -1,0 +1,30 @@
+{
+  "tilejson": "3.0.0",
+  "name": "Goiânia — Overture building footprints",
+  "scheme": "xyz",
+  "tiles": [
+    "/tiles/buildings/{z}/{x}/{y}.pbf"
+  ],
+  "minzoom": 11,
+  "maxzoom": 16,
+  "bounds": [
+    -49.325,
+    -16.755,
+    -49.205,
+    -16.64
+  ],
+  "attribution": "© OpenStreetMap contributors, Overture Maps Foundation; Google Open Buildings; Microsoft Global ML Building Footprints",
+  "vector_layers": [
+    {
+      "id": "buildings",
+      "minzoom": 11,
+      "maxzoom": 16,
+      "fields": {
+        "gers_id": "String",
+        "source_datasets": "String",
+        "name": "String",
+        "height": "Number"
+      }
+    }
+  ]
+}

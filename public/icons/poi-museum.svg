@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Museus">
+  <title>Museus</title>
+  <!-- Maki 8.2.0 (museum), Mapbox, CC0-1.0. Adapted colors and outline. -->
+  <defs><g id="glyph"><path id="path7509" d="M7.5,0L1,3.5V4h13V3.5L7.5,0z M2,5v5l-1,1.6V13h13v-1.4L13,10V5H2z M4,6h1v5.5H4V6z M7,6h1v5.5H7V6z M10,6h1&#xA;&#x9;v5.5h-1V6z"/></g></defs>
+  <g transform="translate(4 4) scale(1.2)" stroke-linecap="round" stroke-linejoin="round">
+    <use xlink:href="#glyph" fill="#ffffff" stroke="#ffffff" stroke-width="3"/>
+    <use xlink:href="#glyph" fill="#171511" stroke="#171511" stroke-width="1.55"/>
+    <use xlink:href="#glyph" fill="#cf9bff"/>
+  </g>
+</svg>

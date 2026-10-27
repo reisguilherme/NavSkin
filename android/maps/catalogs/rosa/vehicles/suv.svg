@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="suv">
+  <title>Rosa Pop · vehicles · suv</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="17" width="7" height="12" rx="2" fill="#731b55"/><rect x="43" y="17" width="7" height="12" rx="2" fill="#731b55"/><rect x="14" y="39" width="7" height="12" rx="2" fill="#731b55"/><rect x="43" y="39" width="7" height="12" rx="2" fill="#731b55"/><path d="M24 8H40Q44 8 45 15V51Q44 56 40 56H24Q20 56 19 51V15Q20 8 24 8Z" fill="#79e4cf" /><path d="M23 21H41L39 29H25Z" fill="#79e4e0" stroke-width="2"/><path d="M24 43H40V50H24Z" fill="#79e4e0" stroke-width="2"/><path d="M24 32L24 39" fill="none"/><path d="M40 32L40 39" fill="none"/><rect x="22" y="12" width="6" height="3" rx="1" fill="#fff7fc"/><rect x="36" y="12" width="6" height="3" rx="1" fill="#fff7fc"/><rect x="22" y="51" width="6" height="3" rx="1" fill="#ad8bff"/><rect x="36" y="51" width="6" height="3" rx="1" fill="#ad8bff"/><path d="M27 31L27 40" fill="none"/><path d="M37 31L37 40" fill="none"/><rect x="25" y="9" width="14" height="7" rx="1" fill="#fed45e"/></g></defs>
+  <use href="#art" stroke="#fff7fc" stroke-width="6.2"/>
+  <use href="#art" stroke="#731b55" stroke-width="3.2"/>
+</svg>

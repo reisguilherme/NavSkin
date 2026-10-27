@@ -1,0 +1,15 @@
+{
+  "bbox": [
+    -49.325,
+    -16.755,
+    -49.205,
+    -16.64
+  ],
+  "release": "2026-10-21.0",
+  "type": "building",
+  "format": "geojson",
+  "client": "overturemaps",
+  "clientVersion": "1.0.2",
+  "fetchedAt": "2026-10-27T00:12:55.216203+00:00",
+  "collectionUrl": "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+}

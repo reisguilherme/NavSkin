@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="meeting">
+  <title>RDR2 · saved · meeting</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><circle cx="22" cy="20" r="8" fill="#cf9f56"/><circle cx="43" cy="22" r="7" fill="#b67339"/><path d="M7 52V43Q7 32 21 32Q35 32 35 43V52Z" fill="#cf9f56" /><path d="M35 52V43Q35 35 43 34Q56 34 57 46V52Z" fill="#b67339" /><path d="M12 16L16 12H26L30 16Z" fill="#edcd8e" /></g></defs>
+  <use href="#art" stroke="#ffe7b7" stroke-width="6.2"/>
+  <use href="#art" stroke="#392819" stroke-width="3.2"/>
+</svg>

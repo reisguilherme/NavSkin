@@ -1,0 +1,135 @@
+{
+  "poi-park": {
+    "width": 52,
+    "height": 52,
+    "x": 4,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-hospital": {
+    "width": 52,
+    "height": 52,
+    "x": 64,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-pharmacy": {
+    "width": 52,
+    "height": 52,
+    "x": 124,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-fuel": {
+    "width": 52,
+    "height": 52,
+    "x": 184,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-theatre": {
+    "width": 52,
+    "height": 52,
+    "x": 244,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-museum": {
+    "width": 52,
+    "height": 52,
+    "x": 4,
+    "y": 64,
+    "pixelRatio": 2
+  },
+  "poi-culture": {
+    "width": 52,
+    "height": 52,
+    "x": 64,
+    "y": 64,
+    "pixelRatio": 2
+  },
+  "poi-cinema": {
+    "width": 52,
+    "height": 52,
+    "x": 124,
+    "y": 64,
+    "pixelRatio": 2
+  },
+  "poi-clinic": {
+    "width": 52,
+    "height": 52,
+    "x": 184,
+    "y": 64,
+    "pixelRatio": 2
+  },
+  "poi-school": {
+    "width": 52,
+    "height": 52,
+    "x": 244,
+    "y": 64,
+    "pixelRatio": 2
+  },
+  "poi-university": {
+    "width": 52,
+    "height": 52,
+    "x": 4,
+    "y": 124,
+    "pixelRatio": 2
+  },
+  "poi-police": {
+    "width": 52,
+    "height": 52,
+    "x": 64,
+    "y": 124,
+    "pixelRatio": 2
+  },
+  "poi-fire_station": {
+    "width": 52,
+    "height": 52,
+    "x": 124,
+    "y": 124,
+    "pixelRatio": 2
+  },
+  "poi-bank": {
+    "width": 52,
+    "height": 52,
+    "x": 184,
+    "y": 124,
+    "pixelRatio": 2
+  },
+  "poi-atm": {
+    "width": 52,
+    "height": 52,
+    "x": 244,
+    "y": 124,
+    "pixelRatio": 2
+  },
+  "poi-parking": {
+    "width": 52,
+    "height": 52,
+    "x": 4,
+    "y": 184,
+    "pixelRatio": 2
+  },
+  "poi-restaurant": {
+    "width": 52,
+    "height": 52,
+    "x": 64,
+    "y": 184,
+    "pixelRatio": 2
+  },
+  "poi-cafe": {
+    "width": 52,
+    "height": 52,
+    "x": 124,
+    "y": 184,
+    "pixelRatio": 2
+  },
+  "poi-fast_food": {
+    "width": 52,
+    "height": 52,
+    "x": 184,
+    "y": 184,
+    "pixelRatio": 2
+  }
+}

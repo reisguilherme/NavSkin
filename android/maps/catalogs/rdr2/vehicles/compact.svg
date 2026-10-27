@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="compact">
+  <title>RDR2 · vehicles · compact</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="17" width="7" height="12" rx="2" fill="#392819"/><rect x="43" y="17" width="7" height="12" rx="2" fill="#392819"/><rect x="14" y="39" width="7" height="12" rx="2" fill="#392819"/><rect x="43" y="39" width="7" height="12" rx="2" fill="#392819"/><path d="M25 8H39Q44 10 45 18V47Q45 55 39 56H25Q19 55 19 47V18Q20 10 25 8Z" fill="#cf9f56" /><path d="M23 21H41L39 29H25Z" fill="#b4c3ad" stroke-width="2"/><path d="M25 41H39L41 48H23Z" fill="#b4c3ad" stroke-width="2"/><path d="M24 32L24 39" fill="none"/><path d="M40 32L40 39" fill="none"/><rect x="22" y="12" width="6" height="3" rx="1" fill="#edcd8e"/><rect x="36" y="12" width="6" height="3" rx="1" fill="#edcd8e"/><rect x="22" y="51" width="6" height="3" rx="1" fill="#ac4e39"/><rect x="36" y="51" width="6" height="3" rx="1" fill="#ac4e39"/></g></defs>
+  <use href="#art" stroke="#ffe7b7" stroke-width="6.2"/>
+  <use href="#art" stroke="#392819" stroke-width="3.2"/>
+</svg>

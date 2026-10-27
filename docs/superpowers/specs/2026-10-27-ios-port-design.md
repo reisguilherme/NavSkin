@@ -1,0 +1,9 @@
+# GameMap para iPhone
+
+O pedido é portar o aplicativo Android existente para iOS, preservando GTA SA, Rosa Pop e RDR2, o mapa em tela inteira, carrossel e painéis retráteis, GPS, busca/rotas Geoapify, navegação visual sem voz, ETA/velocidade/recálculo, favoritos/Casa/Trabalho/recentes e catálogos semânticos de ícones e veículos. Não acrescentar CarPlay ou contas. A chave continua sendo configurada pelo usuário no aparelho.
+
+Decisões de implementação do agente: app nativo SwiftUI + MapLibre Native iOS/Metal 6.31.0, mínimo iOS 17; CoreLocation para GPS e continuidade durante navegação, Keychain para a chave, persistência local de favoritos. Separar um pacote Swift puro para modelos, motor, provedor e storage, com XCTest. Reutilizar os mesmos dados, estilos e arte originais, com adaptação explícita dos URLs locais Android para file:// no bundle iOS. Não converter para mapa raster ou WebView.
+
+Entregar projeto Xcode aberto diretamente, assets preparados, fontes/testes, instruções para simulator/dispositivo/archive e uma cópia ZIP transportável. O ambiente atual é Windows, sem Swift/Xcode/macOS. Compilar a UI, executar o simulador e produzir/assinar IPA dependem de Mac com Xcode e da configuração Apple do usuário. Não apresentar arquivo de projeto ou ZIP como app instalável, nem alegar testes iPhone/CarPlay. Enquanto isso, executar validação estrutural, integridade de assets e regressões existentes; fornecer comandos reproduzíveis para os testes Swift/Xcode pendentes.
+
+Manter cobertura parcial de Goiânia explícita, funcionamento online de busca/rotas e ETA sem trânsito ao vivo. Permissões apenas quando solicitadas; sinal antigo/impreciso não pode manter instruções como atuais. Câmera manual, estilo e veículo não reiniciam sessão. Restauração guarda destino para novo cálculo, sem instruções ou trajetória persistida. Debug replay sempre SIMULAÇÃO.

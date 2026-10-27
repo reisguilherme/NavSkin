@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="restaurant">
+  <title>RDR2 · saved · restaurant</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><circle cx="33" cy="32" r="17" fill="#edcd8e"/><circle cx="33" cy="32" r="10" fill="#cf9f56"/><path d="M8 12V25Q8 30 14 30Q20 30 20 25V12M14 12V53M8 21H20" fill="none" /><path d="M54 12C46 19 46 33 54 33V53Z" fill="#b67339" /><path d="M27 36L36 27" fill="none"/></g></defs>
+  <use href="#art" stroke="#ffe7b7" stroke-width="6.2"/>
+  <use href="#art" stroke="#392819" stroke-width="3.2"/>
+</svg>

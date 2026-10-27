@@ -1,0 +1,61 @@
+name: NavSkin iOS - gerar IPA para Windows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'scripts/*ios*'
+      - 'tests/test_ios_unsigned_package.py'
+      - '.github/workflows/ios-cloud.yml'
+  workflow_dispatch:
+    inputs:
+      apple_tests:
+        description: Executar os testes Apple em um simulador antes do build
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-cloud-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      RUN_APPLE_TESTS: ${{ (github.event_name == 'push' || inputs.apple_tests) && 'true' || 'false' }}
+    steps:
+      - name: Obter o projeto
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Compilar, testar e empacotar sem assinatura pessoal
+        run: bash scripts/build-ios-cloud.sh
+
+      - name: Disponibilizar IPA para reassinar no Windows
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: NavSkin-unsigned-iphoneos-${{ github.run_number }}
+          path: |
+            ios/artifacts/cloud/NavSkin-unsigned.ipa
+            ios/artifacts/cloud/NavSkin-unsigned.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
+
+      - name: Guardar logs e resultados de teste
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: NavSkin-ios-diagnostics-${{ github.run_number }}
+          path: |
+            ios/artifacts/cloud/*.log
+            ios/artifacts/cloud/*.json
+            ios/artifacts/cloud/AppleTests.xcresult
+          if-no-files-found: warn
+          retention-days: 3

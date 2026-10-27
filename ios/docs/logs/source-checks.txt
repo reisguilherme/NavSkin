@@ -1,0 +1,2 @@
+PASS: actual resource resolver, six local styles, all catalog previews, OpenStep project references and XML property lists
+PASS: Swift syntax for app and Apple-platform tests (does not type-check Apple frameworks)

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="health">
+  <title>Rosa Pop · saved · health</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M23 9H41V23H55V41H41V55H23V41H9V23H23Z" fill="#ff77b4" /><path d="M0 2C-3 -2 -6 0 -6 3C-6 6 0 10 0 10C0 10 6 6 6 3C6 0 3 -2 0 2Z" transform="translate(32 25) scale(1.5)" fill="#fff7fc" vector-effect="non-scaling-stroke"/></g></defs>
+  <use href="#art" stroke="#fff7fc" stroke-width="6.2"/>
+  <use href="#art" stroke="#731b55" stroke-width="3.2"/>
+</svg>

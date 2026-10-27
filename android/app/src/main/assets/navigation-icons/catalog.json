@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "themes": [
+    "gta",
+    "rosa",
+    "rdr2"
+  ],
+  "saved": [
+    {
+      "id": "home",
+      "label": "Casa",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/home.png",
+          "preview": "gta/saved/home@2x.png",
+          "svg": "gta/saved/home.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/home.png",
+          "preview": "rosa/saved/home@2x.png",
+          "svg": "rosa/saved/home.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/home.png",
+          "preview": "rdr2/saved/home@2x.png",
+          "svg": "rdr2/saved/home.svg"
+        }
+      }
+    },
+    {
+      "id": "work",
+      "label": "Trabalho",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/work.png",
+          "preview": "gta/saved/work@2x.png",
+          "svg": "gta/saved/work.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/work.png",
+          "preview": "rosa/saved/work@2x.png",
+          "svg": "rosa/saved/work.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/work.png",
+          "preview": "rdr2/saved/work@2x.png",
+          "svg": "rdr2/saved/work.svg"
+        }
+      }
+    },
+    {
+      "id": "favorite",
+      "label": "Favorito",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/favorite.png",
+          "preview": "gta/saved/favorite@2x.png",
+          "svg": "gta/saved/favorite.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/favorite.png",
+          "preview": "rosa/saved/favorite@2x.png",
+          "svg": "rosa/saved/favorite.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/favorite.png",
+          "preview": "rdr2/saved/favorite@2x.png",
+          "svg": "rdr2/saved/favorite.svg"
+        }
+      }
+    },
+    {
+      "id": "restaurant",
+      "label": "Restaurante",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/restaurant.png",
+          "preview": "gta/saved/restaurant@2x.png",
+          "svg": "gta/saved/restaurant.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/restaurant.png",
+          "preview": "rosa/saved/restaurant@2x.png",
+          "svg": "rosa/saved/restaurant.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/restaurant.png",
+          "preview": "rdr2/saved/restaurant@2x.png",
+          "svg": "rdr2/saved/restaurant.svg"
+        }
+      }
+    },
+    {
+      "id": "cafe",
+      "label": "Café",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/cafe.png",
+          "preview": "gta/saved/cafe@2x.png",
+          "svg": "gta/saved/cafe.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/cafe.png",
+          "preview": "rosa/saved/cafe@2x.png",
+          "svg": "rosa/saved/cafe.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/cafe.png",
+          "preview": "rdr2/saved/cafe@2x.png",
+          "svg": "rdr2/saved/cafe.svg"
+        }
+      }
+    },
+    {
+      "id": "park",
+      "label": "Parque",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/park.png",
+          "preview": "gta/saved/park@2x.png",
+          "svg": "gta/saved/park.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/park.png",
+          "preview": "rosa/saved/park@2x.png",
+          "svg": "rosa/saved/park.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/park.png",
+          "preview": "rdr2/saved/park@2x.png",
+          "svg": "rdr2/saved/park.svg"
+        }
+      }
+    },
+    {
+      "id": "shopping",
+      "label": "Compras",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/shopping.png",
+          "preview": "gta/saved/shopping@2x.png",
+          "svg": "gta/saved/shopping.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/shopping.png",
+          "preview": "rosa/saved/shopping@2x.png",
+          "svg": "rosa/saved/shopping.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/shopping.png",
+          "preview": "rdr2/saved/shopping@2x.png",
+          "svg": "rdr2/saved/shopping.svg"
+        }
+      }
+    },
+    {
+      "id": "gym",
+      "label": "Academia",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/gym.png",
+          "preview": "gta/saved/gym@2x.png",
+          "svg": "gta/saved/gym.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/gym.png",
+          "preview": "rosa/saved/gym@2x.png",
+          "svg": "rosa/saved/gym.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/gym.png",
+          "preview": "rdr2/saved/gym@2x.png",
+          "svg": "rdr2/saved/gym.svg"
+        }
+      }
+    },
+    {
+      "id": "health",
+      "label": "Saúde",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/health.png",
+          "preview": "gta/saved/health@2x.png",
+          "svg": "gta/saved/health.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/health.png",
+          "preview": "rosa/saved/health@2x.png",
+          "svg": "rosa/saved/health.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/health.png",
+          "preview": "rdr2/saved/health@2x.png",
+          "svg": "rdr2/saved/health.svg"
+        }
+      }
+    },
+    {
+      "id": "parking",
+      "label": "Estacionamento",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/parking.png",
+          "preview": "gta/saved/parking@2x.png",
+          "svg": "gta/saved/parking.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/parking.png",
+          "preview": "rosa/saved/parking@2x.png",
+          "svg": "rosa/saved/parking.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/parking.png",
+          "preview": "rdr2/saved/parking@2x.png",
+          "svg": "rdr2/saved/parking.svg"
+        }
+      }
+    },
+    {
+      "id": "meeting",
+      "label": "Encontro",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/meeting.png",
+          "preview": "gta/saved/meeting@2x.png",
+          "svg": "gta/saved/meeting.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/meeting.png",
+          "preview": "rosa/saved/meeting@2x.png",
+          "svg": "rosa/saved/meeting.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/meeting.png",
+          "preview": "rdr2/saved/meeting@2x.png",
+          "svg": "rdr2/saved/meeting.svg"
+        }
+      }
+    },
+    {
+      "id": "special",
+      "label": "Local especial",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/saved/special.png",
+          "preview": "gta/saved/special@2x.png",
+          "svg": "gta/saved/special.svg"
+        },
+        "rosa": {
+          "image": "rosa/saved/special.png",
+          "preview": "rosa/saved/special@2x.png",
+          "svg": "rosa/saved/special.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/saved/special.png",
+          "preview": "rdr2/saved/special@2x.png",
+          "svg": "rdr2/saved/special.svg"
+        }
+      }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "arrow",
+      "label": "Seta clássica",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/vehicles/arrow.png",
+          "preview": "gta/vehicles/arrow@2x.png",
+          "svg": "gta/vehicles/arrow.svg"
+        },
+        "rosa": {
+          "image": "rosa/vehicles/arrow.png",
+          "preview": "rosa/vehicles/arrow@2x.png",
+          "svg": "rosa/vehicles/arrow.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/vehicles/arrow.png",
+          "preview": "rdr2/vehicles/arrow@2x.png",
+          "svg": "rdr2/vehicles/arrow.svg"
+        }
+      }
+    },
+    {
+      "id": "compact",
+      "label": "Carro compacto",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/vehicles/compact.png",
+          "preview": "gta/vehicles/compact@2x.png",
+          "svg": "gta/vehicles/compact.svg"
+        },
+        "rosa": {
+          "image": "rosa/vehicles/compact.png",
+          "preview": "rosa/vehicles/compact@2x.png",
+          "svg": "rosa/vehicles/compact.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/vehicles/compact.png",
+          "preview": "rdr2/vehicles/compact@2x.png",
+          "svg": "rdr2/vehicles/compact.svg"
+        }
+      }
+    },
+    {
+      "id": "sport",
+      "label": "Carro esportivo",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/vehicles/sport.png",
+          "preview": "gta/vehicles/sport@2x.png",
+          "svg": "gta/vehicles/sport.svg"
+        },
+        "rosa": {
+          "image": "rosa/vehicles/sport.png",
+          "preview": "rosa/vehicles/sport@2x.png",
+          "svg": "rosa/vehicles/sport.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/vehicles/sport.png",
+          "preview": "rdr2/vehicles/sport@2x.png",
+          "svg": "rdr2/vehicles/sport.svg"
+        }
+      }
+    },
+    {
+      "id": "suv",
+      "label": "SUV",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/vehicles/suv.png",
+          "preview": "gta/vehicles/suv@2x.png",
+          "svg": "gta/vehicles/suv.svg"
+        },
+        "rosa": {
+          "image": "rosa/vehicles/suv.png",
+          "preview": "rosa/vehicles/suv@2x.png",
+          "svg": "rosa/vehicles/suv.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/vehicles/suv.png",
+          "preview": "rdr2/vehicles/suv@2x.png",
+          "svg": "rdr2/vehicles/suv.svg"
+        }
+      }
+    },
+    {
+      "id": "motorcycle",
+      "label": "Moto",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/vehicles/motorcycle.png",
+          "preview": "gta/vehicles/motorcycle@2x.png",
+          "svg": "gta/vehicles/motorcycle.svg"
+        },
+        "rosa": {
+          "image": "rosa/vehicles/motorcycle.png",
+          "preview": "rosa/vehicles/motorcycle@2x.png",
+          "svg": "rosa/vehicles/motorcycle.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/vehicles/motorcycle.png",
+          "preview": "rdr2/vehicles/motorcycle@2x.png",
+          "svg": "rdr2/vehicles/motorcycle.svg"
+        }
+      }
+    },
+    {
+      "id": "themed",
+      "label": "Veículo do tema",
+      "themeAssets": {
+        "gta": {
+          "image": "gta/vehicles/themed.png",
+          "preview": "gta/vehicles/themed@2x.png",
+          "svg": "gta/vehicles/themed.svg"
+        },
+        "rosa": {
+          "image": "rosa/vehicles/themed.png",
+          "preview": "rosa/vehicles/themed@2x.png",
+          "svg": "rosa/vehicles/themed.svg"
+        },
+        "rdr2": {
+          "image": "rdr2/vehicles/themed.png",
+          "preview": "rdr2/vehicles/themed@2x.png",
+          "svg": "rdr2/vehicles/themed.svg"
+        }
+      }
+    }
+  ],
+  "fallbackSaved": "special",
+  "fallbackVehicle": "arrow",
+  "vehicleAnchor": [
+    0.5,
+    0.5
+  ],
+  "vehicleHeading": "north",
+  "routingProfile": "automobile"
+}

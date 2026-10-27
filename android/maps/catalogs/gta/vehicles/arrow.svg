@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="arrow">
+  <title>GTA SA · vehicles · arrow</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M32 7L53 55L32 45L11 55Z" fill="#39d8a0" /><path d="M32 16V39L21 44Z" fill="#fff8d8" stroke-width="1.8"/></g></defs>
+  <use href="#art" stroke="#fffdf4" stroke-width="6.2"/>
+  <use href="#art" stroke="#20221d" stroke-width="3.2"/>
+</svg>

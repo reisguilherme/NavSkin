@@ -1,0 +1,135 @@
+{
+  "poi-park": {
+    "width": 26,
+    "height": 26,
+    "x": 2,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-hospital": {
+    "width": 26,
+    "height": 26,
+    "x": 32,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-pharmacy": {
+    "width": 26,
+    "height": 26,
+    "x": 62,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-fuel": {
+    "width": 26,
+    "height": 26,
+    "x": 92,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-theatre": {
+    "width": 26,
+    "height": 26,
+    "x": 122,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "poi-museum": {
+    "width": 26,
+    "height": 26,
+    "x": 2,
+    "y": 32,
+    "pixelRatio": 1
+  },
+  "poi-culture": {
+    "width": 26,
+    "height": 26,
+    "x": 32,
+    "y": 32,
+    "pixelRatio": 1
+  },
+  "poi-cinema": {
+    "width": 26,
+    "height": 26,
+    "x": 62,
+    "y": 32,
+    "pixelRatio": 1
+  },
+  "poi-clinic": {
+    "width": 26,
+    "height": 26,
+    "x": 92,
+    "y": 32,
+    "pixelRatio": 1
+  },
+  "poi-school": {
+    "width": 26,
+    "height": 26,
+    "x": 122,
+    "y": 32,
+    "pixelRatio": 1
+  },
+  "poi-university": {
+    "width": 26,
+    "height": 26,
+    "x": 2,
+    "y": 62,
+    "pixelRatio": 1
+  },
+  "poi-police": {
+    "width": 26,
+    "height": 26,
+    "x": 32,
+    "y": 62,
+    "pixelRatio": 1
+  },
+  "poi-fire_station": {
+    "width": 26,
+    "height": 26,
+    "x": 62,
+    "y": 62,
+    "pixelRatio": 1
+  },
+  "poi-bank": {
+    "width": 26,
+    "height": 26,
+    "x": 92,
+    "y": 62,
+    "pixelRatio": 1
+  },
+  "poi-atm": {
+    "width": 26,
+    "height": 26,
+    "x": 122,
+    "y": 62,
+    "pixelRatio": 1
+  },
+  "poi-parking": {
+    "width": 26,
+    "height": 26,
+    "x": 2,
+    "y": 92,
+    "pixelRatio": 1
+  },
+  "poi-restaurant": {
+    "width": 26,
+    "height": 26,
+    "x": 32,
+    "y": 92,
+    "pixelRatio": 1
+  },
+  "poi-cafe": {
+    "width": 26,
+    "height": 26,
+    "x": 62,
+    "y": 92,
+    "pixelRatio": 1
+  },
+  "poi-fast_food": {
+    "width": 26,
+    "height": 26,
+    "x": 92,
+    "y": 92,
+    "pixelRatio": 1
+  }
+}

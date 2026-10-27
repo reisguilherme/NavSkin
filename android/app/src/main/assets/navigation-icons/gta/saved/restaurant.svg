@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="restaurant">
+  <title>GTA SA · saved · restaurant</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><circle cx="33" cy="32" r="17" fill="#fff8d8"/><circle cx="33" cy="32" r="10" fill="#f35e68"/><path d="M8 12V25Q8 30 14 30Q20 30 20 25V12M14 12V53M8 21H20" fill="none" /><path d="M54 12C46 19 46 33 54 33V53Z" fill="#ffcb41" /></g></defs>
+  <use href="#art" stroke="#fffdf4" stroke-width="6.2"/>
+  <use href="#art" stroke="#20221d" stroke-width="3.2"/>
+</svg>

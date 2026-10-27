@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26" viewBox="0 0 26 26" role="img" aria-label="Estacionamentos">
+  <title>Estacionamentos</title>
+  <!-- Maki 8.2.0 (parking), Mapbox, CC0-1.0. Adapted colors and outline. -->
+  <defs><g id="glyph"><path d="M4 2V13H6V9H8.5C10.433 9 12 7.433 12 5.5C12 3.567 10.433 2 8.5 2H4ZM6 7V4H8.5C9.32843 4 10 4.67157 10 5.5C10 6.32843 9.32843 7 8.5 7H6Z"/></g></defs>
+  <g transform="translate(4 4) scale(1.2)" stroke-linecap="round" stroke-linejoin="round">
+    <use xlink:href="#glyph" fill="#ffffff" stroke="#ffffff" stroke-width="3"/>
+    <use xlink:href="#glyph" fill="#171511" stroke="#171511" stroke-width="1.55"/>
+    <use xlink:href="#glyph" fill="#8bc6ff"/>
+  </g>
+</svg>

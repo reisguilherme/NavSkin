@@ -1,0 +1,49 @@
+{
+  "format": 1,
+  "kind": "Native map captures; not Android Auto or DHU screenshots",
+  "renderer": "MapLibre Native OpenGL 13.7.1, Android 16/API 36 x86_64, GPU host",
+  "camera": {
+    "longitude": -49.2562748,
+    "latitude": -16.6809224,
+    "zoom": 14.4,
+    "bearing": 0,
+    "tilt": 0
+  },
+  "categories": "All six enabled; day variants",
+  "attribution": "© OpenStreetMap contributors · Overture Maps Foundation · Google Open Buildings · Microsoft Global ML Building Footprints",
+  "previews": [
+    {
+      "theme": "gta",
+      "file": "gta.webp",
+      "width": 800,
+      "height": 480,
+      "bytes": 167772,
+      "sha256": "22246e856a338229ab0ea3d3e5315d2f4edb2b14e1d31cc5ea6655019bdc09ee",
+      "captureSource": "android/screenshots/v0.3/native-v3-gta.png",
+      "captureSha256": "a8563c64c2705d20728508cf123bb7d6b7130dda14116cbdd09c0b29dd4ac4c8",
+      "styleSha256": "3e0e7ed0aad905c24c16c2db0d880de643614116b94fd48134e2abcb41f572d4"
+    },
+    {
+      "theme": "rosa",
+      "file": "rosa.webp",
+      "width": 800,
+      "height": 480,
+      "bytes": 186488,
+      "sha256": "912fdda9095c1cb74ff265385c7848ca58b5e6074cac7541582690cdfb396e23",
+      "captureSource": "android/screenshots/v0.3/native-v3-rosa.png",
+      "captureSha256": "54220375d43044226852a5b219a47e44a80f0851d58654455952e2ef6745556b",
+      "styleSha256": "3502f591c2ebc952ad51778a5242830da7cac9f7a67f05eeb8215af23f80bc41"
+    },
+    {
+      "theme": "rdr2",
+      "file": "rdr2.webp",
+      "width": 800,
+      "height": 480,
+      "bytes": 168124,
+      "sha256": "e679be7e6fd15549c298fb3de15a71e5f0fe30096d8c79162cf8fce3e465257d",
+      "captureSource": "android/screenshots/v0.3/native-v3-rdr2.png",
+      "captureSha256": "c1de117d495e811de2717186b7a9dee950c9a9a1cd1dd2784d98ebe1708b8711",
+      "styleSha256": "42f53bbdf0d594d90d22a7b42957ca244f00f0c487c46c2d156e7996fc699b41"
+    }
+  ]
+}

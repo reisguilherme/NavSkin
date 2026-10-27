@@ -1,0 +1,5 @@
+  * ServiceRecord{c271631 u0 br.com.gamemap.goiania.dev/br.com.gamemap.navigation.NavigationService c:br.com.gamemap.goiania.dev}
+    intent={cmp=br.com.gamemap.goiania.dev/br.com.gamemap.navigation.NavigationService}
+    infoAllowStartForeground=[callingPackage: br.com.gamemap.goiania.dev; callingUid: 10167; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { xflg=0x4 cmp=br.com.gamemap.goiania.dev/br.com.gamemap.navigation.NavigationService }; code:PROC_STATE_TOP; tempAllowListReason:<null>; allowWiu:12; targetSdkVersion:36; callerTargetSdkVersion:36; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+    isForeground=true foregroundId=4701 types=0x00000008 foregroundNoti=Notification(channel=gamemap_navigation shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|ONLY_ALERT_ONCE|NO_CLEAR|FOREGROUND_SERVICE|SILENT color=0x00000000 category=navigation actions=1 vis=PRIVATE)
+    startRequested=true delayedStop=false stopIfKilled=true callStart=true lastStartId=1

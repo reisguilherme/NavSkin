@@ -1,0 +1,55 @@
+
+> goiania-san-andreas-cartography@0.1.0 test
+> node --test tests/*.test.mjs
+
+✔ native filters cover every actual road grade and the real Praça Cívica park (2368.301ms)
+✔ all day/night native variants satisfy the schema and share geographic sources (113.7674ms)
+✔ six independent POI layers cover every real POI once and keep green areas separate (30.8482ms)
+✔ hiding all six categories removes every marker while preserving geographic text and park fills (15.1396ms)
+✔ source GeoJSON bytes and prepared building MVTs are copied without coordinate edits (364.5924ms)
+✔ local Noto glyph PBFs cover all label codepoints including uppercase and accents (85.4344ms)
+✔ both 1x and 2x sprite atlases contain six different editable category icons (28.9662ms)
+✔ GTA preserves approved palette and every day theme has distinct cartography with the same road grades (8.2371ms)
+✔ host night variants retain the same three themes, geometry, symbols and readable palettes (24.3473ms)
+✔ Rosa stays candy pink and mint in both appearances while RDR2 uses parchment and dark ink (5.8382ms)
+✔ all requested OSM tags map to exactly six semantic categories (2.7003ms)
+✔ a fuel site with a convenience shop has one category and unchanged raw provenance (1.9417ms)
+✔ shops are exported using their real tags, never the internal adapter category (0.3492ms)
+✔ deduplication reuses node and area rules, preserves every original source tag (14.9302ms)
+✔ polygon points lie inside complete geometry, outside holes, and incomplete ways are omitted (0.6463ms)
+✔ dedicated query includes shops and all source subtypes without unrelated web categories (0.1604ms)
+✔ prepared Android package matches cached OSM source, metadata and point geometry (55.7905ms)
+✔ inline styles resolve their sprite against the local HTTP origin (4.5672ms)
+✔ iOS bundle retains original geographic bytes and all local map variants (1022.5798ms)
+✔ iOS catalog choices all resolve to actual transparent artwork in every theme (219.9668ms)
+✔ checked-in Xcode project includes every app source and local resources (9.3688ms)
+✔ saved choices and vehicle choices keep stable semantic ids in all three theme catalogs (43.7773ms)
+✔ every runtime image has editable local SVG source and distinct visible transparent pixels (277.0955ms)
+✔ raster builder rejects external SVG references before emitting runtime files (134.71ms)
+Prepared 54 original navigation SVGs and 108 transparent PNGs across 3 themes.
+✔ raster builder uses an edited SVG without overwriting the source or changing its semantic choice (535.7255ms)
+✔ Flamboyant resolves the verified park rather than its homonymous district (3.5421ms)
+✔ classification keeps hospital and clinic separate and covers requested POIs (1.2518ms)
+✔ representative points stay inside concave polygons and outside holes (0.5738ms)
+✔ crossing polygons get an interior point in the output bbox (0.1849ms)
+✔ only safe same-name node/area duplicates merge and retain all source IDs (10.7715ms)
+✔ incomplete polygon geometry and out-of-bounds nodes are omitted with reasons (0.2946ms)
+✔ multipolygon holes are preserved and tagged relation/member duplicates merge (0.7762ms)
+✔ shipped POIs have real OSM sources, correct categories, valid coordinates and attribution (43.4491ms)
+✔ style builder exists for local GeoJSON cartography (1.0142ms)
+✔ both visual modes use identical local geographic sources and no remote assets (4.4813ms)
+✔ crossings stay open: all road casings precede all fills within each grade (0.9208ms)
+✔ visual overrides change paint but preserve source, filters and topology (3.4715ms)
+✔ unknown style is rejected instead of silently rendering another preset (0.4725ms)
+✔ bus corridors are visible and elevated footbridges draw above ground roads (1.4125ms)
+✔ both generated styles satisfy the installed MapLibre schema (70.3988ms)
+✔ actual OSM road and area classes retain drawing rules, including the OSM building fallback (530.5783ms)
+✔ building sources are exclusive and real service categories have icon layers (1.1018ms)
+ℹ tests 42
+ℹ suites 0
+ℹ pass 42
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3296.1797

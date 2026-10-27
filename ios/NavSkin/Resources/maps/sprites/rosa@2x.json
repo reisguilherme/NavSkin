@@ -1,0 +1,44 @@
+{
+  "poi-parks": {
+    "width": 64,
+    "height": 64,
+    "x": 4,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-fuel": {
+    "width": 64,
+    "height": 64,
+    "x": 76,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-food": {
+    "width": 64,
+    "height": 64,
+    "x": 148,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-parking": {
+    "width": 64,
+    "height": 64,
+    "x": 220,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-health": {
+    "width": 64,
+    "height": 64,
+    "x": 292,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-shops": {
+    "width": 64,
+    "height": 64,
+    "x": 364,
+    "y": 4,
+    "pixelRatio": 2
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "endpoint": "https://overpass-api.de/api/interpreter",
+  "fetchedAt": "2026-10-26T23:49:07.859Z",
+  "dataTimestamp": "2026-10-26T23:47:59Z",
+  "queryFile": "data/osm/extract.overpassql",
+  "elements": 28236,
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+}

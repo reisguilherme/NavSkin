@@ -1,0 +1,22 @@
+{
+  "source": "OpenStreetMap via Overpass API",
+  "endpoint": "https://overpass-api.de/api/interpreter",
+  "fetchedAt": "2026-10-27T00:50:44.022Z",
+  "dataTimestamp": "2026-10-27T00:49:32Z",
+  "queryFile": "data/android/pois.overpassql",
+  "rawFile": "data/android/pois.json",
+  "rawSha256": "f7278d03118fd99e2c246f616291e56c5ee0169d639d59d432901c30e4974e5f",
+  "querySha256": "24a649cbc6522a2bddb43fd069e71eddb2086bdb223f0964faa10e584733edf1",
+  "elements": 1576,
+  "bbox": [
+    -49.325,
+    -16.755,
+    -49.205,
+    -16.64
+  ],
+  "attribution": "© OpenStreetMap contributors",
+  "attributionUrl": "https://www.openstreetmap.org/copyright",
+  "license": "ODbL-1.0",
+  "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+}

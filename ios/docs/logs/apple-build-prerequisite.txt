@@ -1,0 +1,1 @@
+iOS build unavailable: macOS with full Xcode and the iOS SDK is required. This script does not produce an IPA on Windows/Linux.

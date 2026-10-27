@@ -1,0 +1,488 @@
+package br.com.gamemap.navigation
+
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import androidx.core.content.ContextCompat
+import br.com.gamemap.BuildConfig
+import br.com.gamemap.navigation.core.EngineUpdate
+import br.com.gamemap.navigation.core.NavigationEngine
+import br.com.gamemap.navigation.model.*
+import br.com.gamemap.navigation.provider.GeoapifyProvider
+import br.com.gamemap.navigation.provider.ProviderErrorKind
+import br.com.gamemap.navigation.provider.TypedProviderException
+import br.com.gamemap.navigation.storage.LocalPlacesStore
+import br.com.gamemap.navigation.storage.NavigationSettings
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+
+/** The application owns one instance; phone, service and car observe the same main-thread state. */
+class NavigationRuntime(
+    context: Context,
+    private val provider: GeoapifyProvider,
+    private val settings: NavigationSettings,
+    private val places: LocalPlacesStore,
+    private val worker: ExecutorService = Executors.newFixedThreadPool(2),
+    private val elapsedClock: () -> Long = SystemClock::elapsedRealtime,
+    private val wallClock: () -> Long = System::currentTimeMillis,
+    private val serviceStarter: (Context) -> Unit = {
+        ContextCompat.startForegroundService(it, Intent(it, NavigationService::class.java)); Unit
+    },
+    private val serviceStopper: (Context) -> Unit = {
+        it.stopService(Intent(it, NavigationService::class.java)); Unit
+    },
+) : AutoCloseable {
+    private val appContext = context.applicationContext
+    private val main = Handler(Looper.getMainLooper())
+    private var engine = NavigationEngine()
+    private val listeners = linkedSetOf<(NavigationSnapshot) -> Unit>()
+    private val clients = mutableMapOf<String, Int>()
+    private var finePermission = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    private var coarsePermission = hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+    private var providersEnabled = locationEnabled()
+    private var serviceRequested = false
+    private var idleStopScheduled = false
+    private var closed = false
+    private var routeEpoch = 0L
+    private var searchEpoch = 0L
+    private var replayEpoch = 0L
+    private var routeTask: Future<*>? = null
+    private var searchTask: Future<*>? = null
+    private var routeInFlight: Long? = null
+    private var pendingPreview = false
+    private var rateLimitedUntilMs = 0L
+    private var locationLifecycleMessage: String? = null
+    @Volatile private var state = NavigationSnapshot(
+        phase = if (places.snapshot().resumeDestination != null) NavigationPhase.RESUME_AVAILABLE else NavigationPhase.IDLE,
+        resumeDestination = places.snapshot().resumeDestination,
+        providerConfigured = settings.apiKey().isNotBlank(),
+        message = places.snapshot().loadError,
+    )
+    private val tick = object : Runnable {
+        override fun run() {
+            if (closed) return
+            applyEngine(engine.onTick(elapsedClock(), wallClock()))
+            if (state.serviceRunning || state.simulation || state.location.fix != null && state.location.ageMs <= 15_000)
+                main.postDelayed(this, 1_000L)
+        }
+    }
+    private val stopUnusedService = Runnable {
+        idleStopScheduled = false
+        if (clients.isEmpty() && (!state.navigationActive || state.simulation)) {
+            if (state.simulation) stopReplay()
+            serviceRequested = false
+            serviceStopper(appContext)
+        }
+    }
+    private val removeSettingsListener = settings.addListener {
+        onMain {
+            publish(state.copy(providerConfigured = settings.apiKey().isNotBlank()))
+            calculatePendingPreview()
+        }
+    }
+    private val removePlacesListener = places.addListener { value ->
+        onMain { publish(state.copy(resumeDestination = value.resumeDestination)) }
+    }
+
+    fun snapshot(): NavigationSnapshot = state
+
+    fun addListener(listener: (NavigationSnapshot) -> Unit): () -> Unit {
+        onMain { listeners += listener; listener(state) }
+        return { onMain { listeners -= listener } }
+    }
+
+    fun attachClient(id: String): () -> Unit {
+        onMain {
+            clients[id] = (clients[id] ?: 0) + 1
+            main.removeCallbacks(stopUnusedService)
+            idleStopScheduled = false
+        }
+        var attached = true
+        return {
+            onMain {
+                if (attached) {
+                    attached = false
+                    val count = clients[id] ?: 0
+                    if (count <= 1) clients.remove(id) else clients[id] = count - 1
+                    scheduleIdleStop()
+                }
+            }
+        }
+    }
+
+    fun setLocationPermission(fine: Boolean, coarse: Boolean) = onMain {
+        finePermission = fine
+        coarsePermission = coarse
+        // Recreated phone/car views refresh real permissions; debug replay owns its separate source.
+        if (state.simulation) return@onMain
+        if (!fine && !coarse) {
+            cancelRouteRequest()
+            engine.stop()
+            publish(state.copy(locationAccess = LocationAccess.DENIED, progress = null,
+                phase = if (state.navigationActive) NavigationPhase.RESUME_AVAILABLE else state.phase,
+                message = locationNotice("Permita o acesso à localização no celular.")))
+            serviceStopper(appContext)
+        } else applyEngine(engine.onTick(elapsedClock(), wallClock()))
+    }
+
+    /** Call from a visible phone screen; Android may reject starting from a car-only background. */
+    fun activateLocation(): Boolean {
+        check(Looper.myLooper() == Looper.getMainLooper()) { "Activate location on the main thread" }
+        if (closed || state.simulation) return false
+        finePermission = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        coarsePermission = hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (!finePermission && !coarsePermission) {
+            publish(state.copy(locationAccess = LocationAccess.DENIED,
+                message = locationNotice("Permita o acesso à localização no celular.")))
+            return false
+        }
+        providersEnabled = locationEnabled()
+        if (state.serviceRunning || serviceRequested) return true
+        return try {
+            serviceRequested = true
+            publish(state.copy(locationAccess = if (providersEnabled) LocationAccess.WAITING else LocationAccess.DISABLED,
+                message = locationNotice(if (providersEnabled) "Aguardando posição GPS atual." else "Ative a localização do aparelho.")))
+            serviceStarter(appContext)
+            true
+        } catch (_: Exception) {
+            serviceRequested = false
+            publish(state.copy(locationAccess = LocationAccess.NEEDS_PHONE_START, serviceRunning = false,
+                message = locationNotice("Abra o NavSkin no celular e ative o GPS para continuar.")))
+            false
+        }
+    }
+
+    fun search(query: String) = onMain {
+        searchEpoch++
+        searchTask?.cancel(true)
+        val generation = searchEpoch
+        val text = query.trim()
+        if (text.length < 2) {
+            publish(state.copy(searching = false, searchResults = emptyList(), searchError = null))
+            return@onMain
+        }
+        val blocked = requestBlockMessage()
+        if (blocked != null) {
+            publish(state.copy(searching = false, searchError = blocked))
+            return@onMain
+        }
+        val bias = state.location.fix?.point?.takeIf { state.location.quality == LocationQuality.GOOD }
+        publish(state.copy(searching = true, searchError = null))
+        searchTask = worker.submit {
+            val result = runCatching { provider.search(text, bias) }
+            onMain {
+                if (generation != searchEpoch) return@onMain
+                result.fold({ publish(state.copy(searching = false, searchResults = it, searchError = null)) }, {
+                    recordRateLimit(it)
+                    publish(state.copy(searching = false, searchResults = emptyList(), searchError = safeMessage(it)))
+                })
+            }
+        }
+    }
+
+    fun selectDestination(destination: Destination) = onMain {
+        if (state.simulation) stopReplay()
+        cancelRouteRequest()
+        engine.stop()
+        saveResume(null)
+        pendingPreview = true
+        publish(state.copy(phase = NavigationPhase.IDLE, destination = destination, route = null,
+            progress = null, message = null, sessionId = state.sessionId + 1))
+        if (finePermission && !state.serviceRunning && !serviceRequested) activateLocation()
+        requestRoute(recalculation = false)
+    }
+
+    fun startNavigation() = onMain {
+        if (state.phase != NavigationPhase.PREVIEW || state.route == null) return@onMain
+        applyEngine(engine.onTick(elapsedClock(), wallClock()))
+        if (!finePermission || !state.serviceRunning || state.location.quality != LocationQuality.GOOD) {
+            publish(state.copy(message = "Ative o GPS preciso no celular e aguarde uma posição atual antes de iniciar."))
+            return@onMain
+        }
+        engine.start(state.route!!)
+        val fix = state.location.fix!!
+        val update = engine.onFix(fix, elapsedClock(), wallClock())
+        // The engine has already seen this fix before preview; the next GPS reading will match it.
+        publish(state.copy(phase = NavigationPhase.NAVIGATING, progress = update.progress, message = null))
+        saveResume(state.destination)
+        runCatching { places.rememberRecent(state.destination!!) }.onFailure { publish(state.copy(message = "Navegação ativa; não foi possível salvar o destino recente.")) }
+        main.removeCallbacks(stopUnusedService)
+        idleStopScheduled = false
+        startTicker()
+    }
+
+    fun stopNavigation() = onMain {
+        val wasSimulation = state.simulation
+        cancelRouteRequest()
+        searchEpoch++
+        searchTask?.cancel(true)
+        replayEpoch++
+        pendingPreview = false
+        if (wasSimulation) engine = NavigationEngine() else engine.stop()
+        saveResume(null)
+        publish(state.copy(phase = NavigationPhase.IDLE, destination = null, route = null, progress = null,
+            location = if (wasSimulation) LocationState() else state.location,
+            locationAccess = if (wasSimulation) LocationAccess.WAITING else state.locationAccess,
+            message = null, searching = false, simulation = false, sessionId = state.sessionId + 1))
+        scheduleIdleStop()
+    }
+
+    fun retryRoute() = onMain {
+        if (state.destination != null && !state.simulation) {
+            if (!state.navigationActive) pendingPreview = true
+            requestRoute(state.navigationActive)
+        }
+    }
+
+    fun resumeDestination() = onMain {
+        state.resumeDestination?.let { selectDestination(it) }
+    }
+
+    fun onServiceStarted() = onMain {
+        serviceRequested = true
+        publish(state.copy(serviceRunning = true, locationAccess = accessFor(state.location)))
+        startTicker()
+        scheduleIdleStop()
+    }
+
+    fun onServiceStopped() = onMain {
+        serviceRequested = false
+        if (state.navigationActive && !state.simulation) {
+            cancelRouteRequest()
+            engine.stop()
+            publish(state.copy(serviceRunning = false, phase = NavigationPhase.RESUME_AVAILABLE,
+                locationAccess = LocationAccess.NEEDS_PHONE_START, progress = null, route = null,
+                message = locationNotice("GPS interrompido. Abra o celular e recalcule o destino para retomar.")))
+        } else publish(state.copy(serviceRunning = false))
+    }
+
+    fun onLocationProvidersChanged(enabled: Boolean) = onMain {
+        providersEnabled = enabled
+        applyEngine(engine.onTick(elapsedClock(), wallClock()))
+        publish(state.copy(locationAccess = accessFor(state.location),
+            message = if (!enabled) locationNotice("Localização desativada no aparelho.") else state.message))
+    }
+
+    fun onLocationFailure(message: String) = onMain {
+        publish(state.copy(locationAccess = if (!finePermission && !coarsePermission) LocationAccess.DENIED
+            else LocationAccess.NEEDS_PHONE_START, message = locationNotice(message), progress = null))
+    }
+
+    fun acceptFix(fix: LocationFix) = onMain {
+        if (!state.simulation && (finePermission || coarsePermission)) {
+            val allowedFix = if (finePermission) fix else fix.copy(accuracyMeters = maxOf(100.0, fix.accuracyMeters))
+            applyEngine(engine.onFix(allowedFix, elapsedClock(), wallClock()))
+            startTicker()
+        }
+    }
+
+    /** Explicit debug-only playback. It never substitutes fixtures for a production HTTP response. */
+    fun startReplay(route: NavRoute, fixes: List<LocationFix>, intervalMs: Long = 1_000L) = onMain {
+        if (!BuildConfig.DEBUG || fixes.isEmpty() || clients.isEmpty()) return@onMain
+        stopNavigation()
+        serviceRequested = false
+        serviceStopper(appContext)
+        engine = NavigationEngine()
+        engine.start(route)
+        val generation = ++replayEpoch
+        publish(state.copy(phase = NavigationPhase.NAVIGATING, route = route, destination = route.destination,
+            simulation = true, progress = null, message = "SIMULAÇÃO GPS DE DESENVOLVIMENTO", sessionId = state.sessionId + 1))
+        fun replay(index: Int) {
+            if (closed || generation != replayEpoch || !state.simulation) return
+            val source = fixes[index]
+            applyEngine(engine.onFix(source.copy(elapsedRealtimeMs = elapsedClock(), wallTimeMs = wallClock(), isMock = true),
+                elapsedClock(), wallClock()))
+            if (index + 1 < fixes.size) main.postDelayed({ replay(index + 1) }, intervalMs.coerceIn(250L, 60_000L))
+            else publish(state.copy(message = "SIMULAÇÃO GPS: reprodução encerrada; o sinal será marcado como perdido."))
+        }
+        replay(0)
+        startTicker()
+    }
+
+    fun stopReplay() = onMain {
+        if (state.simulation) stopNavigation()
+    }
+
+    private fun requestRoute(recalculation: Boolean) {
+        if (routeInFlight != null || state.simulation) return
+        val destination = state.destination ?: return
+        val fix = state.location.fix
+        val block = requestBlockMessage() ?: if (state.location.quality != LocationQuality.GOOD ||
+            fix == null || elapsedClock() - fix.elapsedRealtimeMs !in 0L..5_000L || !providersEnabled)
+            "Aguarde uma posição GPS atual e precisa para calcular a rota." else null
+        if (block != null) {
+            publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.ERROR,
+                progress = null, message = block))
+            return
+        }
+        val generation = ++routeEpoch
+        pendingPreview = false
+        routeInFlight = generation
+        val origin = state.location.fix!!.point
+        publish(state.copy(phase = if (recalculation) NavigationPhase.RECALCULATING else NavigationPhase.CALCULATING,
+            progress = null, message = if (recalculation) "Recalculando rota…" else "Calculando rota…"))
+        routeTask = worker.submit {
+            val result = runCatching { provider.route(origin, destination) }
+            onMain {
+                if (generation != routeEpoch || state.destination?.id != destination.id) return@onMain
+                routeInFlight = null
+                result.fold({ route ->
+                    if (recalculation) engine.start(route)
+                    publish(state.copy(route = route, progress = null,
+                        phase = if (recalculation) NavigationPhase.NAVIGATING else NavigationPhase.PREVIEW,
+                        message = "Estimativa sem trânsito em tempo real."))
+                }, { error ->
+                    recordRateLimit(error)
+                    publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.ERROR,
+                        route = state.route.takeIf { recalculation }, progress = null, message = safeMessage(error)))
+                })
+                scheduleIdleStop()
+            }
+        }
+    }
+
+    private fun applyEngine(update: EngineUpdate) {
+        val usableSource = state.simulation || providersEnabled && (finePermission || coarsePermission)
+        val location = when {
+            !usableSource -> update.location.copy(
+                quality = if (update.location.fix == null) LocationQuality.UNAVAILABLE else LocationQuality.LOST,
+                speedKmh = null)
+            !state.simulation && !finePermission && update.location.quality == LocationQuality.GOOD ->
+                update.location.copy(quality = LocationQuality.WEAK, speedKmh = null)
+            else -> update.location
+        }
+        var next = state.copy(location = location, locationAccess = accessFor(location),
+            progress = if (state.phase == NavigationPhase.NAVIGATING && location.quality == LocationQuality.GOOD)
+                update.progress else if (state.navigationActive) null else state.progress)
+        if (!state.simulation && location.quality == LocationQuality.GOOD) {
+            // Only dismiss a notice still owned by the location lifecycle; newer route errors survive.
+            if (next.message == locationLifecycleMessage) next = next.copy(message = null)
+            locationLifecycleMessage = null
+        }
+        if (state.navigationActive && update.arrived) {
+            next = next.copy(phase = NavigationPhase.ARRIVED, progress = update.progress,
+                resumeDestination = null, message = "Você chegou ao destino.")
+            saveResume(null)
+            engine.stop()
+        }
+        publish(next)
+        calculatePendingPreview()
+        if (update.shouldRecalculate && state.phase in setOf(NavigationPhase.NAVIGATING, NavigationPhase.REROUTE_FAILED)) {
+            if (state.simulation) publish(state.copy(phase = NavigationPhase.REROUTE_FAILED, progress = null,
+                message = "SIMULAÇÃO GPS: desvio confirmado; cálculo pela internet desativado nesta reprodução."))
+            else requestRoute(recalculation = true)
+        }
+        scheduleIdleStop()
+    }
+
+    private fun calculatePendingPreview() {
+        if (pendingPreview && !state.simulation && state.providerConfigured && providersEnabled &&
+            state.location.quality == LocationQuality.GOOD && routeInFlight == null &&
+            state.phase in setOf(NavigationPhase.IDLE, NavigationPhase.ERROR)) requestRoute(recalculation = false)
+    }
+
+    private fun accessFor(location: LocationState): LocationAccess = when {
+        state.simulation -> when (location.quality) {
+            LocationQuality.GOOD -> LocationAccess.AVAILABLE
+            LocationQuality.WEAK -> LocationAccess.WEAK
+            LocationQuality.LOST -> LocationAccess.LOST
+            else -> LocationAccess.WAITING
+        }
+        !finePermission && !coarsePermission -> LocationAccess.DENIED
+        !providersEnabled -> LocationAccess.DISABLED
+        location.quality == LocationQuality.LOST -> LocationAccess.LOST
+        location.quality == LocationQuality.WEAK || !finePermission -> LocationAccess.WEAK
+        location.quality == LocationQuality.GOOD -> LocationAccess.AVAILABLE
+        else -> LocationAccess.WAITING
+    }
+
+    private fun requestBlockMessage(): String? = when {
+        settings.apiKey().isBlank() -> "Configure sua chave Geoapify no celular."
+        elapsedClock() < rateLimitedUntilMs -> "Limite de consultas atingido. Aguarde antes de tentar novamente."
+        else -> null
+    }
+
+    private fun recordRateLimit(error: Throwable) {
+        if (error is TypedProviderException && error.kind == ProviderErrorKind.RATE_LIMIT) {
+            rateLimitedUntilMs = elapsedClock() + (error.retryAfterSeconds ?: 60).coerceIn(1, 86_400) * 1_000L
+        }
+    }
+
+    private fun safeMessage(error: Throwable): String = (error as? TypedProviderException)?.message
+        ?: "Não foi possível concluir a consulta. Tente novamente."
+
+    private fun locationNotice(message: String): String {
+        locationLifecycleMessage = message
+        return message
+    }
+
+    private fun cancelRouteRequest() {
+        routeEpoch++
+        routeTask?.cancel(true)
+        routeTask = null
+        routeInFlight = null
+    }
+
+    private fun saveResume(destination: Destination?) {
+        runCatching { places.setResumeDestination(destination) }
+            .onFailure { publish(state.copy(message = "Não foi possível salvar o destino para retomada.")) }
+    }
+
+    private fun scheduleIdleStop() {
+        val shouldStop = clients.isEmpty() && (!state.navigationActive || state.simulation)
+        if (!shouldStop) {
+            main.removeCallbacks(stopUnusedService)
+            idleStopScheduled = false
+        } else if (!idleStopScheduled) {
+            idleStopScheduled = true
+            main.postDelayed(stopUnusedService, 5_000L)
+        }
+    }
+
+    private fun startTicker() {
+        main.removeCallbacks(tick)
+        main.postDelayed(tick, 1_000L)
+    }
+
+    private fun publish(next: NavigationSnapshot) {
+        if (state == next || closed) return
+        state = next
+        listeners.toList().forEach { it(next) }
+    }
+
+    private fun onMain(block: () -> Unit) {
+        if (closed) return
+        if (Looper.myLooper() == Looper.getMainLooper()) block() else main.post { if (!closed) block() }
+    }
+
+    private fun hasPermission(permission: String): Boolean =
+        ContextCompat.checkSelfPermission(appContext, permission) == PackageManager.PERMISSION_GRANTED
+
+    private fun locationEnabled(): Boolean = runCatching {
+        val manager = appContext.getSystemService(LocationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 28) manager.isLocationEnabled else
+            manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }.getOrDefault(false)
+
+    override fun close() = onMain {
+        routeEpoch++
+        searchEpoch++
+        replayEpoch++
+        routeTask?.cancel(true)
+        searchTask?.cancel(true)
+        main.removeCallbacksAndMessages(null)
+        removeSettingsListener()
+        removePlacesListener()
+        worker.shutdownNow()
+        serviceStopper(appContext)
+        listeners.clear()
+        closed = true
+    }
+}

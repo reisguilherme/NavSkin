@@ -1,0 +1,184 @@
+{
+  "product": "NavSkin",
+  "mode": "online-world",
+  "provider": "OpenFreeMap",
+  "tilejson": "https://tiles.openfreemap.org/planet",
+  "schema": "OpenMapTiles",
+  "schemaDocumentation": "https://openmaptiles.org/docs/schema/",
+  "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  "fontstack": [
+    "Noto Sans Bold"
+  ],
+  "bounds": [
+    -180,
+    -85.05113,
+    180,
+    85.05113
+  ],
+  "minzoom": 0,
+  "maxzoom": 14,
+  "overzoom": "Native renderer may overzoom the maximum source tile zoom for street detail.",
+  "requiresNetwork": true,
+  "apiKeyRequired": false,
+  "geometryEdited": false,
+  "serviceReferences": {
+    "homepage": "https://openfreemap.org/",
+    "integration": "https://openfreemap.org/quick_start/",
+    "terms": "https://openfreemap.org/tos/",
+    "privacy": "https://openfreemap.org/privacy/",
+    "fontServiceSource": "https://github.com/hyperknot/openfreemap-styles/tree/main/fonts"
+  },
+  "attributionHtml": "<a href=\"https://openfreemap.org/\">OpenFreeMap</a> · <a href=\"https://www.openmaptiles.org/\">© OpenMapTiles</a> · Data from <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap contributors</a>",
+  "sources": [
+    {
+      "name": "OpenFreeMap public production service",
+      "url": "https://openfreemap.org/",
+      "terms": "https://openfreemap.org/tos/"
+    },
+    {
+      "name": "OpenMapTiles schema",
+      "url": "https://openmaptiles.org/",
+      "license": "CC-BY-4.0"
+    },
+    {
+      "name": "OpenStreetMap contributors",
+      "url": "https://www.openstreetmap.org/copyright",
+      "license": "ODbL-1.0"
+    },
+    {
+      "name": "Noto Sans Bold",
+      "url": "https://github.com/notofonts/noto-fonts",
+      "license": "SIL-OFL-1.1"
+    },
+    {
+      "name": "GTA SA category sprites: Maki / Mapbox",
+      "url": "https://github.com/mapbox/maki",
+      "license": "CC0-1.0"
+    },
+    {
+      "name": "Rosa Pop and RDR2-inspired original category artwork",
+      "license": "CC0-1.0"
+    }
+  ],
+  "categoryMappings": {
+    "parks": [
+      "park",
+      "garden"
+    ],
+    "fuel": [
+      "fuel"
+    ],
+    "food": [
+      "restaurant",
+      "cafe",
+      "fast_food"
+    ],
+    "parking": [
+      "parking"
+    ],
+    "health": [
+      "hospital",
+      "clinic",
+      "doctors",
+      "pharmacy"
+    ],
+    "shops": [
+      "supermarket",
+      "convenience"
+    ]
+  },
+  "coverage": "Worldwide Web Mercator map coverage, with detail limited to available source data. Online rendering uses the same geography for every visual theme.",
+  "offline": "No worldwide offline pack is downloaded. The existing bundled Goiânia package is a separate optional map.",
+  "serviceAvailability": "Public service offered as-is without an SLA. No API key, registration or map-view/request charge according to the provider homepage checked on 2026-10-27.",
+  "offlineDownloadPolicy": "No offline downloader is implemented here. Provider terms permit at most 3000 tiles or 50 MB per download, at most four concurrent requests, and a unique app User-Agent; larger downloads require contacting the provider.",
+  "fontDecision": "OpenFreeMap serves Noto Sans Bold including sampled Latin, Arabic and CJK glyphs. Noto Serif Bold returned HTTP 404 there. All online themes use the verified sans font; the separate offline RDR2 style retains its bundled serif font.",
+  "validation": {
+    "checkedAt": "2026-10-27T18:10:34.606Z",
+    "observedTileTemplate": "https://tiles.openfreemap.org/planet/20261025_080012_pt/{z}/{x}/{y}.pbf",
+    "runtimeUsesStableTilejsonUrl": true,
+    "vectorLayers": [
+      "aerodrome_label",
+      "aeroway",
+      "boundary",
+      "building",
+      "housenumber",
+      "landcover",
+      "landuse",
+      "mountain_peak",
+      "park",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name",
+      "water",
+      "water_name",
+      "waterway"
+    ],
+    "samples": [
+      {
+        "name": "São Paulo",
+        "coordinate": [
+          -46.6333,
+          -23.5505
+        ],
+        "tile": {
+          "z": 14,
+          "x": 6069,
+          "y": 9295
+        },
+        "status": 200,
+        "bytes": 621305,
+        "sha256": "df2150c37132720bee857d54cb03f1a8605a3b521eeb513608eacd20bf666041",
+        "featureCounts": {
+          "building": 199,
+          "transportation": 1356,
+          "poi": 4331
+        }
+      },
+      {
+        "name": "Tokyo",
+        "coordinate": [
+          139.7671,
+          35.6812
+        ],
+        "tile": {
+          "z": 14,
+          "x": 14552,
+          "y": 6451
+        },
+        "status": 200,
+        "bytes": 747142,
+        "sha256": "34b4d2bea0007939a33851cf57cc64f24daf305bb50bf26db37f753b0db1ca37",
+        "featureCounts": {
+          "building": 132,
+          "transportation": 888,
+          "poi": 6148
+        }
+      }
+    ],
+    "glyphSamples": [
+      {
+        "character": "ã",
+        "codepoint": 227,
+        "range": "0-255",
+        "status": 200,
+        "containsGlyph": true
+      },
+      {
+        "character": "ا",
+        "codepoint": 1575,
+        "range": "1536-1791",
+        "status": 200,
+        "containsGlyph": true
+      },
+      {
+        "character": "中",
+        "codepoint": 20013,
+        "range": "19968-20223",
+        "status": 200,
+        "containsGlyph": true
+      }
+    ],
+    "scope": "HTTP responses, decoded MVT layers and individual glyph IDs were verified. This does not establish Android Auto, CarPlay or native screen rendering."
+  }
+}

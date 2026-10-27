@@ -1,0 +1,177 @@
+{
+  "title": "Goiânia — Overture building footprints",
+  "bbox": [
+    -49.325,
+    -16.755,
+    -49.205,
+    -16.64
+  ],
+  "bounds": {
+    "west": -49.325,
+    "south": -16.755,
+    "east": -49.205,
+    "north": -16.64
+  },
+  "crs": "EPSG:4326",
+  "release": "2026-10-21.0",
+  "releaseDate": "2026-10-21",
+  "dataTimestamp": "2026-10-21",
+  "fetchedAt": "2026-10-27T00:12:55.216203+00:00",
+  "generatedAt": "2026-10-27T00:15:37.731516Z",
+  "imageryCaptureDate": null,
+  "source": "Overture Maps Foundation buildings theme",
+  "sourceUrl": "https://docs.overturemaps.org/guides/buildings/",
+  "catalogUrl": "https://stac.overturemaps.org/catalog.json",
+  "collectionUrl": "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json",
+  "dataUrl": "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/type=building/",
+  "license": "ODbL-1.0",
+  "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "© OpenStreetMap contributors, Overture Maps Foundation; Google Open Buildings; Microsoft Global ML Building Footprints",
+  "attributionUrl": "https://docs.overturemaps.org/attribution/",
+  "counts": {
+    "total": 269728,
+    "raw": 269741,
+    "excludedEnvelopeOnly": 13,
+    "bySource": {
+      "Google Open Buildings": 202610,
+      "Microsoft ML Buildings": 64157,
+      "OpenStreetMap": 2961
+    },
+    "byGeometry": {
+      "Polygon": 269724,
+      "MultiPolygon": 4
+    },
+    "withName": 559,
+    "withHeight": 46
+  },
+  "comparison": {
+    "osmBuildingCount": 2963,
+    "coverageRatio": 91.03,
+    "interpretation": "Feature count comparison, not a completeness or accuracy score; data dates and conflation differ."
+  },
+  "sources": [
+    {
+      "dataset": "Google Open Buildings",
+      "count": 202610,
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "url": "https://sites.research.google/open-buildings/",
+      "method": "ML-derived roofprint",
+      "attribution": "Google Open Buildings",
+      "versions": [
+        "2024-04-16"
+      ],
+      "sourceUpdateTimeRange": [
+        "2023-05-01T00:00:00.000Z",
+        "2023-05-01T00:00:00.000Z"
+      ]
+    },
+    {
+      "dataset": "Microsoft ML Buildings",
+      "count": 64157,
+      "license": "ODbL-1.0",
+      "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "url": "https://github.com/microsoft/GlobalMLBuildingFootprints",
+      "method": "ML-derived roofprint",
+      "attribution": "Microsoft Global ML Building Footprints",
+      "versions": [
+        "2026-08-11"
+      ],
+      "sourceUpdateTimeRange": null
+    },
+    {
+      "dataset": "OpenStreetMap",
+      "count": 2961,
+      "license": "ODbL-1.0",
+      "licenseUrl": "https://www.openstreetmap.org/copyright",
+      "url": "https://www.openstreetmap.org",
+      "method": "Community-contributed footprint",
+      "attribution": "© OpenStreetMap contributors",
+      "versions": [
+        "2026-09-06T00:00:00.000Z"
+      ],
+      "sourceUpdateTimeRange": [
+        "2011-09-24T19:58:27.000Z",
+        "2026-08-20T20:44:04.000Z"
+      ]
+    }
+  ],
+  "files": {
+    "geojson": "public/data/buildings.geojson",
+    "geojsonBytes": 107230787,
+    "raw": "data/overture/buildings.raw.geojson",
+    "rawBytes": 155081891,
+    "rawSha256": "69d3c3c439bbb42d4262f864e1fe760558dcfad0c0c90ccbb4606dc8509fdbc6"
+  },
+  "processing": {
+    "query": "Official overturemaps Python client: type building, STAC file pruning plus bbox envelope pushdown; exact geometry-intersects test afterwards.",
+    "geometry": "Unmodified upstream Polygon/MultiPolygon coordinates. No generated buildings, coordinate rounding, simplification, or footprint repair.",
+    "clipping": "Keep entire footprints intersecting bbox; edge coordinates may extend beyond it.",
+    "provenance": "Public sources is a compact dataset-name list. Full upstream source records, confidence, record_id, property, update_time, provider, resource and version remain in raw cache, joined by GERS ID.",
+    "duplicates": "Use this conflated layer in place of OSM buildings; do not stack the two building sources.",
+    "timestamps": "Release, download, generation and upstream update dates are separate. None establishes imagery acquisition date or current ground truth."
+  },
+  "validation": {
+    "invalidGeometries": 0,
+    "emptyGeometries": 0,
+    "duplicateGersIds": 0,
+    "outsideQuery": 0,
+    "geometryBounds": [
+      -49.3255647,
+      -16.7555824,
+      -49.2043565,
+      -16.6395426
+    ]
+  },
+  "warnings": [
+    "Most footprints here are ML-derived roofprints: omissions, false detections, misalignment and age are possible.",
+    "These are map features, not confirmed cadastral records, parcel boundaries, ownership or verified building occupancy.",
+    "Heights are sparse source attributes; no heights have been invented."
+  ],
+  "vectorTiles": {
+    "template": "/tiles/buildings/{z}/{x}/{y}.pbf",
+    "sourceLayer": "buildings",
+    "scheme": "xyz",
+    "minzoom": 11,
+    "maxzoom": 16,
+    "bounds": [
+      -49.325,
+      -16.755,
+      -49.205,
+      -16.64
+    ],
+    "extent": 4096,
+    "buffer": 64,
+    "tolerance": 0.5,
+    "indexMaxZoom": 12,
+    "tileCount": 729,
+    "emptyTileCount": 1,
+    "totalBytes": 117785969,
+    "byZoom": {
+      "11": 2,
+      "12": 6,
+      "13": 12,
+      "14": 36,
+      "15": 144,
+      "16": 529
+    },
+    "emptyByZoom": {
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 1
+    },
+    "generatedAt": "2026-10-27T00:24:09.338Z",
+    "generationSeconds": 4.63,
+    "manifest": "public/tiles/buildings/manifest.json",
+    "attributes": {
+      "gers_id": "string",
+      "source_datasets": "semicolon-separated dataset names",
+      "name": "optional string",
+      "height": "optional source height in meters"
+    },
+    "geometry": "Display-only Web Mercator tile projection, 4096-unit quantization, clipping and 0.5 tile-unit simplification below z16. Full source geometry remains in buildings.geojson and raw cache. No source polygons were invented."
+  }
+}

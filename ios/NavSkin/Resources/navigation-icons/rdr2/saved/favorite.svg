@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="favorite">
+  <title>RDR2 · saved · favorite</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M32 7L39 22L56 24L44 36L47 53L32 45L17 53L20 36L8 24L25 22Z" fill="#b67339" /><path d="M28 24L23 34" fill="none"/><path d="M32 25L27 35" fill="none"/></g></defs>
+  <use href="#art" stroke="#ffe7b7" stroke-width="6.2"/>
+  <use href="#art" stroke="#392819" stroke-width="3.2"/>
+</svg>

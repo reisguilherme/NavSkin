@@ -1,0 +1,4 @@
+# Keep prepared map assets byte-for-byte identical to their resource manifests.
+* -text
+*.sh text eol=lf
+android/gradlew text eol=lf

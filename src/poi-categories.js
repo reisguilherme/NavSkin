@@ -1,0 +1,22 @@
+/** Shared by the map, category filters, and the reproducible local sprite build. */
+export const POI_CATEGORIES = [
+  { id: 'park', label: 'Parques', group: 'outdoor', color: '#70d648', minzoom: 12.2, maki: 'park' },
+  { id: 'hospital', label: 'Hospitais', group: 'health', color: '#ff5f72', minzoom: 12.4, maki: 'hospital' },
+  { id: 'pharmacy', label: 'Farmácias', group: 'health', color: '#fe8bd3', minzoom: 13.2, maki: 'pharmacy' },
+  { id: 'fuel', label: 'Postos de combustível', group: 'fuel', color: '#ffd343', minzoom: 13, maki: 'fuel' },
+  { id: 'theatre', label: 'Teatros', group: 'culture', color: '#ee8feb', minzoom: 12.5, maki: 'theatre' },
+  { id: 'museum', label: 'Museus', group: 'culture', color: '#cf9bff', minzoom: 12.5, maki: 'museum' },
+  { id: 'culture', label: 'Centros culturais', group: 'culture', color: '#e6a3fb', minzoom: 12.5, maki: 'art-gallery' },
+  { id: 'cinema', label: 'Cinemas', group: 'culture', color: '#b59bff', minzoom: 15, maki: 'cinema' },
+  { id: 'clinic', label: 'Clínicas', group: 'health', color: '#fb9fb2', minzoom: 15, maki: 'doctor' },
+  { id: 'school', label: 'Escolas', group: 'services', color: '#f4d77b', minzoom: 15.5, maki: 'school' },
+  { id: 'university', label: 'Universidades', group: 'services', color: '#f2cb56', minzoom: 14.5, maki: 'college' },
+  { id: 'police', label: 'Polícia', group: 'services', color: '#78bcff', minzoom: 14.5, maki: 'police' },
+  { id: 'fire_station', label: 'Bombeiros', group: 'services', color: '#ff914d', minzoom: 14.5, maki: 'fire-station' },
+  { id: 'bank', label: 'Bancos', group: 'services', color: '#8bdfa6', minzoom: 15.5, maki: 'town-hall' },
+  { id: 'atm', label: 'Caixas eletrônicos', group: 'services', color: '#a3ed85', minzoom: 16, maki: 'bank' },
+  { id: 'parking', label: 'Estacionamentos', group: 'services', color: '#8bc6ff', minzoom: 16, maki: 'parking' },
+  { id: 'restaurant', label: 'Restaurantes', group: 'food', color: '#ffa86a', minzoom: 15.5, maki: 'restaurant' },
+  { id: 'cafe', label: 'Cafés', group: 'food', color: '#e9bb84', minzoom: 16, maki: 'cafe' },
+  { id: 'fast_food', label: 'Lanchonetes', group: 'food', color: '#ffca55', minzoom: 16, maki: 'fast-food' },
+];

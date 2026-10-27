@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="park">
+  <title>RDR2 · saved · park</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M26 55V37H19Q11 37 11 28V21Q11 14 18 17V28H26V12Q26 5 34 7Q38 8 38 13V31H45V21Q45 15 52 18V33Q52 41 38 41V55Z" fill="#cf9f56" /><path d="M21 55L44 55" fill="none"/><path d="M30 17L30 48" fill="none"/></g></defs>
+  <use href="#art" stroke="#ffe7b7" stroke-width="6.2"/>
+  <use href="#art" stroke="#392819" stroke-width="3.2"/>
+</svg>

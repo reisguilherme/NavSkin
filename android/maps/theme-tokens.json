@@ -1,0 +1,352 @@
+{
+  "specification": {
+    "gtaReference": "Approved PoC src/style.js and public/styles/tokens.json. No game artwork or extracted assets.",
+    "rosaReference": "Original candy-pink Rosa Pop cartography: vivid mint parks, turquoise water, pink/lilac night fabric and cute original symbols.",
+    "edit": "Edit these palettes and android/maps/icons/{gta,rosa,rdr2}/*.svg, then run node scripts/prepare-android-maps.mjs.",
+    "rdr2Reference": "Original parchment, dark-ink roads, muted water and selective red accents inspired by the official Piggyback RDR2 atlas. No game imagery, invented features or extracted symbols."
+  },
+  "zoomStops": [
+    11,
+    13,
+    15,
+    17
+  ],
+  "palettes": {
+    "gta": {
+      "background": "#999999",
+      "urban": "#999999",
+      "commercial": "#A2A29A",
+      "industrial": "#978572",
+      "park": "#748837",
+      "wood": "#38682C",
+      "grass": "#879548",
+      "water": "#7088AB",
+      "square": "#B4B5A5",
+      "waterOutline": "#475C70",
+      "building": "#F7FCF8",
+      "road": "#080A08",
+      "roadOutline": "#E4E7DC",
+      "motorway": "#969A87",
+      "path": "#B2AE8F",
+      "rail": "#533D30",
+      "label": "#FFFFFF",
+      "labelHalo": "#20251D"
+    },
+    "rosa": {
+      "background": "#FFD5ED",
+      "urban": "#FFC4E3",
+      "commercial": "#FFADD9",
+      "industrial": "#D5B6FA",
+      "park": "#6FE3BD",
+      "wood": "#38C9AB",
+      "grass": "#B4F1CC",
+      "water": "#64D7EB",
+      "square": "#FFF0A6",
+      "waterOutline": "#259EBC",
+      "building": "#FFF3FB",
+      "buildingOutline": "#F289C0",
+      "road": "#FFF9FE",
+      "roadOutline": "#C8318E",
+      "motorway": "#FFA7C9",
+      "primary": "#FFDF79",
+      "secondary": "#FFC3E0",
+      "tertiary": "#E5CFFF",
+      "busway": "#B7A0FF",
+      "service": "#FFF1FC",
+      "motorwayCenter": "#FFF0AC",
+      "path": "#CE57A1",
+      "rail": "#9563C5",
+      "label": "#5D1851",
+      "labelHalo": "#FFF6FE"
+    },
+    "gta-night": {
+      "background": "#626961",
+      "urban": "#626961",
+      "commercial": "#6B7064",
+      "industrial": "#635547",
+      "park": "#53662D",
+      "wood": "#294827",
+      "grass": "#697540",
+      "water": "#4B6E91",
+      "square": "#7D826D",
+      "waterOutline": "#2D485E",
+      "building": "#B2BBAE",
+      "road": "#060805",
+      "roadOutline": "#A4AD9C",
+      "motorway": "#75816B",
+      "path": "#979474",
+      "rail": "#3C2D25",
+      "label": "#F3F6E9",
+      "labelHalo": "#182118"
+    },
+    "rosa-night": {
+      "background": "#593276",
+      "urban": "#663A84",
+      "commercial": "#8B469B",
+      "industrial": "#5B4794",
+      "park": "#41AB99",
+      "wood": "#288974",
+      "grass": "#69B790",
+      "water": "#388EBC",
+      "square": "#A99066",
+      "waterOutline": "#246687",
+      "building": "#B888BB",
+      "buildingOutline": "#7D4B9B",
+      "road": "#FFE3FA",
+      "roadOutline": "#D65ABB",
+      "motorway": "#FF9DD7",
+      "primary": "#EFC46F",
+      "secondary": "#F6A4D3",
+      "tertiary": "#D0A6F8",
+      "busway": "#AB96ED",
+      "service": "#EFC7EC",
+      "motorwayCenter": "#FFE5AA",
+      "path": "#EFA6D8",
+      "rail": "#B992E1",
+      "label": "#FFF1FC",
+      "labelHalo": "#321744"
+    },
+    "rdr2": {
+      "background": "#D9C69E",
+      "urban": "#D8C49D",
+      "commercial": "#D0B68C",
+      "industrial": "#C8B394",
+      "park": "#B5AF88",
+      "wood": "#93916D",
+      "grass": "#C4BD96",
+      "water": "#A8B9AD",
+      "square": "#E8D7AD",
+      "waterOutline": "#5C746F",
+      "building": "#B6A17A",
+      "buildingOutline": "#8C7757",
+      "road": "#4C3928",
+      "roadOutline": "#E7D4AD",
+      "motorway": "#6C2C25",
+      "primary": "#5C4030",
+      "secondary": "#65503B",
+      "tertiary": "#756047",
+      "busway": "#8D4331",
+      "service": "#877154",
+      "motorwayCenter": "#A84837",
+      "path": "#8D7957",
+      "rail": "#6F5340",
+      "label": "#39281C",
+      "labelHalo": "#F1DEB6"
+    },
+    "rdr2-night": {
+      "background": "#948162",
+      "urban": "#8E7C5F",
+      "commercial": "#897052",
+      "industrial": "#7B6A53",
+      "park": "#777D5A",
+      "wood": "#606746",
+      "grass": "#848666",
+      "water": "#718F89",
+      "square": "#A38E6A",
+      "waterOutline": "#3B514B",
+      "building": "#B19B75",
+      "buildingOutline": "#6A573D",
+      "road": "#221B15",
+      "roadOutline": "#B29B74",
+      "motorway": "#4E211C",
+      "primary": "#32271D",
+      "secondary": "#3B3022",
+      "tertiary": "#463A2A",
+      "busway": "#652D24",
+      "service": "#51442F",
+      "motorwayCenter": "#A34C3C",
+      "path": "#594C36",
+      "rail": "#39281F",
+      "label": "#FFF0CB",
+      "labelHalo": "#3C2D20"
+    }
+  },
+  "roads": [
+    {
+      "id": "service",
+      "kinds": [
+        "service"
+      ],
+      "minzoom": 14.2,
+      "widths": [
+        0.25,
+        0.5,
+        1.6,
+        4
+      ],
+      "outline": 0.3
+    },
+    {
+      "id": "local",
+      "kinds": [
+        "residential",
+        "unclassified",
+        "living_street",
+        "road"
+      ],
+      "minzoom": 11,
+      "widths": [
+        0.5,
+        1.15,
+        3.4,
+        8
+      ],
+      "outline": 0.35
+    },
+    {
+      "id": "tertiary",
+      "kinds": [
+        "tertiary"
+      ],
+      "minzoom": 11,
+      "widths": [
+        0.7,
+        1.7,
+        4.3,
+        10
+      ],
+      "outline": 0.45
+    },
+    {
+      "id": "secondary",
+      "kinds": [
+        "secondary"
+      ],
+      "minzoom": 11,
+      "widths": [
+        1,
+        2.4,
+        5.7,
+        13
+      ],
+      "outline": 0.55
+    },
+    {
+      "id": "busway",
+      "kinds": [
+        "busway"
+      ],
+      "minzoom": 11,
+      "widths": [
+        0.9,
+        2,
+        4.8,
+        11
+      ],
+      "outline": 0.5
+    },
+    {
+      "id": "primary",
+      "kinds": [
+        "primary"
+      ],
+      "minzoom": 11,
+      "widths": [
+        1.3,
+        3,
+        7,
+        15
+      ],
+      "outline": 0.65
+    },
+    {
+      "id": "trunk",
+      "kinds": [
+        "trunk"
+      ],
+      "minzoom": 11,
+      "widths": [
+        1.8,
+        3.8,
+        8.5,
+        18
+      ],
+      "outline": 0.8
+    },
+    {
+      "id": "motorway",
+      "kinds": [
+        "motorway"
+      ],
+      "minzoom": 11,
+      "widths": [
+        2.3,
+        4.7,
+        10.5,
+        22
+      ],
+      "outline": 1
+    }
+  ],
+  "visibility": {
+    "buildingsMinzoom": 13.4,
+    "pathsMinzoom": 14.4,
+    "roadLabelsMinzoom": 15.5,
+    "districtLabelsMinzoom": 14.2,
+    "placesMinzoom": 11.5,
+    "labelSpacing": 330,
+    "poiNamesMinzoom": 16.8
+  },
+  "labels": {
+    "font": "GameMapSans",
+    "placeSizes": [
+      12,
+      14,
+      17
+    ],
+    "districtSize": 12,
+    "roadSize": 11.5,
+    "haloWidth": 1.5
+  },
+  "categories": [
+    {
+      "id": "parks",
+      "label": "Parques",
+      "maki": "park",
+      "color": "#70D648",
+      "minzoom": 12.2
+    },
+    {
+      "id": "fuel",
+      "label": "Postos de combustível",
+      "maki": "fuel",
+      "color": "#FFD343",
+      "minzoom": 13
+    },
+    {
+      "id": "food",
+      "label": "Restaurantes e cafés",
+      "maki": "restaurant",
+      "color": "#FFA86A",
+      "minzoom": 14.5
+    },
+    {
+      "id": "parking",
+      "label": "Estacionamentos",
+      "maki": "parking",
+      "color": "#8BC6FF",
+      "minzoom": 15
+    },
+    {
+      "id": "health",
+      "label": "Hospitais e serviços de saúde",
+      "maki": "hospital",
+      "color": "#FF5F72",
+      "minzoom": 13.2
+    },
+    {
+      "id": "shops",
+      "label": "Mercados e lojas de conveniência",
+      "maki": "grocery",
+      "color": "#E6A3FB",
+      "minzoom": 14.5
+    }
+  ],
+  "geometry": {
+    "projection": "Web Mercator EPSG:3857",
+    "sourceCRS": "WGS84 EPSG:4326",
+    "sourceCoordinatesModified": false,
+    "geojsonTilingTolerance": 0.3,
+    "buildingNote": "Overture roofprints from OSM/Google/Microsoft at zoom >=13.4, including ML predictions; OSM-only alternative; no invented block polygons"
+  }
+}

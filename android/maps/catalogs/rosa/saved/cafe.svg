@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="cafe">
+  <title>Rosa Pop · saved · cafe</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M43 25H48Q57 25 55 34Q54 42 43 40" fill="none" /><path d="M11 23H44V40Q44 50 32 50H23Q11 50 11 40Z" fill="#ff77b4" /><path d="M9 53L48 53" fill="none"/><path d="M20 16C15 10 24 11 21 5M32 17C27 11 36 11 33 5" fill="none" stroke-width="2.5"/><path d="M0 2C-3 -2 -6 0 -6 3C-6 6 0 10 0 10C0 10 6 6 6 3C6 0 3 -2 0 2Z" transform="translate(27 29) scale(1.4166666666666667)" fill="#fed45e" vector-effect="non-scaling-stroke"/></g></defs>
+  <use href="#art" stroke="#fff7fc" stroke-width="6.2"/>
+  <use href="#art" stroke="#731b55" stroke-width="3.2"/>
+</svg>

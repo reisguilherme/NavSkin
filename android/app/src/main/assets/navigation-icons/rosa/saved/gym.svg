@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="gym">
+  <title>Rosa Pop · saved · gym</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><rect x="20" y="27" width="24" height="10" rx="1" fill="#fed45e"/><rect x="12" y="17" width="10" height="30" rx="2" fill="#ff77b4"/><rect x="5" y="23" width="7" height="18" rx="1" fill="#ad8bff"/><rect x="42" y="17" width="10" height="30" rx="2" fill="#ff77b4"/><rect x="52" y="23" width="7" height="18" rx="1" fill="#ad8bff"/><path d="M0 2C-3 -2 -6 0 -6 3C-6 6 0 10 0 10C0 10 6 6 6 3C6 0 3 -2 0 2Z" transform="translate(32 26) scale(0.8333333333333334)" fill="#fff7fc" vector-effect="non-scaling-stroke"/></g></defs>
+  <use href="#art" stroke="#fff7fc" stroke-width="6.2"/>
+  <use href="#art" stroke="#731b55" stroke-width="3.2"/>
+</svg>

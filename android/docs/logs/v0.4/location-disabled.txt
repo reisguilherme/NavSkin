@@ -1,0 +1,4 @@
+GPS
+Sua posição
+— km/h · Localização desativada
+Localização desativada no aparelho.

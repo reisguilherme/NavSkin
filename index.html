@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#20231f" />
+    <meta name="description" content="Estudo cartográfico local: a geografia real de Goiânia com a linguagem visual do mapa original de GTA San Andreas." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2320231f'/%3E%3Cpath d='M5 23L12 7L20 25L27 9M3 16H29' fill='none' stroke='%23ceda9c' stroke-width='3'/%3E%3C/svg%3E" />
+    <title>NavSkin — Estudo cartográfico</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="identity">
+          <svg class="brandmark" viewBox="0 0 40 40" aria-hidden="true"><path d="M5 30 15 7l12 26 8-22M2 20h36"/></svg>
+          <div><div class="eyebrow">ESTUDO CARTOGRÁFICO <span>01 / POC</span></div><h1>NavSkin</h1></div>
+        </div>
+        <div class="header-actions">
+          <div class="style-switch" role="group" aria-label="Estilo do mapa">
+            <button id="style-gta" class="active" aria-pressed="true"><span class="mode-dot"></span>Estilo GTA SA</button>
+            <button id="style-neutral" aria-pressed="false">Estilo neutro</button>
+          </div>
+          <button id="panel-toggle" class="panel-toggle" aria-expanded="false" aria-controls="research-panel"><span>Referências & ajustes</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h12M12 3v14"/></svg></button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="map-frame" aria-label="Mapa comparativo de Goiânia">
+          <div id="map" aria-label="Mapa interativo; use arraste para navegar e a roda do mouse para ampliar"></div>
+          <div class="map-top">
+            <nav class="presets" aria-label="Enquadramentos predefinidos">
+              <button data-preset="overview" class="selected" aria-pressed="true"><small>01</small>Visão geral</button>
+              <button data-preset="center" aria-pressed="false"><small>02</small>Centro <span>/ Praça Cívica</span></button>
+              <button data-preset="park" aria-pressed="false"><small>03</small>Vaca Brava</button>
+            </nav>
+            <button id="home" class="home" title="Voltar ao enquadramento inicial" aria-label="Voltar ao enquadramento inicial"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10V4h6M20 14v6h-6M14 4h6v6M10 20H4v-6"/></svg></button>
+          </div>
+
+          <div class="map-caption"><span class="live-dot"></span><span id="mode-caption">LINGUAGEM GTA SA · ORIGINAL / 2004</span><span class="caption-rule"></span><span>GEOGRAFIA REAL</span></div>
+          <div class="map-key" aria-label="Legenda">
+            <span><i class="swatch road"></i>Vias</span><span><i class="swatch urban"></i>Solo urbano</span><span><i class="swatch park"></i>Vegetação</span><span><i class="swatch water"></i>Água</span><span><i class="swatch building"></i>Edificações</span>
+          </div>
+          <div id="loading" class="loading" role="status"><span class="spinner"></span><strong>Desenhando Goiânia</strong><span>Carregando o recorte vetorial local…</span></div>
+          <div id="map-error" class="error" role="alert" hidden></div>
+          <div id="feature-info" class="feature-info" hidden></div>
+          <button id="poi-shortcut" class="poi-shortcut"><img src="/icons/poi-hospital.svg" alt=""/>Locais e prédios <span>›</span></button>
+        </section>
+
+        <aside id="research-panel" class="research-panel" hidden aria-label="Referências, paleta e ajustes">
+          <div class="panel-heading"><div><span class="eyebrow">CADERNO DE ESTUDO</span><h2>A linguagem do mapa</h2></div><button id="panel-close" class="icon-button" aria-label="Fechar painel">×</button></div>
+          <p class="panel-intro">O mapa original de <em>San Andreas</em>, aplicado à cidade que existe fora do jogo.</p>
+          <div class="panel-tabs" role="group" aria-label="Conteúdo do painel"><button data-tab="reference" class="active" aria-pressed="true">Referências</button><button data-tab="layers" aria-pressed="false">Camadas</button><button data-tab="adjust" aria-pressed="false">Ajustes</button><button data-tab="data" aria-pressed="false">Dados</button></div>
+
+          <div id="tab-layers" class="panel-content" hidden>
+            <h3>Edificações reais</h3>
+            <label class="source-label" for="building-source">Fonte dos contornos</label>
+            <select id="building-source"><option value="overture">Overture · cobertura ampliada</option><option value="osm">Somente OpenStreetMap</option></select>
+            <p id="building-coverage" class="muted"></p>
+            <p class="note">Overture combina dados abertos e contornos identificados em imagens de satélite. A precisão varia; não equivale a cadastro municipal. As duas fontes de prédios são alternativas, evitando duplicação.</p>
+            <h3>Locais e serviços</h3>
+            <label class="checkbox-control"><input id="pois-toggle" type="checkbox" checked/> Exibir ícones de pontos de interesse</label>
+            <p id="poi-summary" class="muted"></p>
+            <div id="poi-categories" class="poi-categories"></div>
+            <p class="note">Aproxime para ver mais serviços. Colisões são reduzidas para manter a leitura. Os símbolos são adaptações da biblioteca aberta Maki, não ícones originais do GTA. Pontos OSM podem estar incompletos ou desatualizados.</p>
+            <a class="source-link" href="/docs/buildings.md" target="_blank" rel="noopener">Fonte e precisão dos prédios <span>↗</span></a>
+            <a class="source-link" href="/docs/pois.md" target="_blank" rel="noopener">Origem dos locais e categorias <span>↗</span></a>
+          </div>
+
+          <div id="tab-reference" class="panel-content">
+            <a class="reference-image" href="/references/bradygames-ps2-p18-pause-crop.png" target="_blank" rel="noopener"><img src="/references/bradygames-ps2-p18-pause-crop.png" alt="Screenshot do mapa no menu de pausa, reproduzida na página 18 do guia oficial BradyGames PS2, copyright 2005" /><span>PAUSA · GUIA OFICIAL PS2 ↗</span></a>
+            <div class="reference-caption"><strong>O mapa dentro do menu de pausa</strong><span>Guia oficial BradyGames PS2, ©2005, página 18. Recorte da screenshot impressa: ruas pretas, massas claras e base cinza. Artefato primário da época; build exato não certificado.</span></div>
+            <a class="source-link" href="https://archive.org/details/GTA_San_Andreas_Guide_PS2/page/n18/mode/1up" target="_blank" rel="noopener">Consultar a página completa do guia <span>↗</span></a>
+            <a class="ps2-reference" href="/references/gtasanandreas-original-map.webp" target="_blank" rel="noopener"><img src="/references/gtasanandreas-original-map.webp" alt="Mosaico complementar do radar original, publicado por GTA-SanAndreas.com"/><span><strong>Radar: referência complementar</strong><small>Mosaico de terceiros atribuído ao original. Usado para estimar cores, sem certificação de pixels PS2.</small></span><b>↗</b></a>
+            <h3>O que orienta este estilo</h3>
+            <ol class="decisions"><li><b>01</b><span><strong>Preto organiza a cidade.</strong> Vias contínuas, contraste alto e hierarquia pela espessura.</span></li><li><b>02</b><span><strong>Grandes massas, poucos detalhes.</strong> Cinza urbano, formas claras e vegetação chapada. Sem relevo ou textura inventados.</span></li><li><b>03</b><span><strong>A geografia continua sendo Goiânia.</strong> Ruas e edifícios reais. Os blocos simplificados do jogo não são recriados com polígonos fictícios.</span></li></ol>
+            <p class="note">Cores estimadas na imagem publicada; não são valores oficiais PS2. Rótulos e marcadores são adaptações da PoC. Nenhum asset foi extraído do jogo.</p>
+            <a class="source-link" href="/docs/references.md" target="_blank" rel="noopener">Pesquisa, método e limitações <span>↗</span></a>
+          </div>
+
+          <div id="tab-adjust" class="panel-content" hidden>
+            <h3>Paleta de San Andreas</h3><p class="muted">Estimativas editáveis. Os controles afetam apenas o estilo GTA SA.</p>
+            <div id="palette-controls" class="palette-controls"></div>
+            <div class="width-control"><label for="road-width">Espessura das vias <output id="width-value">100%</output></label><input id="road-width" type="range" min="60" max="160" value="100" step="5"/><div class="range-labels"><span>Mais fino</span><span>Mais espesso</span></div></div>
+            <label class="checkbox-control"><input id="labels-toggle" type="checkbox" checked /> Exibir rótulos de lugares e vias</label>
+            <button id="restore" class="secondary-button">Restaurar valores de referência</button>
+            <button id="export-style" class="secondary-button subtle">Exportar estilo MapLibre (.json) ↗</button>
+            <p class="note">As larguras são interpoladas entre os zooms 11, 13, 15 e 17. Ruas de serviço e caminhos aparecem ao aproximar; edifícios reais a partir de 13,4.</p>
+            <a class="source-link" href="/styles/tokens.json" target="_blank" rel="noopener">Abrir arquivo de tokens <span>↗</span></a>
+          </div>
+
+          <div id="tab-data" class="panel-content" hidden>
+            <h3>A mesma cidade. Dois estilos.</h3><p class="muted">A comparação troca apenas as regras de desenho. Coordenadas, enquadramento e zoom permanecem iguais.</p>
+            <dl id="data-details" class="data-details"></dl>
+            <h3>Lugares conferidos no OSM</h3><ul id="anchors" class="anchor-list"></ul>
+            <p class="note">Cinza de fundo é suporte cartográfico, não uma afirmação de uso do solo. Branco representa contornos de edificações da fonte selecionada, incluindo estimativas de telhados na Overture. O recorte não inclui toda a cidade.</p>
+            <a class="source-link" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL <span>↗</span></a>
+            <a class="source-link" href="/docs/data.md" target="_blank" rel="noopener">Origem, schema e reprodução <span>↗</span></a>
+          </div>
+          <footer class="panel-footer">PROVA DE CONCEITO INDEPENDENTE <span>SEM VÍNCULO COM ROCKSTAR GAMES</span></footer>
+        </aside>
+      </main>
+
+      <footer class="statusbar"><div><span class="status-dot"></span><span id="data-status">Dados locais · OpenStreetMap</span></div><div class="status-right"><span id="coordinates">16.69° S / 49.27° O</span><span class="status-divider"></span><span id="zoom-level">ZOOM —</span><span class="status-divider"></span><span>ARRASTE PARA EXPLORAR <b>↔</b></span></div></footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

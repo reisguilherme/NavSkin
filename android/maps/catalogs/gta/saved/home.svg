@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="home">
+  <title>GTA SA · saved · home</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M10 30L32 11L54 30L48 30V53H17V30Z" fill="#33c9a3" /><path d="M9 30L32 10L55 30" fill="#f55e67" /><rect x="27" y="36" width="11" height="17" rx="1" fill="#fff8d8"/><rect x="21" y="26" width="10" height="8" rx="0" fill="#8adcf3"/></g></defs>
+  <use href="#art" stroke="#fffdf4" stroke-width="6.2"/>
+  <use href="#art" stroke="#20221d" stroke-width="3.2"/>
+</svg>

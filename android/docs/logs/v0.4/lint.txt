@@ -1,0 +1,259 @@
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\MainActivity.kt:397: Warning: Use SwitchCompat from AppCompat or MaterialSwitch from Material library [UseSwitchCompatOrMaterialCode from androidx.appcompat]
+            val toggle = Switch(this).apply {
+            ^
+
+   Explanation for issues of type "UseSwitchCompatOrMaterialCode":
+   Use SwitchCompat from AppCompat or MaterialSwitch from Material library
+
+   Vendor: Android Open Source Project
+   Identifier: androidx.appcompat
+   Feedback: https://issuetracker.google.com/issues/new?component=460343
+
+C:\Users\Guilherme\Downloads\GameMap\android\gradle\wrapper\gradle-wrapper.properties:3: Warning: A newer version of Gradle than 8.13 is available: 8.14.6 [AndroidGradlePluginVersion]
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AndroidGradlePluginVersion":
+   This detector looks for usage of the Android Gradle Plugin where the
+   version you are using is not the current stable release. Using older
+   versions is fine, and there are cases where you deliberately want to stick
+   with an older version. However, you may simply not be aware that a more
+   recent version is available, and that is what this lint check helps find.
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\build.gradle.kts:29: Warning: A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1 [GradleDependency]
+    implementation("androidx.core:core-ktx:1.17.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\build.gradle.kts:30: Warning: A newer version of androidx.activity:activity-ktx than 1.11.0 is available: 1.13.0 [GradleDependency]
+    implementation("androidx.activity:activity-ktx:1.11.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\build.gradle.kts:31: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.9.4 is available: 2.11.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\build.gradle.kts:32: Warning: A newer version of com.google.android.material:material than 1.13.0 is available: 1.14.0 [GradleDependency]
+    implementation("com.google.android.material:material:1.13.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\build.gradle.kts:42: Warning: A newer version of androidx.test.uiautomator:uiautomator than 2.3.0 is available: 2.4.0 [GradleDependency]
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\build.gradle.kts:37: Warning: A newer version of org.robolectric:robolectric than 4.16 is available: 4.17 [NewerVersionAvailable]
+    testImplementation("org.robolectric:robolectric:4.16")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\car\GameMapCarAppService.kt:29: Warning: The resource @array/hosts_allowlist_sample is marked as private in androidx.car.app:app:1.7.0 [PrivateResource]
+                .addAllowedHosts(androidx.car.app.R.array.hosts_allowlist_sample).build()
+                                                          ~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "PrivateResource":
+   Private resources should not be referenced; the may not be present
+   everywhere, and even where they are they may disappear without notice.
+
+   To fix this, copy the resource into your own project instead.
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\render\CarSurfaceRenderer.kt:289: Warning: Using 'Log' instead of 'Timber' [LogNotTimber from com.jakewharton.timber:timber:{version}]
+        Log.i("GameMapSurface", message)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "LogNotTimber":
+   Since Timber is included in the project, it is likely that calls to Log
+   should instead be going to Timber.
+
+   Vendor: JakeWharton/timber
+   Identifier: com.jakewharton.timber:timber:{version}
+   Feedback: https://github.com/JakeWharton/timber/issues
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\AndroidManifest.xml:37: Warning: Exported service does not require permission [ExportedService]
+        <service android:name=".car.GameMapCarAppService" android:exported="true" android:label="GameMap Goiânia">
+         ~~~~~~~
+
+   Explanation for issues of type "ExportedService":
+   Exported services (services which either set exported=true or contain an
+   intent-filter and do not specify exported=false) should define a permission
+   that an entity must have in order to launch the service or bind to it.
+   Without this, any application can use this service.
+
+   https://goo.gle/ExportedService
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\AndroidManifest.xml:20: Warning: The attribute android:allowBackup is deprecated from Android 12 and higher and may be removed in future versions. Consider adding the attribute android:dataExtractionRules specifying an @xml resource which configures cloud backups and device transfers on Android 12 and higher. [DataExtractionRules]
+        android:allowBackup="false" android:supportsRtl="true">
+                             ~~~~~
+
+   Explanation for issues of type "DataExtractionRules":
+   Before Android 12, the attributes android:allowBackup and
+   android:fullBackupContent were used to configure all forms of backup,
+   including cloud backups, device-to-device transfers and adb backup.
+
+   In Android 12 and higher, these attributes have been deprecated and will
+   only apply to cloud backups. You should instead use the attribute
+   android:dataExtractionRules, specifying an @xml resource that configures
+   which files to back up, for cloud backups and for device-to-device
+   transfers, separately. If your minSdkVersion supports older versions,
+   you'll still want to specify an android:fullBackupContent resource if the
+   default behavior is not right for your app.
+
+   https://developer.android.com/about/versions/12/backup-restore#xml-changes
+   https://goo.gle/DataExtractionRules
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\PhoneUi.kt:79: Warning: Custom view PhoneAction is missing constructor used by tools: (Context) or (Context,AttributeSet) or (Context,AttributeSet,int) [ViewConstructor]
+internal class PhoneAction(context: Context, iconResource: Int, label: String, showLabel: Boolean = false) :
+               ~~~~~~~~~~~
+
+   Explanation for issues of type "ViewConstructor":
+   Some layout tools (such as the Android layout editor) need to find a
+   constructor with one of the following signatures:
+   * View(Context context)
+   * View(Context context, AttributeSet attrs)
+   * View(Context context, AttributeSet attrs, int defStyle)
+
+   If your custom view needs to perform initialization which does not apply
+   when used in a layout editor, you can surround the given code with a check
+   to see if View#isInEditMode() is false, since that method will return false
+   at runtime but true within a user interface editor.
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\render\CarSurfaceRenderer.kt:308: Warning: Use the KTX extension function Int.toDrawable instead? [UseKtx]
+                setBackgroundDrawable(ColorDrawable(Color.BLACK))
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\ConnectionInstructionsActivity.kt:76: Warning: Use the KTX extension property View.isVisible instead? [UseKtx]
+                details.visibility = if (details.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\ConnectionInstructionsActivity.kt:76: Warning: Use the KTX extension property View.isVisible instead? [UseKtx]
+                details.visibility = if (details.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\ConnectionInstructionsActivity.kt:77: Warning: Use the KTX extension property View.isVisible instead? [UseKtx]
+                ViewCompat.setStateDescription(this, if (details.visibility == View.VISIBLE) "Expandido" else "Recolhido")
+                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\navigation\storage\NavigationSettings.kt:38: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        val editor = storage.edit()
+                     ~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\PhoneNavigationUi.kt:432: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+        action(content, "Abrir Geoapify") { activity.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://www.geoapify.com/pricing/"))) }
+                                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\PhoneUi.kt:36: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+        private fun color(value: String) = Color.parseColor(value)
+                                           ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\preferences\PreferenceStore.kt:30: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        check(storage.edit().putString(THEME, theme.assetName).commit()) { "Não foi possível salvar o tema" }
+              ~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\preferences\PreferenceStore.kt:36: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        check(storage.edit().putStringSet(CATEGORIES, selected.map { it.id }.toSet()).commit()) {
+              ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseKtx":
+   The Android KTX libraries decorates the Android platform SDK as well as
+   various libraries with more convenient extension functions available from
+   Kotlin, allowing you to use default parameters, named parameters, and
+   more.
+
+   Available options:
+
+   **remove-defaults** (default is true):
+   Whether to skip arguments that match the defaults provided by the extension.
+
+   Extensions often provide default values for some of the parameters. For example:
+   ```kotlin
+   fun Path.readLines(charset: Charset = Charsets.UTF_8): List<String> { return Files.readAllLines(this, charset) }
+   ```
+   This lint check will by default automatically omit parameters that match the default, so if your code was calling
+
+   ```kotlin
+   Files.readAllLines(file, Charset.UTF_8)
+   ```
+   lint would replace this with
+   ```kotlin
+   file.readLines()
+   ```
+   rather than
+
+   ```kotlin
+   file.readLines(Charset.UTF_8
+   ```
+   You can turn this behavior off using this option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="remove-defaults" value="true" />
+       </issue>
+   </lint>
+   ```
+
+   **require-present** (default is true):
+   Whether to only offer extensions already available.
+
+   This option lets you only have lint suggest extension replacements if those extensions are already available on the class path (in other words, you're already depending on the library containing the extension method.)
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="require-present" value="true" />
+       </issue>
+   </lint>
+   ```
+
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\MainActivity.kt:204: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                renderStatus.text = "Não foi possível abrir o mapa local. Reabra o app para tentar novamente."
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\MainActivity.kt:208: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                renderStatus.text = "Carregando mapa local…"
+                                     ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\MainActivity.kt:222: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        selection.text = "Goiânia · ${preferences.theme.label}"
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\MainActivity.kt:222: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        selection.text = "Goiânia · ${preferences.theme.label}"
+                          ~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\MainActivity.kt:241: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        attribution.text = "© OpenStreetMap · Overture · Geoapify"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\PhoneNavigationUi.kt:209: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        status.text = "$notice$speed · $quality" + (if (state.message != null) "\n${state.message}" else "")
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\PhoneNavigationUi.kt:209: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        status.text = "$notice$speed · $quality" + (if (state.message != null) "\n${state.message}" else "")
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\SurfaceProbeActivity.kt:22: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            text = "GameMap Goiânia · prova de superfície"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\SurfaceProbeActivity.kt:37: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            text = "© OpenStreetMap contributors · ODbL\nO teste no celular não comprova Android Auto."
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\SurfaceProbeActivity.kt:37: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            text = "© OpenStreetMap contributors · ODbL\nO teste no celular não comprova Android Auto."
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Guilherme\Downloads\GameMap\android\app\src\main\java\br\com\gamemap\phone\SurfaceProbeActivity.kt:37: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            text = "© OpenStreetMap contributors · ODbL\nO teste no celular não comprova Android Auto."
+                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+0 errors, 33 warnings

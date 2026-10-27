@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="gym">
+  <title>GTA SA · saved · gym</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><rect x="20" y="27" width="24" height="10" rx="1" fill="#ffcb41"/><rect x="12" y="17" width="10" height="30" rx="2" fill="#52cddd"/><rect x="5" y="23" width="7" height="18" rx="1" fill="#f55e67"/><rect x="42" y="17" width="10" height="30" rx="2" fill="#52cddd"/><rect x="52" y="23" width="7" height="18" rx="1" fill="#f55e67"/></g></defs>
+  <use href="#art" stroke="#fffdf4" stroke-width="6.2"/>
+  <use href="#art" stroke="#20221d" stroke-width="3.2"/>
+</svg>

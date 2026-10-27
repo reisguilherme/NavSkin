@@ -1,0 +1,4 @@
+// Account and provisioning are selected on the user's Mac; no certificate is bundled.
+DEVELOPMENT_TEAM =
+PRODUCT_BUNDLE_IDENTIFIER = br.com.navskin.ios
+#include? "Local.xcconfig"

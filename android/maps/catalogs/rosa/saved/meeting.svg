@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="meeting">
+  <title>Rosa Pop · saved · meeting</title>
+  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><circle cx="22" cy="20" r="8" fill="#ff77b4"/><circle cx="43" cy="22" r="7" fill="#fed45e"/><path d="M7 52V43Q7 32 21 32Q35 32 35 43V52Z" fill="#ff77b4" /><path d="M35 52V43Q35 35 43 34Q56 34 57 46V52Z" fill="#fed45e" /><path d="M0 2C-3 -2 -6 0 -6 3C-6 6 0 10 0 10C0 10 6 6 6 3C6 0 3 -2 0 2Z" transform="translate(33 7) scale(0.9166666666666666)" fill="#ad8bff" vector-effect="non-scaling-stroke"/></g></defs>
+  <use href="#art" stroke="#fff7fc" stroke-width="6.2"/>
+  <use href="#art" stroke="#731b55" stroke-width="3.2"/>
+</svg>

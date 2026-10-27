@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><resources>
+    <style name="Theme.GameMap.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="colorPrimary">#4C692B</item>
+        <item name="colorPrimaryVariant">#3E5721</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#D92376</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="android:colorAccent">#4C692B</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">#FFFCF4</item>
+        <item name="android:windowBackground">#FFFCF4</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+    <style name="Theme.GameMap" parent="Theme.GameMap.Base" />
+</resources>
