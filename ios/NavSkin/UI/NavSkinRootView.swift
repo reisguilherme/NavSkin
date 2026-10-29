@@ -138,7 +138,16 @@ struct NavSkinRootView: View {
             }
             HStack(alignment: .bottom) {
                 speedBadge
-                Spacer(minLength: 16)
+                if store.traffic.enabled {
+                    Button { present(.settings) } label: {
+                        Text(store.traffic.compactStatus).gameFont(.caption, weight: .semibold)
+                            .lineLimit(2).multilineTextAlignment(.center)
+                            .foregroundStyle(palette.text).padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(palette.surface, in: Capsule())
+                    }
+                    .buttonStyle(.plain).frame(maxWidth: .infinity)
+                    .accessibilityHint("Ver estado do trânsito e configurar a chave TomTom")
+                } else { Spacer(minLength: 16) }
                 Button { store.recenter() } label: {
                     Image(systemName: "location.fill").font(.system(size: 21, weight: .semibold))
                         .foregroundStyle(store.following ? palette.surface : palette.text)

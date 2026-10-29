@@ -1,5 +1,7 @@
 # NavSkin — configurar e testar a navegação
 
+Novo na 0.8: [câmera adaptativa, controles e trânsito TomTom opcional](../../docs/navigation-v0.8.md).
+
 Versão do código **0.7.1**, `versionCode 7`. Instale o APK por cima da versão anterior, com a mesma assinatura, para manter favoritos, destinos, temas e filtros. O pacote de desenvolvimento continua `br.com.gamemap.goiania.dev`; o nome exibido é **NavSkin**. Os três estilos, os dados de Goiânia offline e os catálogos acompanham o APK. O padrão é **Mundo online**; a escolha entre os dois modos fica salva no aparelho e é compartilhada com o Android Auto.
 
 ## Primeira utilização

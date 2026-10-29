@@ -76,12 +76,17 @@ class NativeNavigationTest {
                 }
                 scenario.onActivity { activity ->
                     val summary = activity.findViewById<ViewGroup>(br.com.gamemap.R.id.phone_route_summary)
-                    val text = (0 until summary.childCount).mapNotNull { index ->
-                        (summary.getChildAt(index) as? android.widget.TextView)?.takeIf { it.isShown }?.text?.toString()
-                    }.joinToString(" ")
+                    fun visibleTexts(view: View): List<String> = when {
+                        !view.isShown -> emptyList()
+                        view is android.widget.TextView -> listOf(view.text.toString())
+                        view is ViewGroup -> (0 until view.childCount).flatMap { visibleTexts(view.getChildAt(it)) }
+                        else -> emptyList()
+                    }
+                    val text = visibleTexts(summary).joinToString(" ")
                     assertFalse("ETA card must not duplicate speed", text.contains("km/h"))
                     assertFalse("ETA card must not show GPS precision or diagnostics", text.contains("GPS") || text.contains("SIMULAÇÃO") || text.contains("Carregando"))
-                    assertTrue("ETA card must retain trip estimates", text.contains("·") && text.contains(":"))
+                    assertTrue("ETA card must retain three clear trip estimates", text.contains("TEMPO") &&
+                        text.contains("DISTÂNCIA") && text.contains("CHEGADA") && text.contains(":"))
                 }
                 // GPS/camera controls must never hide the followed vehicle at the map center.
                 val followControl = device.findObject(By.res("${instrumentation.targetContext.packageName}:id/phone_recenter"))
@@ -126,6 +131,20 @@ class NativeNavigationTest {
                 await { device.displayWidth > device.displayHeight }
                 assertTrue(device.wait(Until.hasObject(By.descContains("recursos e renderização prontos")), 30_000))
                 scenario.onActivity { assertEquals(NavigationPhase.NAVIGATING, app.navigation.snapshot().phase); assertTrue(app.navigation.snapshot().guidanceAvailable) }
+                scenario.onActivity { activity ->
+                    fun findGuidance(view: View): View? {
+                        if (view is br.com.gamemap.phone.GuidanceCard) return view
+                        if (view is ViewGroup) for (index in 0 until view.childCount) {
+                            findGuidance(view.getChildAt(index))?.let { return it }
+                        }
+                        return null
+                    }
+                    val cue = android.graphics.Rect()
+                    val eta = android.graphics.Rect()
+                    assertTrue(findGuidance(activity.window.decorView)!!.getGlobalVisibleRect(cue))
+                    assertTrue(activity.findViewById<View>(br.com.gamemap.R.id.phone_route_summary).getGlobalVisibleRect(eta))
+                    assertFalse("Landscape maneuver must not overlap ETA", android.graphics.Rect.intersects(cue, eta))
+                }
                 device.takeScreenshot(java.io.File(instrumentation.targetContext.getExternalFilesDir(null), "nav-landscape-simulation.png"))
                 saveScreenshot("nav-landscape-simulation.png")
                 instrumentation.runOnMainSync { app.navigation.stopReplay() }

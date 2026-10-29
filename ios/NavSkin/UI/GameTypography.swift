@@ -22,7 +22,7 @@ enum GameTypography {
         // Keep the original HTTPS URL and serve its bundled bytes through URLProtocol.
         GameGlyphURLProtocol.router = makeGlyphRouter(root: root, catalog: catalog)
         let configuration = (MLNNetworkConfiguration.sharedManager.sessionConfiguration.copy() as? URLSessionConfiguration) ?? .default
-        configuration.protocolClasses = [GameGlyphURLProtocol.self] + (configuration.protocolClasses ?? [])
+        configuration.protocolClasses = [GameGlyphURLProtocol.self, TrafficTileURLProtocol.self] + (configuration.protocolClasses ?? [])
         MLNNetworkConfiguration.sharedManager.sessionConfiguration = configuration
         MLNOfflineStorage.shared.delegate = glyphDelegate
     }

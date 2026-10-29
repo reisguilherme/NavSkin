@@ -76,4 +76,49 @@ class NavigationSettingsTest {
             assertEquals("", restored.apiKey())
         }
     }
+
+    @Test fun trafficKeyIsSeparateEncryptedAndRequiresExplicitEnablement() {
+        val vault = MemoryVault()
+        NavigationSettings(context, vault).use { settings ->
+            settings.setApiKey("routing-only")
+            assertFalse(settings.trafficEnabled())
+            settings.setTrafficEnabled(true)
+            assertFalse(settings.trafficEnabled())
+            settings.setTrafficApiKey("  synthetic-traffic-token  ")
+            assertFalse(settings.trafficEnabled())
+            settings.setTrafficEnabled(true)
+            assertTrue(settings.trafficEnabled())
+            assertEquals("synthetic-traffic-token", settings.trafficApiKey())
+            assertEquals("routing-only", settings.apiKey())
+            val stored = context.getSharedPreferences(NavigationSettings.FILE_NAME, Context.MODE_PRIVATE)
+            assertFalse(stored.all.values.any { it.toString().contains("synthetic-traffic-token") })
+        }
+        NavigationSettings(context, vault).use { settings ->
+            assertTrue(settings.trafficEnabled())
+            settings.setTrafficApiKey("")
+            assertFalse(settings.trafficEnabled())
+            assertEquals("routing-only", settings.apiKey())
+        }
+    }
+
+    @Test fun lostTrafficEncryptionKeyDisablesNetworkAccess() {
+        val vault = MemoryVault()
+        NavigationSettings(context, vault).use { settings ->
+            settings.setTrafficApiKey("synthetic-traffic-token")
+            settings.setTrafficEnabled(true)
+            vault.key = null
+            assertEquals("", settings.trafficApiKey())
+            assertFalse(settings.trafficEnabled())
+        }
+    }
+
+    @Test fun trafficKeyRejectsCharactersThatCannotBeSentInHttpHeaders() {
+        NavigationSettings(context, MemoryVault()).use { settings ->
+            for (value in listOf("token\nsecond-line", "token with space", "token-é", "token\u0000middle")) {
+                assertThrows(IllegalArgumentException::class.java) { settings.setTrafficApiKey(value) }
+            }
+            assertEquals("", settings.trafficApiKey())
+            assertFalse(settings.trafficEnabled())
+        }
+    }
 }

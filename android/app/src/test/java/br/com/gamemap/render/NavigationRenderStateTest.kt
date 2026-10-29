@@ -45,6 +45,11 @@ class NavigationRenderStateTest {
         assertEquals(0.0, state(LocationQuality.LOST).followBearing(MapOrientation.MOVEMENT_UP), 0.0)
     }
 
+    @Test fun stationaryGpsBearingDoesNotRotateTheFollowCamera() {
+        val stopped = state().copy(location = state().location.copy(speedKmh = 0.0, bearingDegrees = 137.0))
+        assertEquals(0.0, stopped.followBearing(MapOrientation.MOVEMENT_UP), 0.0)
+    }
+
     @Test fun onlyNewActiveSessionResumesFollowingAfterManualPan() {
         val camera = NavigationCameraState()
         camera.observe(state())

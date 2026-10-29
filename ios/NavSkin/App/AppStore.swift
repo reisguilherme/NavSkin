@@ -19,12 +19,14 @@ final class AppStore: ObservableObject {
     @Published var mapSelection: Destination?
     let resources: ResourceCatalog
     let mapRepository: MapResourceRepository
+    let traffic = TrafficStore()
     private let preferences: UserDefaults
     private let keyStore: APIKeyStore
     private let storage: PlacesStore
     private let session: NavigationSession
     private let location = IOSLocationSource()
     private var timer: Timer?
+    private var trafficChanges: AnyCancellable?
     private var previousAccess: LocationAccess = .notRequested
 
     init() {
@@ -84,8 +86,9 @@ final class AppStore: ObservableObject {
             self.previousAccess = access
         }
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in self?.session.tick() }
+            Task { @MainActor [weak self] in self?.session.tick(); self?.traffic.tick() }
         }
+        trafficChanges = traffic.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
 
     func activateGPS() { session.activateGPS() }
@@ -97,6 +100,7 @@ final class AppStore: ObservableObject {
     func resumeDestination() { session.resumeDestination() }
     func setForeground(_ foreground: Bool) {
         session.setForeground(foreground)
+        traffic.setForeground(foreground)
         // Refresh freshness immediately after suspension before presenting old guidance again.
         if foreground { session.tick() }
     }

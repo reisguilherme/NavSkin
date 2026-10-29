@@ -1,0 +1,256 @@
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version-CDCA4532F8D5A1C.txt
+Build complete! (1.46s)
+Test Suite 'All tests' started at 2026-10-29 12:09:33.926
+Test Suite 'debug.xctest' started at 2026-10-29 12:09:33.957
+Test Suite 'GameAssetCatalogTests' started at 2026-10-29 12:09:33.957
+Test Case 'GameAssetCatalogTests.testBundledFontBlockUsesLocalResourceAndMissingBlockUsesGlobalNoto' started at 2026-10-29 12:09:33.957
+Test Case 'GameAssetCatalogTests.testBundledFontBlockUsesLocalResourceAndMissingBlockUsesGlobalNoto' passed (0.003 seconds)
+Test Case 'GameAssetCatalogTests.testCatalogReadsExactReferencesAndDoesNotInventOtherThemeFonts' started at 2026-10-29 12:09:33.961
+Test Case 'GameAssetCatalogTests.testCatalogReadsExactReferencesAndDoesNotInventOtherThemeFonts' passed (0.001 seconds)
+Test Case 'GameAssetCatalogTests.testCatalogRejectsTraversalAndUnknownSchema' started at 2026-10-29 12:09:33.961
+Test Case 'GameAssetCatalogTests.testCatalogRejectsTraversalAndUnknownSchema' passed (0.0 seconds)
+Test Case 'GameAssetCatalogTests.testInvalidRangesCredentialsAndParametersCannotBecomeLocalPaths' started at 2026-10-29 12:09:33.962
+Test Case 'GameAssetCatalogTests.testInvalidRangesCredentialsAndParametersCannotBecomeLocalPaths' passed (0.0 seconds)
+Test Case 'GameAssetCatalogTests.testUnrelatedServersAndResourcesAreNotIntercepted' started at 2026-10-29 12:09:33.962
+Test Case 'GameAssetCatalogTests.testUnrelatedServersAndResourcesAreNotIntercepted' passed (0.0 seconds)
+Test Suite 'GameAssetCatalogTests' passed at 2026-10-29 12:09:33.962
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'GeoMathTests' started at 2026-10-29 12:09:33.962
+Test Case 'GeoMathTests.testAntipodesAndPolesHaveFiniteDistances' started at 2026-10-29 12:09:33.962
+Test Case 'GeoMathTests.testAntipodesAndPolesHaveFiniteDistances' passed (0.0 seconds)
+Test Case 'GeoMathTests.testBearingsHandleTheNorthBoundaryWithoutSpinning' started at 2026-10-29 12:09:33.962
+Test Case 'GeoMathTests.testBearingsHandleTheNorthBoundaryWithoutSpinning' passed (0.0 seconds)
+Test Case 'GeoMathTests.testDatelineDistanceAndProjectionTakeTheShortWay' started at 2026-10-29 12:09:33.963
+Test Case 'GeoMathTests.testDatelineDistanceAndProjectionTakeTheShortWay' passed (0.0 seconds)
+Test Case 'GeoMathTests.testIdenticalPointsHaveZeroDistanceAndFiniteProjection' started at 2026-10-29 12:09:33.963
+Test Case 'GeoMathTests.testIdenticalPointsHaveZeroDistanceAndFiniteProjection' passed (0.0 seconds)
+Test Case 'GeoMathTests.testInvalidCoordinatesAreRejected' started at 2026-10-29 12:09:33.963
+Test Case 'GeoMathTests.testInvalidCoordinatesAreRejected' passed (0.0 seconds)
+Test Suite 'GeoMathTests' passed at 2026-10-29 12:09:33.963
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'GeoapifyProviderTests' started at 2026-10-29 12:09:33.963
+Test Case 'GeoapifyProviderTests.testDefaultTransportRejectsCleartextForeignHostsCredentialsAndPortsBeforeConnecting' started at 2026-10-29 12:09:33.963
+Test Case 'GeoapifyProviderTests.testDefaultTransportRejectsCleartextForeignHostsCredentialsAndPortsBeforeConnecting' passed (0.002 seconds)
+Test Case 'GeoapifyProviderTests.testEmptyResultsAndUnconnectedRouteHaveExplicitStates' started at 2026-10-29 12:09:33.965
+Test Case 'GeoapifyProviderTests.testEmptyResultsAndUnconnectedRouteHaveExplicitStates' passed (0.002 seconds)
+Test Case 'GeoapifyProviderTests.testMalformedCoordinatesIntervalsDurationsAndDisconnectedLegsCannotProduceGuidance' started at 2026-10-29 12:09:33.967
+Test Case 'GeoapifyProviderTests.testMalformedCoordinatesIntervalsDurationsAndDisconnectedLegsCannotProduceGuidance' passed (0.002 seconds)
+Test Case 'GeoapifyProviderTests.testMissingArrivalIsAppendedAtTheActualRouteEndpoint' started at 2026-10-29 12:09:33.969
+Test Case 'GeoapifyProviderTests.testMissingArrivalIsAppendedAtTheActualRouteEndpoint' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testMissingKeyAndInvalidCoordinatesStopBeforeTheNetwork' started at 2026-10-29 12:09:33.969
+Test Case 'GeoapifyProviderTests.testMissingKeyAndInvalidCoordinatesStopBeforeTheNetwork' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testMissingProviderIDUsesTheSameStableUUIDAsAndroid' started at 2026-10-29 12:09:33.969
+Test Case 'GeoapifyProviderTests.testMissingProviderIDUsesTheSameStableUUIDAsAndroid' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testOversizedResponseIsRejectedEvenWithInjectedTransport' started at 2026-10-29 12:09:33.970
+Test Case 'GeoapifyProviderTests.testOversizedResponseIsRejectedEvenWithInjectedTransport' passed (0.003 seconds)
+Test Case 'GeoapifyProviderTests.testQuotaForbiddenAndHTTPDateRetryAfterAreRecognized' started at 2026-10-29 12:09:33.973
+Test Case 'GeoapifyProviderTests.testQuotaForbiddenAndHTTPDateRetryAfterAreRecognized' passed (0.008 seconds)
+Test Case 'GeoapifyProviderTests.testReverseUsesLatitudeLongitudeParametersAndReturnsRealAddress' started at 2026-10-29 12:09:33.981
+Test Case 'GeoapifyProviderTests.testReverseUsesLatitudeLongitudeParametersAndReturnsRealAddress' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testRouteFlattensSharedLegEndpointsAndKeepsInstructionStartIndicesAndSeconds' started at 2026-10-29 12:09:33.982
+Test Case 'GeoapifyProviderTests.testRouteFlattensSharedLegEndpointsAndKeepsInstructionStartIndicesAndSeconds' passed (0.001 seconds)
+Test Case 'GeoapifyProviderTests.testSearchCombinesRealAddressAndNearbyPOIWithLongitudeLatitudeBias' started at 2026-10-29 12:09:33.983
+Test Case 'GeoapifyProviderTests.testSearchCombinesRealAddressAndNearbyPOIWithLongitudeLatitudeBias' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testSearchWithoutGPSDoesNotInventBiasAndDuplicateIDsAppearOnce' started at 2026-10-29 12:09:33.983
+Test Case 'GeoapifyProviderTests.testSearchWithoutGPSDoesNotInventBiasAndDuplicateIDsAppearOnce' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testTypedErrorsKeepRetryAfterAndNeverRetainURLResponseOrTransportSecrets' started at 2026-10-29 12:09:33.984
+Test Case 'GeoapifyProviderTests.testTypedErrorsKeepRetryAfterAndNeverRetainURLResponseOrTransportSecrets' passed (0.0 seconds)
+Test Case 'GeoapifyProviderTests.testUnknownManeuverIsNeutralAndRoundaboutKeepsStructuredExit' started at 2026-10-29 12:09:33.984
+Test Case 'GeoapifyProviderTests.testUnknownManeuverIsNeutralAndRoundaboutKeepsStructuredExit' passed (0.001 seconds)
+Test Suite 'GeoapifyProviderTests' passed at 2026-10-29 12:09:33.985
+	 Executed 14 tests, with 0 failures (0 unexpected) in 0.021 (0.021) seconds
+Test Suite 'NavigationCameraTests' started at 2026-10-29 12:09:33.985
+Test Case 'NavigationCameraTests.testAgeOnlyTicksDoNotAdvanceSmoothingAndLostFixCannotMoveCamera' started at 2026-10-29 12:09:33.985
+Test Case 'NavigationCameraTests.testAgeOnlyTicksDoNotAdvanceSmoothingAndLostFixCannotMoveCamera' passed (0.001 seconds)
+Test Case 'NavigationCameraTests.testHeadingCrossesNorthByShortestArcAndZoomChangesGradually' started at 2026-10-29 12:09:33.986
+Test Case 'NavigationCameraTests.testHeadingCrossesNorthByShortestArcAndZoomChangesGradually' passed (0.0 seconds)
+Test Case 'NavigationCameraTests.testIdleCameraDoesNotAdoptNavigationZoom' started at 2026-10-29 12:09:33.986
+Test Case 'NavigationCameraTests.testIdleCameraDoesNotAdoptNavigationZoom' passed (0.0 seconds)
+Test Case 'NavigationCameraTests.testInvalidInputsNeverProduceAnInvalidCamera' started at 2026-10-29 12:09:33.986
+Test Case 'NavigationCameraTests.testInvalidInputsNeverProduceAnInvalidCamera' passed (0.0 seconds)
+Test Case 'NavigationCameraTests.testMismatchedOrOffRouteProgressDoesNotZoomIntoAnOldManeuver' started at 2026-10-29 12:09:33.986
+Test Case 'NavigationCameraTests.testMismatchedOrOffRouteProgressDoesNotZoomIntoAnOldManeuver' passed (0.0 seconds)
+Test Case 'NavigationCameraTests.testNorthUpAndResetAreImmediateEvenWhenStopped' started at 2026-10-29 12:09:33.986
+Test Case 'NavigationCameraTests.testNorthUpAndResetAreImmediateEvenWhenStopped' passed (0.0 seconds)
+Test Case 'NavigationCameraTests.testStationaryNoiseAndWeakFixDoNotRotateOrDragCamera' started at 2026-10-29 12:09:33.986
+Test Case 'NavigationCameraTests.testStationaryNoiseAndWeakFixDoNotRotateOrDragCamera' passed (0.0 seconds)
+Test Case 'NavigationCameraTests.testUrbanDrivingAndApproachingTurnsRevealMoreStreetDetail' started at 2026-10-29 12:09:33.987
+Test Case 'NavigationCameraTests.testUrbanDrivingAndApproachingTurnsRevealMoreStreetDetail' passed (0.0 seconds)
+Test Suite 'NavigationCameraTests' passed at 2026-10-29 12:09:33.987
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'NavigationEngineTests' started at 2026-10-29 12:09:33.987
+Test Case 'NavigationEngineTests.testAcceptedProgressDoesNotRewindOnSmallGPSBacktrack' started at 2026-10-29 12:09:33.987
+Test Case 'NavigationEngineTests.testAcceptedProgressDoesNotRewindOnSmallGPSBacktrack' passed (0.001 seconds)
+Test Case 'NavigationEngineTests.testAlreadyAtDestinationZeroLengthRouteCanArrive' started at 2026-10-29 12:09:33.987
+Test Case 'NavigationEngineTests.testAlreadyAtDestinationZeroLengthRouteCanArrive' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testAlreadyStaleFixCannotAdvanceOrExposeCurrentSpeed' started at 2026-10-29 12:09:33.987
+Test Case 'NavigationEngineTests.testAlreadyStaleFixCannotAdvanceOrExposeCurrentSpeed' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testArrivalNeedsSuccessiveGoodFixesNearFinalProgress' started at 2026-10-29 12:09:33.988
+Test Case 'NavigationEngineTests.testArrivalNeedsSuccessiveGoodFixesNearFinalProgress' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testArrivalUsesDriveableEndpointForDestinationInsidePark' started at 2026-10-29 12:09:33.988
+Test Case 'NavigationEngineTests.testArrivalUsesDriveableEndpointForDestinationInsidePark' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testConfirmedDeviationRequiresTwoGoodReadingsToRecover' started at 2026-10-29 12:09:33.988
+Test Case 'NavigationEngineTests.testConfirmedDeviationRequiresTwoGoodReadingsToRecover' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testConsistentDeviationUnsnapsAndReroutesOnceDuringCooldown' started at 2026-10-29 12:09:33.988
+Test Case 'NavigationEngineTests.testConsistentDeviationUnsnapsAndReroutesOnceDuringCooldown' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testCrossingStaysOnCurrentLeg' started at 2026-10-29 12:09:33.988
+Test Case 'NavigationEngineTests.testCrossingStaysOnCurrentLeg' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testETAUsesRemainingStepDurationsDespiteFastCurrentSpeed' started at 2026-10-29 12:09:33.988
+Test Case 'NavigationEngineTests.testETAUsesRemainingStepDurationsDespiteFastCurrentSpeed' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testETAUsesRouteProportionWithoutStepDurationsAndRebasesClockOnTick' started at 2026-10-29 12:09:33.989
+Test Case 'NavigationEngineTests.testETAUsesRouteProportionWithoutStepDurationsAndRebasesClockOnTick' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testExtremeValidWallClockAndEstimateDoNotTrap' started at 2026-10-29 12:09:33.989
+Test Case 'NavigationEngineTests.testExtremeValidWallClockAndEstimateDoNotTrap' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testFreshnessThresholdsUseElapsedTimeAndKeepExactBoundaries' started at 2026-10-29 12:09:33.989
+Test Case 'NavigationEngineTests.testFreshnessThresholdsUseElapsedTimeAndKeepExactBoundaries' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testGapWithoutTickBreaksArrivalConfidence' started at 2026-10-29 12:09:33.989
+Test Case 'NavigationEngineTests.testGapWithoutTickBreaksArrivalConfidence' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testHeadingAndContinuityKeepParallelRoadFromStealingMatch' started at 2026-10-29 12:09:33.989
+Test Case 'NavigationEngineTests.testHeadingAndContinuityKeepParallelRoadFromStealingMatch' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testHeadingCanUseDisplacementWhenProviderHasNoSpeed' started at 2026-10-29 12:09:33.990
+Test Case 'NavigationEngineTests.testHeadingCanUseDisplacementWhenProviderHasNoSpeed' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testInaccurateGPSDoesNotAdvanceOrCauseRerouting' started at 2026-10-29 12:09:33.990
+Test Case 'NavigationEngineTests.testInaccurateGPSDoesNotAdvanceOrCauseRerouting' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testInaccurateProviderSpeedIsUnavailable' started at 2026-10-29 12:09:33.990
+Test Case 'NavigationEngineTests.testInaccurateProviderSpeedIsUnavailable' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testMatchingDoesNotJumpToRepeatedLaterGeometry' started at 2026-10-29 12:09:33.990
+Test Case 'NavigationEngineTests.testMatchingDoesNotJumpToRepeatedLaterGeometry' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testOneAccurateOutlierDoesNotTriggerRerouting' started at 2026-10-29 12:09:33.990
+Test Case 'NavigationEngineTests.testOneAccurateOutlierDoesNotTriggerRerouting' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testOutOfOrderFixCannotRewindLocationOrAdvanceRoute' started at 2026-10-29 12:09:33.991
+Test Case 'NavigationEngineTests.testOutOfOrderFixCannotRewindLocationOrAdvanceRoute' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testPassingDestinationNearStartOfLoopCannotArrive' started at 2026-10-29 12:09:33.991
+Test Case 'NavigationEngineTests.testPassingDestinationNearStartOfLoopCannotArrive' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testPlausibleOffsetWithWeakAccuracyDoesNotCauseDeviation' started at 2026-10-29 12:09:33.991
+Test Case 'NavigationEngineTests.testPlausibleOffsetWithWeakAccuracyDoesNotCauseDeviation' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testProviderSpeedIsCurrentAndParkedBearingDoesNotSpin' started at 2026-10-29 12:09:33.991
+Test Case 'NavigationEngineTests.testProviderSpeedIsCurrentAndParkedBearingDoesNotSpin' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testReliableSpeedChangesPromptly' started at 2026-10-29 12:09:33.991
+Test Case 'NavigationEngineTests.testReliableSpeedChangesPromptly' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testRepeatedTimestampCannotSatisfySuccessiveArrivalReadings' started at 2026-10-29 12:09:33.991
+Test Case 'NavigationEngineTests.testRepeatedTimestampCannotSatisfySuccessiveArrivalReadings' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testShortNoisyDeviationCannotRetryDuringCooldown' started at 2026-10-29 12:09:33.992
+Test Case 'NavigationEngineTests.testShortNoisyDeviationCannotRetryDuringCooldown' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testSignalLossBreaksSuccessiveArrivalConfidence' started at 2026-10-29 12:09:33.992
+Test Case 'NavigationEngineTests.testSignalLossBreaksSuccessiveArrivalConfidence' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testSignalLossRequiresFreshDeviationEvidence' started at 2026-10-29 12:09:33.992
+Test Case 'NavigationEngineTests.testSignalLossRequiresFreshDeviationEvidence' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testSnapshotDefaultsAndCodableRoundTrip' started at 2026-10-29 12:09:33.992
+Test Case 'NavigationEngineTests.testSnapshotDefaultsAndCodableRoundTrip' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testStaleSignalHidesSpeedAndProgressThenRecovers' started at 2026-10-29 12:09:33.993
+Test Case 'NavigationEngineTests.testStaleSignalHidesSpeedAndProgressThenRecovers' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testStartRejectsInvalidRoutesWithoutReplacingActiveRoute' started at 2026-10-29 12:09:33.993
+Test Case 'NavigationEngineTests.testStartRejectsInvalidRoutesWithoutReplacingActiveRoute' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testStoppingRemovesRouteAndKeepsCurrentGPS' started at 2026-10-29 12:09:33.993
+Test Case 'NavigationEngineTests.testStoppingRemovesRouteAndKeepsCurrentGPS' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testUnavailableInvalidAndFutureFixesCannotCreateCurrentPosition' started at 2026-10-29 12:09:33.993
+Test Case 'NavigationEngineTests.testUnavailableInvalidAndFutureFixesCannotCreateCurrentPosition' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testUnreliableSpeedNeverBecomesNegativeOrNonfiniteDisplay' started at 2026-10-29 12:09:33.993
+Test Case 'NavigationEngineTests.testUnreliableSpeedNeverBecomesNegativeOrNonfiniteDisplay' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testUpcomingManeuverUsesNextStartAndAdvancesAfterTurn' started at 2026-10-29 12:09:33.994
+Test Case 'NavigationEngineTests.testUpcomingManeuverUsesNextStartAndAdvancesAfterTurn' passed (0.0 seconds)
+Test Case 'NavigationEngineTests.testZeroLengthSegmentsDoNotProduceNaNProgress' started at 2026-10-29 12:09:33.994
+Test Case 'NavigationEngineTests.testZeroLengthSegmentsDoNotProduceNaNProgress' passed (0.0 seconds)
+Test Suite 'NavigationEngineTests' passed at 2026-10-29 12:09:33.994
+	 Executed 36 tests, with 0 failures (0 unexpected) in 0.007 (0.007) seconds
+Test Suite 'NavigationSessionTests' started at 2026-10-29 12:09:33.994
+Test Case 'NavigationSessionTests.testArrivalClearsBothPersistedAndVisibleResumeDestination' started at 2026-10-29 12:09:33.994
+Test Case 'NavigationSessionTests.testArrivalClearsBothPersistedAndVisibleResumeDestination' passed (0.02 seconds)
+Test Case 'NavigationSessionTests.testBackgroundKeepsRealNavigationButStopsReplayAndClearsSimulatedPosition' started at 2026-10-29 12:09:34.014
+Test Case 'NavigationSessionTests.testBackgroundKeepsRealNavigationButStopsReplayAndClearsSimulatedPosition' passed (0.117 seconds)
+Test Case 'NavigationSessionTests.testConfiguringTheKeyResumesTheSelectedDestinationWaitingForGPS' started at 2026-10-29 12:09:34.132
+Test Case 'NavigationSessionTests.testConfiguringTheKeyResumesTheSelectedDestinationWaitingForGPS' passed (0.011 seconds)
+Test Case 'NavigationSessionTests.testCurrentGPSDoesNotEraseNewerProviderErrorAndRetryRecovers' started at 2026-10-29 12:09:34.142
+Test Case 'NavigationSessionTests.testCurrentGPSDoesNotEraseNewerProviderErrorAndRetryRecovers' passed (0.018 seconds)
+Test Case 'NavigationSessionTests.testExplicitReplaySearchClearsResultsAndExplainsSimulationWithoutAnyHTTP' started at 2026-10-29 12:09:34.160
+Test Case 'NavigationSessionTests.testExplicitReplaySearchClearsResultsAndExplainsSimulationWithoutAnyHTTP' passed (0.012 seconds)
+Test Case 'NavigationSessionTests.testFailedRecalculationKeepsOldGuidanceHiddenUntilSuccessfulReplacement' started at 2026-10-29 12:09:34.172
+Test Case 'NavigationSessionTests.testFailedRecalculationKeepsOldGuidanceHiddenUntilSuccessfulReplacement' passed (0.129 seconds)
+Test Case 'NavigationSessionTests.testHTTPFailuresRemainErrorsWhenFreshGPSUpdatesArrive' started at 2026-10-29 12:09:34.301
+Test Case 'NavigationSessionTests.testHTTPFailuresRemainErrorsWhenFreshGPSUpdatesArrive' passed (0.053 seconds)
+Test Case 'NavigationSessionTests.testKeyRemovalInvalidatesAnOutstandingRouteCompletion' started at 2026-10-29 12:09:34.354
+Test Case 'NavigationSessionTests.testKeyRemovalInvalidatesAnOutstandingRouteCompletion' passed (0.018 seconds)
+Test Case 'NavigationSessionTests.testLocationFailureHidesOldGuidanceUntilANewValidSampleRecovers' started at 2026-10-29 12:09:34.372
+Test Case 'NavigationSessionTests.testLocationFailureHidesOldGuidanceUntilANewValidSampleRecovers' passed (0.013 seconds)
+Test Case 'NavigationSessionTests.testMissingConfigurationRemainsAnErrorBeforeGPSIsReady' started at 2026-10-29 12:09:34.386
+Test Case 'NavigationSessionTests.testMissingConfigurationRemainsAnErrorBeforeGPSIsReady' passed (0.01 seconds)
+Test Case 'NavigationSessionTests.testMockFixesAreRejectedByDefaultAndExplicitDebugPolicyUsesRealProviderWithoutReplayMode' started at 2026-10-29 12:09:34.396
+Test Case 'NavigationSessionTests.testMockFixesAreRejectedByDefaultAndExplicitDebugPolicyUsesRealProviderWithoutReplayMode' passed (0.021 seconds)
+Test Case 'NavigationSessionTests.testPermissionRevocationSuspendsGuidanceAndRetainsOnlyDestinationForResume' started at 2026-10-29 12:09:34.417
+Test Case 'NavigationSessionTests.testPermissionRevocationSuspendsGuidanceAndRetainsOnlyDestinationForResume' passed (0.013 seconds)
+Test Case 'NavigationSessionTests.testQuotaBlocksRepeatedRequestsUntilMonotonicCooldownExpiresAndRetryRecovers' started at 2026-10-29 12:09:34.430
+Test Case 'NavigationSessionTests.testQuotaBlocksRepeatedRequestsUntilMonotonicCooldownExpiresAndRetryRecovers' passed (0.126 seconds)
+Test Case 'NavigationSessionTests.testRetryDuringInFlightRequestDoesNotAutomaticallyRetryItsFailure' started at 2026-10-29 12:09:34.556
+Test Case 'NavigationSessionTests.testRetryDuringInFlightRequestDoesNotAutomaticallyRetryItsFailure' passed (0.127 seconds)
+Test Case 'NavigationSessionTests.testReturningToForegroundRestartsGPSForTheWaitingDestination' started at 2026-10-29 12:09:34.683
+Test Case 'NavigationSessionTests.testReturningToForegroundRestartsGPSForTheWaitingDestination' passed (0.111 seconds)
+Test Case 'NavigationSessionTests.testSelectedDestinationWaitsForCurrentGPSAndAutomaticallyPreviews' started at 2026-10-29 12:09:34.793
+Test Case 'NavigationSessionTests.testSelectedDestinationWaitsForCurrentGPSAndAutomaticallyPreviews' passed (0.026 seconds)
+Test Case 'NavigationSessionTests.testSourceDeathOffersResumeWithoutOldRouteAndFreshGPSOnlyClearsOwnedNotice' started at 2026-10-29 12:09:34.819
+Test Case 'NavigationSessionTests.testSourceDeathOffersResumeWithoutOldRouteAndFreshGPSOnlyClearsOwnedNotice' passed (0.013 seconds)
+Test Case 'NavigationSessionTests.testStaleAndImpreciseGPSKeepSelectedDestinationWaitingWithoutHTTP' started at 2026-10-29 12:09:34.833
+Test Case 'NavigationSessionTests.testStaleAndImpreciseGPSKeepSelectedDestinationWaitingWithoutHTTP' passed (0.018 seconds)
+Test Case 'NavigationSessionTests.testStaleGPSHidesGuidanceETASpeedAndDisabledStatusSuppressesImmediately' started at 2026-10-29 12:09:34.851
+Test Case 'NavigationSessionTests.testStaleGPSHidesGuidanceETASpeedAndDisabledStatusSuppressesImmediately' passed (0.013 seconds)
+Test Case 'NavigationSessionTests.testStartRequiresActuallyRunningSourceAndPreciseCurrentFix' started at 2026-10-29 12:09:34.864
+Test Case 'NavigationSessionTests.testStartRequiresActuallyRunningSourceAndPreciseCurrentFix' passed (0.013 seconds)
+Test Case 'NavigationSessionTests.testStopAndKeyChangeInvalidateUninterruptibleSearchResults' started at 2026-10-29 12:09:34.878
+Test Case 'NavigationSessionTests.testStopAndKeyChangeInvalidateUninterruptibleSearchResults' passed (0.065 seconds)
+Test Case 'NavigationSessionTests.testStoppingWhileWaitingForGPSDoesNotCalculateWhenLocationArrives' started at 2026-10-29 12:09:34.942
+Test Case 'NavigationSessionTests.testStoppingWhileWaitingForGPSDoesNotCalculateWhenLocationArrives' passed (0.012 seconds)
+Test Case 'NavigationSessionTests.testUninterruptibleOlderRouteCannotReplaceNewDestinationOrResurrectAfterStop' started at 2026-10-29 12:09:34.954
+Test Case 'NavigationSessionTests.testUninterruptibleOlderRouteCannotReplaceNewDestinationOrResurrectAfterStop' passed (0.053 seconds)
+Test Suite 'NavigationSessionTests' passed at 2026-10-29 12:09:35.007
+	 Executed 23 tests, with 0 failures (0 unexpected) in 1.012 (1.012) seconds
+Test Suite 'PlacesStoreTests' started at 2026-10-29 12:09:35.007
+Test Case 'PlacesStoreTests.testClockRollbackCannotMoveUpdatedTimestampBeforeCommittedEdit' started at 2026-10-29 12:09:35.007
+Test Case 'PlacesStoreTests.testClockRollbackCannotMoveUpdatedTimestampBeforeCommittedEdit' passed (0.004 seconds)
+Test Case 'PlacesStoreTests.testCorruptSourceAndMalformedOptionalStateRemainUntouchedAndBlockMutations' started at 2026-10-29 12:09:35.011
+Test Case 'PlacesStoreTests.testCorruptSourceAndMalformedOptionalStateRemainUntouchedAndBlockMutations' passed (0.006 seconds)
+Test Case 'PlacesStoreTests.testEditsPreserveUUIDCreationTimestampAndUnknownIconsAndDeleteClearsShortcuts' started at 2026-10-29 12:09:35.017
+Test Case 'PlacesStoreTests.testEditsPreserveUUIDCreationTimestampAndUnknownIconsAndDeleteClearsShortcuts' passed (0.008 seconds)
+Test Case 'PlacesStoreTests.testFailedFilesystemWriteDoesNotPublishUncommittedState' started at 2026-10-29 12:09:35.025
+Test Case 'PlacesStoreTests.testFailedFilesystemWriteDoesNotPublishUncommittedState' passed (0.002 seconds)
+Test Case 'PlacesStoreTests.testInvalidInputsDoNotChangeCommittedFileOrSnapshot' started at 2026-10-29 12:09:35.027
+Test Case 'PlacesStoreTests.testInvalidInputsDoNotChangeCommittedFileOrSnapshot' passed (0.002 seconds)
+Test Case 'PlacesStoreTests.testRecentsDeduplicateByIDOrNearbyNormalizedNameAndRetainTwentyNewest' started at 2026-10-29 12:09:35.029
+Test Case 'PlacesStwarning: '--build-system native' has been deprecated and will be removed in a future release; please report an issue at https://github.com/swiftlang/swift-package-manager/issues if you are unable to adopt the default build system.
+oreTests.testRecentsDeduplicateByIDOrNearbyNormalizedNameAndRetainTwentyNewest' passed (0.055 seconds)
+Test Case 'PlacesStoreTests.testRecentsWithSameIDReplaceDistantEntryButSameNameFarAwayRemainsDistinct' started at 2026-10-29 12:09:35.084
+Test Case 'PlacesStoreTests.testRecentsWithSameIDReplaceDistantEntryButSameNameFarAwayRemainsDistinct' passed (0.005 seconds)
+Test Case 'PlacesStoreTests.testResumePersistsOnlyDestinationAndCanBeCleared' started at 2026-10-29 12:09:35.090
+Test Case 'PlacesStoreTests.testResumePersistsOnlyDestinationAndCanBeCleared' passed (0.004 seconds)
+Test Case 'PlacesStoreTests.testVersionZeroMigrationPreservesIdentityCoordinatesAndUnknownIcon' started at 2026-10-29 12:09:35.094
+Test Case 'PlacesStoreTests.testVersionZeroMigrationPreservesIdentityCoordinatesAndUnknownIcon' passed (0.004 seconds)
+Test Suite 'PlacesStoreTests' passed at 2026-10-29 12:09:35.097
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.09 (0.09) seconds
+Test Suite 'TrafficTests' started at 2026-10-29 12:09:35.097
+Test Case 'TrafficTests.testIncidentRequestUsesHeaderAuthenticationAndSmallLocalBounds' started at 2026-10-29 12:09:35.097
+Test Case 'TrafficTests.testIncidentRequestUsesHeaderAuthenticationAndSmallLocalBounds' passed (0.001 seconds)
+Test Case 'TrafficTests.testIncidentsCannotBePresentedAfterZoomOutExpiryOrClockRollback' started at 2026-10-29 12:09:35.099
+Test Case 'TrafficTests.testIncidentsCannotBePresentedAfterZoomOutExpiryOrClockRollback' passed (0.0 seconds)
+Test Case 'TrafficTests.testOrbisTextCategoriesDecodeAndInvalidGeometryIsRejected' started at 2026-10-29 12:09:35.099
+Test Case 'TrafficTests.testOrbisTextCategoriesDecodeAndInvalidGeometryIsRejected' passed (0.0 seconds)
+Test Case 'TrafficTests.testRefreshPolicyBlocksDisabledUnconfiguredBackgroundAndRepeatedRequests' started at 2026-10-29 12:09:35.099
+Test Case 'TrafficTests.testRefreshPolicyBlocksDisabledUnconfiguredBackgroundAndRepeatedRequests' passed (0.0 seconds)
+Test Suite 'TrafficTests' passed at 2026-10-29 12:09:35.099
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'VehicleInterpolationTests' started at 2026-10-29 12:09:35.099
+Test Case 'VehicleInterpolationTests.testDatelineAndHeadingUseTheShortWay' started at 2026-10-29 12:09:35.099
+Test Case 'VehicleInterpolationTests.testDatelineAndHeadingUseTheShortWay' passed (0.0 seconds)
+Test Case 'VehicleInterpolationTests.testInterpolatesOnlyBetweenObservedFixesAndStopsAtDestination' started at 2026-10-29 12:09:35.099
+Test Case 'VehicleInterpolationTests.testInterpolatesOnlyBetweenObservedFixesAndStopsAtDestination' passed (0.0 seconds)
+Test Case 'VehicleInterpolationTests.testStaleJumpsAndUnknownQualityDoNotAnimate' started at 2026-10-29 12:09:35.099
+Test Case 'VehicleInterpolationTests.testStaleJumpsAndUnknownQualityDoNotAnimate' passed (0.0 seconds)
+Test Suite 'VehicleInterpolationTests' passed at 2026-10-29 12:09:35.100
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'debug.xctest' passed at 2026-10-29 12:09:35.100
+	 Executed 107 tests, with 0 failures (0 unexpected) in 1.139 (1.139) seconds
+Test Suite 'All tests' passed at 2026-10-29 12:09:35.100
+	 Executed 107 tests, with 0 failures (0 unexpected) in 1.139 (1.139) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.4.1 (804dc4530ef3666)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

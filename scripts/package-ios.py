@@ -5,7 +5,7 @@ import json
 import zipfile
 
 root = Path(__file__).resolve().parent.parent
-output = root / "ios" / "artifacts" / "NavSkin-ios-0.7.1-source.zip"
+output = root / "ios" / "artifacts" / "NavSkin-ios-0.8.0-source.zip"
 output.parent.mkdir(parents=True, exist_ok=True)
 excluded_dirs = {".build", ".swiftpm", "DerivedData", "xcuserdata", "artifacts", "__pycache__"}
 files = []
@@ -22,7 +22,7 @@ for name in ["scripts/build-ios.sh", "scripts/check-ios-source.sh", "scripts/che
              "scripts/build-ios-cloud.sh", "scripts/package-ios-unsigned.py",
              ".github/workflows/ios-cloud.yml", "docs/ios-cloud-research.md",
              "docs/ios-platform-research.md", "docs/navigation-provider-decision.md",
-             "docs/world-maps.md", "docs/game-assets-provenance.md",
+             "docs/world-maps.md", "docs/game-assets-provenance.md", "docs/traffic-provider-research.md", "docs/navigation-v0.8.md",
              "tests/test_ios_unsigned_package.py"]:
     files.append(root / name)
 with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:

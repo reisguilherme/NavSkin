@@ -1,12 +1,22 @@
-# Validação NavSkin iOS 0.7.1 · 27/10/2026
+# NavSkin iOS 0.8.0 — validação em 29/10/2026
 
-A correção separa espera pelo primeiro GPS de falha de rota. O estado waitingForLocation só dispara HTTP quando a origem é atual e precisa. A interface mostra espera/progresso; ETA válido mantém apenas tempo, distância e chegada.
+Projeto preparado para Xcode, com recursos locais e versão 0.8.0. Não é um IPA instalável.
 
-- **92 testes SwiftCore passaram**, incluindo origem fraca/antiga, aquisição inicial, cancelamento, retorno ao app, chave ausente/alterada, 401/429/503 e retry concorrente. São fixtures controladas, sem chave pessoal ou consulta real Geoapify.
-- **62 testes Node passaram** para recursos e contratos de empacotamento compartilhados.
-- Foundation ProjectProbe e parser Swift passaram com versão0.7.1, recursos, referências Xcode, aplicativo e testes Apple.
-- A revisão independente conferiu os guards de requests, epoch e reativação da fonte no foreground.
+## Verificações executadas
 
-Não houve build/typecheck com SDK Apple, simulador iOS, IPA ou iPhone. O projeto continua pronto para o [Mac do amigo](../README.md#para-quem-vai-compilar-no-mac). Os resultados de cartografia/UI0.7 e seus limites estão no [relatório anterior](VALIDATION-v0.7.md).
+- **107 testes XCTest do núcleo Swift**, zero falhas, no backend nativo Swift 6.4.1/Linux. Incluem câmera adaptativa, rumo, posições interpoladas, limites e decodificação TomTom e regressões da sessão de navegação. [Log](logs/v0.8/swift-core-tests.txt).
+- Validação Foundation de recursos, estilos, catálogos, referências OpenStep do projeto e XML; parser dos fontes Swift/SwiftUI e testes Apple. [Log](logs/v0.8/source-validation.txt).
+- Revisão independente da API MapLibre 6.31.0 e do código de tráfego/câmera. Corrigidos incidentes após zoom-out, recuperação de falha temporária, callbacks de configuração anterior e geometria de incidentes lineares.
+- Projeto Xcode regenerado com todos os fontes do app. O ZIP inclui as fontes e os ícones originais preparados, sem configuração de assinatura pessoal.
 
-O pacote de fontes/ícones é o mesmo da0.7. A atualização não apaga preferências, salvos ou a chave guardada no Keychain. Hardware GPS e integração de serviços ainda precisam de teste em iPhone; não há voz, trânsito ao vivo ou CarPlay.
+## Comportamento preparado
+
+Rotação por gesto, câmera com rumo/zoom adaptativos e marcador interpolado entre posições realmente recebidas, sem extrapolação. Gestos, visão geral, recentralização, troca de tema e ciclo de vida preservam a propriedade da câmera. Próxima manobra maior e tempo/distância/chegada em três campos.
+
+TomTom opcional com chave separada no Keychain, autenticação por header, fluxo raster e incidentes, limitação de consultas, expiração e cancelamento ao desligar/sair do primeiro plano. A revisão validou compatibilidade dos nomes de APIs com os headers oficiais; não executou MapLibre/URLProtocol no iPhone.
+
+## Ainda depende do Mac e da conta do usuário
+
+Não houve build/typecheck com SDK Apple, execução SwiftUI/Metal/URLProtocol em iPhone, IPA assinado ou consulta TomTom autenticada. Testes Linux e parser não comprovam esses itens. O amigo deve seguir o [README](../README.md#para-quem-vai-compilar-no-mac), compilar e testar a interface/ciclo de vida/trânsito com Xcode antes de distribuir o IPA.
+
+O ETA continua Geoapify sem trânsito ao vivo; não foram adicionados radares, posições de semáforos ou fases verde/vermelho. [Uso e limites](../../docs/navigation-v0.8.md). [Validação anterior](VALIDATION-v0.7.1.md).

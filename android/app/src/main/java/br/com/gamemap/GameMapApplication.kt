@@ -15,6 +15,8 @@ import br.com.gamemap.navigation.provider.GeoapifyProvider
 import br.com.gamemap.navigation.storage.IconCatalogRepository
 import br.com.gamemap.navigation.storage.LocalPlacesStore
 import br.com.gamemap.navigation.storage.NavigationSettings
+import br.com.gamemap.traffic.TrafficTileInterceptor
+import br.com.gamemap.traffic.TrafficTileAuthenticationInterceptor
 
 class GameMapApplication : Application() {
     lateinit var preferences: PreferenceStore
@@ -36,6 +38,7 @@ class GameMapApplication : Application() {
         preferences = PreferenceStore(this)
         maps = MapStyleRepository(this)
         mapConnectivity = MapConnectivity(this)
+        navigationSettings = NavigationSettings(this)
         MapLibre.getInstance(this)
         val gameAssets = GameAssetCatalog.load(this)
         val presentGlyphs = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
@@ -44,8 +47,9 @@ class GameMapApplication : Application() {
         }
         HttpRequestUtil.setOkHttpClient(OkHttpClient.Builder().addInterceptor(
             GameGlyphInterceptor(glyphs) { path -> assets.open(path).use { it.readBytes() } }
-        ).build())
-        navigationSettings = NavigationSettings(this)
+        ).addInterceptor(TrafficTileInterceptor(navigationSettings::trafficApiKey, navigationSettings::trafficEnabled))
+            .addNetworkInterceptor(TrafficTileAuthenticationInterceptor(navigationSettings::trafficApiKey,
+                navigationSettings::trafficEnabled)).build())
         places = LocalPlacesStore(this)
         icons = IconCatalogRepository(this)
         navigation = NavigationRuntime(this, GeoapifyProvider(navigationSettings::apiKey), navigationSettings, places)

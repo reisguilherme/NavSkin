@@ -23,6 +23,7 @@ struct NavSkinView: UIViewRepresentable {
         let map = MLNMapView(frame: .zero, styleJSON: initialJSON)
         map.delegate = context.coordinator
         map.showsUserLocation = false
+        map.isRotateEnabled = true
         let offline = store.baseMapMode == .goianiaOffline
         map.setCenter(CLLocationCoordinate2D(latitude: offline ? -16.6869 : -23.5505, longitude: offline ? -49.2648 : -46.6333), zoomLevel: offline ? 13 : 12, direction: 0, animated: false)
         map.compassView.isHidden = true
@@ -44,6 +45,7 @@ struct NavSkinView: UIViewRepresentable {
 
     static func dismantleUIView(_ map: MLNMapView, coordinator: Coordinator) {
         map.delegate = nil
+        coordinator.detach()
         coordinator.map = nil
     }
 
@@ -57,6 +59,7 @@ struct NavSkinView: UIViewRepresentable {
         var loadedDark = false
         var styleFailure: String?
         private let overlay = NavigationMapOverlay()
+        private let trafficOverlay = TrafficMapOverlay()
         private var ready = false
         private var mode: CameraMode = .follow
         private var sessionID: Int64?
@@ -65,8 +68,8 @@ struct NavSkinView: UIViewRepresentable {
         private var renderedCategories: Set<String>?
         private var pendingCamera: MLNMapCamera?
         private var pendingZoom: Double?
-        private var lastCameraPoint: GeoPoint?
-        private var lastCameraBearing: Double?
+        private var cameraPolicy = NavigationCameraPolicy()
+        private var renderedCamera: NavigationCameraPosition?
         private var lastOrientation: MapOrientation?
         private var reportedFollowing: Bool?
         private var reportedStatus: String?
@@ -75,6 +78,8 @@ struct NavSkinView: UIViewRepresentable {
         private var needsOverview = false
 
         init(store: AppStore) { self.store = store }
+
+        func detach() { overlay.detach(); trafficOverlay.styleLoading() }
 
         func update(store: AppStore, dark: Bool) {
             self.store = store
@@ -87,6 +92,7 @@ struct NavSkinView: UIViewRepresentable {
                     pendingZoom = map.zoomLevel
                     ready = false
                     overlay.styleLoading()
+                    trafficOverlay.styleLoading()
                     loadedTheme = store.theme
                     loadedBaseMapMode = store.baseMapMode
                     loadedDark = dark
@@ -103,13 +109,16 @@ struct NavSkinView: UIViewRepresentable {
                 renderedCategories = store.enabledCategories
             }
             overlay.update(store: store)
+            trafficOverlay.update(store.traffic)
             if let error = overlay.resourceError { reportStatus(error) }
             updateCamera(map)
         }
 
         func mapView(_ mapView: MLNMapView, didFinishLoading style: MLNStyle) {
+            guard mapView.style === style else { return }
             ready = true
             overlay.styleLoaded(style)
+            trafficOverlay.styleLoaded(style)
             if let pendingCamera {
                 mapView.setCamera(pendingCamera, animated: false)
                 if let pendingZoom { mapView.setZoomLevel(pendingZoom, animated: false) }
@@ -118,6 +127,20 @@ struct NavSkinView: UIViewRepresentable {
             }
             reportStatus(styleFailure)
             update(store: store, dark: loadedDark)
+            updateTrafficViewport(mapView)
+        }
+
+        func mapView(_ mapView: MLNMapView, regionDidChangeAnimated animated: Bool) {
+            updateTrafficViewport(mapView)
+        }
+
+        private func updateTrafficViewport(_ map: MLNMapView) {
+            guard ready else { return }
+            let coordinate = map.centerCoordinate
+            let zoom = map.zoomLevel
+            DispatchQueue.main.async { [weak self] in
+                self?.store.traffic.viewport(center: GeoPoint(latitude: coordinate.latitude, longitude: coordinate.longitude), zoom: zoom)
+            }
         }
 
         func mapViewDidFailLoadingMap(_ mapView: MLNMapView, withError error: Error) {
@@ -133,6 +156,7 @@ struct NavSkinView: UIViewRepresentable {
             // A gesture during style loading supersedes the camera captured before the reload.
             pendingCamera = nil
             pendingZoom = nil
+            needsOverview = false
             mode = .manual
             reportFollowing(false)
             return true
@@ -143,6 +167,7 @@ struct NavSkinView: UIViewRepresentable {
         @objc func selectPoint(_ gesture: UILongPressGestureRecognizer) {
             guard gesture.state == .began, let map else { return }
             mode = .manual
+            needsOverview = false
             reportFollowing(false)
             let coordinate = map.convert(gesture.location(in: map), toCoordinateFrom: map)
             let point = GeoPoint(latitude: coordinate.latitude, longitude: coordinate.longitude)
@@ -156,7 +181,9 @@ struct NavSkinView: UIViewRepresentable {
                 sessionID = snapshot.sessionId
                 mode = .follow
                 hasCenteredGPS = false
-                lastCameraPoint = nil
+                needsOverview = false
+                cameraPolicy.reset()
+                renderedCamera = nil
                 reportFollowing(true)
             }
             if let command = store.mapCommand, command.id != commandID {
@@ -165,7 +192,9 @@ struct NavSkinView: UIViewRepresentable {
                 case .recenter:
                     mode = .follow
                     hasCenteredGPS = false
-                    lastCameraPoint = nil
+                    needsOverview = false
+                    cameraPolicy.reset()
+                    renderedCamera = nil
                     reportFollowing(true)
                 case .overview:
                     mode = .overview
@@ -180,6 +209,7 @@ struct NavSkinView: UIViewRepresentable {
                     return
                 case .zoom(let delta):
                     mode = .manual
+                    needsOverview = false
                     reportFollowing(false)
                     map.setZoomLevel(min(20, max(1, map.zoomLevel + delta)), animated: true)
                 }
@@ -198,13 +228,13 @@ struct NavSkinView: UIViewRepresentable {
                 if fitRoute(map) { previewRouteID = route.id }
             }
             if needsOverview, fitRoute(map) { needsOverview = false }
-            guard mode == .follow, snapshot.hasCurrentMapFix, let point = snapshot.mapRenderPosition else { return }
-            let heading = snapshot.mapFollowBearing(store.navigationPreferences.orientation)
-            guard point != lastCameraPoint || heading != lastCameraBearing || lastOrientation != store.navigationPreferences.orientation || !hasCenteredGPS else { return }
-            let zoom = hasCenteredGPS ? map.zoomLevel : 16
-            map.setCenter(point.coordinate, zoomLevel: zoom, direction: heading, animated: false)
-            lastCameraPoint = point
-            lastCameraBearing = heading
+            guard mode == .follow,
+                  let target = cameraPolicy.update(snapshot, orientation: store.navigationPreferences.orientation,
+                                                   fallbackBearing: map.direction),
+                  target != renderedCamera || !hasCenteredGPS else { return }
+            map.setCenter(target.point.coordinate, zoomLevel: target.zoom, direction: target.bearing,
+                          animated: hasCenteredGPS && !UIAccessibility.isReduceMotionEnabled)
+            renderedCamera = target
             lastOrientation = store.navigationPreferences.orientation
             hasCenteredGPS = true
             reportFollowing(true)

@@ -53,9 +53,11 @@ internal fun NavigationSnapshot.vehicleOpacity(): Float = when {
     else -> 1f
 }
 
-internal fun NavigationSnapshot.followBearing(orientation: MapOrientation): Double =
-    if (orientation == MapOrientation.MOVEMENT_UP && hasCurrentFix()) {
-        location.bearingDegrees?.takeIf { it.isFinite() }?.let { ((it % 360.0) + 360.0) % 360.0 } ?: 0.0
+internal fun NavigationSnapshot.followBearing(orientation: MapOrientation, previousBearing: Double = 0.0): Double =
+    if (orientation == MapOrientation.MOVEMENT_UP) {
+        val moving = location.speedKmh?.let { it.isFinite() && it >= 5.0 } == true
+        location.bearingDegrees?.takeIf { hasCurrentFix() && moving && it.isFinite() }
+            ?.let(::normalizeBearing) ?: previousBearing
     } else 0.0
 
 internal fun NavigationSnapshot.surfaceSpeedText(): String {

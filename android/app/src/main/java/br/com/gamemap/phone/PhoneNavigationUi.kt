@@ -30,6 +30,7 @@ import br.com.gamemap.navigation.storage.CatalogIcon
 import br.com.gamemap.navigation.storage.SavedPlace
 import br.com.gamemap.render.NativeMapRenderer
 import br.com.gamemap.preferences.MapBaseMode
+import br.com.gamemap.traffic.TrafficStatus
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.text.SimpleDateFormat
@@ -66,7 +67,7 @@ internal class PhoneNavigationUi(
     private var currentMapNotice: String? = null
     private var lastPreviewId: String? = restoredState?.getString(PREVIEW_STATE)
     private val search = label("Para onde?", 16f, true)
-    private val guidance = label("", 17f, true)
+    private val guidance = GuidanceCard(activity)
     private val summary = LinearLayout(activity).apply { orientation = LinearLayout.VERTICAL }
     private val preparationProgress = ProgressBar(activity).apply {
         isIndeterminate = true
@@ -74,6 +75,19 @@ internal class PhoneNavigationUi(
         contentDescription = "Preparando rota"
     }
     private val metrics = label("", 18f, true).apply { gravity = Gravity.CENTER }
+    private val tripMetrics = TripMetrics(activity)
+    private var lastLayoutKey: List<Int>? = null
+    private var lastTracking: Boolean? = null
+    private var trafficMessage = "Configure uma chave TomTom e ative a camada para consultar o trânsito."
+    private var trafficDetails: TextView? = null
+    private val trafficBadge = label("Trânsito · © TomTom", 10f, true).apply {
+        gravity = Gravity.CENTER
+        maxLines = 2
+        setPadding(dp(8), dp(6), dp(8), dp(6))
+        minimumHeight = dp(48)
+        setOnClickListener { showTraffic() }
+        visibility = View.GONE
+    }
     private val primary = label("", 14f, true)
     private val speedNumber = label("—", 24f, true).apply { gravity = Gravity.CENTER; maxLines = 1 }
     private val speedUnit = label("km/h", 9f).apply { gravity = Gravity.CENTER; maxLines = 1 }
@@ -113,7 +127,6 @@ internal class PhoneNavigationUi(
         search.contentDescription = "Para onde? Buscar destinos"
         search.setOnClickListener { showDestinations() }
         add(search, Gravity.BOTTOM, MATCH, WRAP)
-        guidance.setPadding(dp(16), dp(14), dp(16), dp(14))
         guidance.accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         guidance.visibility = View.GONE
         add(guidance, Gravity.TOP, MATCH, WRAP)
@@ -124,6 +137,7 @@ internal class PhoneNavigationUi(
             gravity = Gravity.CENTER_HORIZONTAL; bottomMargin = dp(6)
         })
         summary.addView(metrics)
+        summary.addView(tripMetrics, LinearLayout.LayoutParams(MATCH, WRAP))
         summary.addView(primary, LinearLayout.LayoutParams(MATCH, dp(48)).apply { topMargin = dp(6) })
         primary.gravity = Gravity.CENTER
         primary.setOnClickListener { primaryAction() }
@@ -133,13 +147,30 @@ internal class PhoneNavigationUi(
         val diameter = dp(maxOf(64, (48 * activity.resources.configuration.fontScale).roundToInt()))
         add(speedBadge, Gravity.BOTTOM or Gravity.START, diameter, diameter)
         add(recenter, Gravity.BOTTOM or Gravity.END, diameter, diameter)
+        add(trafficBadge, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, dp(154), dp(48))
         search.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             if (bottom - top != oldBottom - oldTop) position()
         }
         renderer.setOnMapDestinationListener { point -> showPoint(point) }
         renderer.setOnCameraModeChangedListener { following ->
             recenter.isSelected = following
-            recenter.contentDescription = if (following) "Recentralizar; GPS acompanhando" else "Recentralizar"
+            updateRecenterAppearance()
+        }
+        renderer.setOnTrafficStatusChangedListener { status ->
+            trafficMessage = status.displayText() + status.incidents.take(10).joinToString("", prefix = "") { incident ->
+                "\n\n${incident.kind.label} · ${incident.description.take(220)}"
+            } + if (status.incidents.size > 10) "\n\nMais ${status.incidents.size - 10} ocorrências na área consultada." else ""
+            trafficDetails?.updateText(trafficMessage)
+            trafficBadge.updateText(when (status.state) {
+                TrafficStatus.AUTHENTICATION -> "Verificar chave\n© TomTom"
+                TrafficStatus.RATE_LIMIT -> "Limite de trânsito\n© TomTom"
+                TrafficStatus.OFFLINE -> "Trânsito sem conexão\n© TomTom"
+                TrafficStatus.UNAVAILABLE -> "Trânsito indisponível\n© TomTom"
+                TrafficStatus.LOADING -> "Consultando trânsito\n© TomTom"
+                TrafficStatus.WAITING_ZOOM -> "Aproxime para trânsito\n© TomTom"
+                else -> "Trânsito · © TomTom"
+            })
+            trafficBadge.contentDescription = "Trânsito TomTom. $trafficMessage. Abrir opções de trânsito."
         }
         themeChanged()
     }
@@ -165,13 +196,17 @@ internal class PhoneNavigationUi(
         colors = PhonePalette.forTheme(app.preferences.snapshot().theme)
         search.surface(colors, 28)
         search.compoundDrawableTintList = android.content.res.ColorStateList.valueOf(colors.muted)
-        guidance.surface(colors, 20)
+        guidance.bind(colors)
+        tripMetrics.bind(colors)
         summary.surface(colors, 22)
         speedBadge.surface(colors, 100)
+        trafficBadge.surface(colors, 18)
+        trafficBadge.setTextColor(colors.text)
         recenter.bind(colors)
         recenter.touchSurface(colors.surface, 100)
         recenter.elevation = dp(6).toFloat()
-        listOf(search, guidance, metrics).forEach { it.setTextColor(colors.text) }
+        lastTracking = null
+        listOf(search, metrics).forEach { it.setTextColor(colors.text) }
         speedNumber.setTextColor(colors.text)
         speedUnit.setTextColor(colors.muted)
         preparationProgress.indeterminateTintList = android.content.res.ColorStateList.valueOf(colors.accent)
@@ -191,6 +226,11 @@ internal class PhoneNavigationUi(
     private fun position() {
         val landscape = activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         val viewportWidth = root.width.takeIf { it > 0 } ?: activity.resources.displayMetrics.widthPixels
+        val layoutKey = listOf(viewportWidth, root.height, leftInset, rightInset, topInset, bottomInset,
+            headerBottom, search.height, speedBadge.layoutParams.height, if (landscape) 1 else 0)
+        if (layoutKey == lastLayoutKey) return
+        lastLayoutKey = layoutKey
+        guidance.compact(landscape)
         val availableWidth = viewportWidth - leftInset - rightInset - dp(32)
         val panelWidth = if (landscape) dp(360).coerceAtMost(availableWidth) else availableWidth
         search.layoutParams = (search.layoutParams as FrameLayout.LayoutParams).apply { width = panelWidth; gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL }
@@ -199,8 +239,6 @@ internal class PhoneNavigationUi(
             width = panelWidth
             gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         }
-        guidance.maxLines = if (landscape) 2 else 5
-        guidance.ellipsize = android.text.TextUtils.TruncateAt.END
         val searchHeight = search.height.coerceAtLeast(dp(56))
         val circleBottom = bottomInset + dp(16) + searchHeight + dp(12)
         val circleHeight = speedBadge.layoutParams.height
@@ -216,23 +254,39 @@ internal class PhoneNavigationUi(
         }
         place(speedBadge, bottom = circleBottom)
         place(recenter, bottom = circleBottom)
+        trafficBadge.layoutParams = (trafficBadge.layoutParams as FrameLayout.LayoutParams).apply {
+            gravity = if (landscape) Gravity.TOP or Gravity.END else Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+            width = minOf(dp(154), (availableWidth - 2 * circleHeight - dp(16)).coerceAtLeast(dp(80)))
+        }
+        if (landscape) place(trafficBadge, top = maxOf(headerBottom, topInset + dp(70)) + dp(12))
+        else place(trafficBadge, bottom = circleBottom + (circleHeight - dp(48)) / 2)
     }
     private fun render() {
+        trafficBadge.visibility = if (app.navigationSettings.trafficEnabled()) View.VISIBLE else View.GONE
         renderer.updateNavigation(state, app.navigationSettings.snapshot(), app.places.snapshot().savedPlaces, app.preferences.snapshot().theme)
+        updateRecenterAppearance()
         val visible = state.destination != null || state.resumeDestination != null
         summary.visibility = if (visible) View.VISIBLE else View.GONE
         val speed = state.location.speedKmh?.takeIf { state.location.quality == LocationQuality.GOOD }?.roundToInt()?.let { "$it km/h" } ?: "— km/h"
         val progress = state.progress.takeIf { state.guidanceAvailable }
         val preparing = RoutePreparationUi.forState(state, granted(Manifest.permission.ACCESS_FINE_LOCATION))
         preparationProgress.visibility = if (preparing?.busy == true) View.VISIBLE else View.GONE
-        metrics.text = when {
+        val estimate = when {
+            progress != null -> Triple(progress.remainingSeconds, progress.remainingDistanceMeters, progress.arrivalEpochMs)
+            state.phase == NavigationPhase.PREVIEW && state.route != null -> state.route!!.let {
+                Triple(it.durationSeconds, it.distanceMeters, System.currentTimeMillis() + (it.durationSeconds * 1000).toLong())
+            }
+            else -> null
+        }
+        tripMetrics.visibility = if (estimate != null) View.VISIBLE else View.GONE
+        metrics.visibility = if (estimate == null) View.VISIBLE else View.GONE
+        estimate?.let { tripMetrics.update(duration(it.first), distance(it.second), eta(it.third)) }
+        if (estimate == null) metrics.updateText(when {
             preparing != null -> preparing.message
-            progress != null -> "${duration(progress.remainingSeconds)} · ${distance(progress.remainingDistanceMeters)} · ${eta(progress.arrivalEpochMs)}"
-            state.phase == NavigationPhase.PREVIEW && state.route != null -> "${duration(state.route!!.durationSeconds)} · ${distance(state.route!!.distanceMeters)} · ${eta(System.currentTimeMillis() + (state.route!!.durationSeconds * 1000).toLong())}"
             state.phase == NavigationPhase.ARRIVED -> "Você chegou!"
             state.phase == NavigationPhase.RESUME_AVAILABLE -> "Retomar destino?"
             else -> state.destination?.name ?: "Sua posição"
-        }
+        })
         val quality = when (state.locationAccess) {
             LocationAccess.AVAILABLE -> "GPS ±${state.location.fix?.accuracyMeters?.roundToInt() ?: 0} m"
             LocationAccess.WEAK -> "GPS impreciso"
@@ -243,20 +297,20 @@ internal class PhoneNavigationUi(
             else -> "Aguardando GPS"
         }
         val notice = if (state.simulation) "SIMULAÇÃO · " else ""
-        speedNumber.text = speed.substringBefore(" km/h")
+        speedNumber.updateText(speed.substringBefore(" km/h"))
         speedBadge.contentDescription = "${notice}Velocidade: $speed · $quality"
         guidance.visibility = if (state.navigationActive || state.simulation) View.VISIBLE else View.GONE
         onGuidanceChanged(guidance.visibility == View.VISIBLE)
-        guidance.text = if (progress != null) {
+        if (progress != null) {
             val step = state.route?.steps?.getOrNull(progress.stepIndex)
-            "${distance(progress.distanceToManeuverMeters)}  ${step?.instruction ?: "Siga a rota"}" +
-                (step?.streetName?.takeIf { it.isNotBlank() }?.let { "\n$it" } ?: "")
-        } else when (state.phase) {
+            guidance.update(distance(progress.distanceToManeuverMeters), step?.instruction ?: "Siga a rota",
+                step?.streetName, step?.kind)
+        } else guidance.update(null, when (state.phase) {
             NavigationPhase.RECALCULATING -> "Recalculando rota…"
             NavigationPhase.REROUTE_FAILED -> "Rota indisponível · tente novamente"
             else -> "Aguardando GPS preciso para orientar"
-        }
-        primary.text = when {
+        }, null, null)
+        primary.updateText(when {
             preparing != null -> preparing.action.orEmpty()
             state.phase == NavigationPhase.PREVIEW -> "Iniciar navegação"
             state.phase == NavigationPhase.RESUME_AVAILABLE -> "Retomar e recalcular"
@@ -265,7 +319,7 @@ internal class PhoneNavigationUi(
             state.navigationActive -> "Opções da viagem"
             state.destination != null -> "Ver destino"
             else -> "Seus lugares e opções"
-        }
+        })
         primary.visibility = if (state.navigationActive || preparing != null && preparing.action == null) View.GONE else View.VISIBLE
         summary.isClickable = preparing?.busy != true
         summary.isFocusable = preparing?.busy != true
@@ -273,7 +327,7 @@ internal class PhoneNavigationUi(
             lastPreviewId = state.route?.id
             renderer.showRouteOverview()
         }
-        search.text = if (state.simulation) "SIMULAÇÃO · Para onde?" else "Para onde?"
+        search.updateText(if (state.simulation) "SIMULAÇÃO · Para onde?" else "Para onde?")
         val currentSearch = state.searchResults to state.searchError
         searchStatus?.text = when { state.searching -> "Buscando endereços e estabelecimentos…"
             state.searchError != null -> state.searchError
@@ -289,6 +343,15 @@ internal class PhoneNavigationUi(
             } }
         }
         position()
+    }
+
+    private fun updateRecenterAppearance() {
+        val tracking = renderer.isFollowing && state.location.quality == LocationQuality.GOOD
+        if (lastTracking == tracking) return
+        lastTracking = tracking
+        recenter.bind(colors, filled = tracking)
+        recenter.touchSurface(if (tracking) colors.accent else colors.surface, 100)
+        recenter.contentDescription = if (tracking) "Recentralizar; GPS acompanhando" else "Recentralizar"
     }
 
     private fun primaryAction() = when (state.phase) {
@@ -360,6 +423,7 @@ internal class PhoneNavigationUi(
             dialog?.dismiss(); openMapSettings()
         }
         action(content, if (state.providerConfigured) "Geoapify · chave configurada" else "Configurar chave Geoapify") { showProvider() }
+        action(content, if (app.navigationSettings.trafficEnabled()) "Trânsito TomTom · ativado" else "Trânsito ao vivo · TomTom") { showTraffic() }
         action(content, "Configurações de localização do aparelho") { activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
         if (Build.VERSION.SDK_INT >= 33 && !granted(Manifest.permission.POST_NOTIFICATIONS))
             action(content, "Permitir notificação da navegação") { permission.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS)) }
@@ -506,6 +570,46 @@ internal class PhoneNavigationUi(
         action(content, "Abrir Geoapify") { activity.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://www.geoapify.com/pricing/"))) }
     }
 
+    private fun showTraffic() {
+        val settings = app.navigationSettings
+        val configured = settings.trafficApiKey().isNotBlank()
+        val content = sheet("Trânsito ao vivo", "TomTom · serviço opcional")
+        trafficDetails = label(trafficMessage, 14f).also { content.addView(it) }
+        note(content, "A camada mostra o fluxo das vias e incidentes informados pela TomTom na região visível. Ao ativar, a área do mapa é enviada ao serviço. A chave fica criptografada neste aparelho.")
+        val toggle = Switch(activity).apply {
+            text = "Mostrar trânsito e incidentes"
+            isChecked = settings.trafficEnabled()
+            isEnabled = configured
+            setPadding(0, dp(12), 0, dp(12))
+            setOnCheckedChangeListener { _, checked -> safely { settings.setTrafficEnabled(checked) } }
+        }
+        content.addView(toggle, LinearLayout.LayoutParams(MATCH, WRAP))
+        val key = input(if (configured) "Nova chave TomTom (a atual está salva)" else "Sua chave TomTom").apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+            isSaveEnabled = false
+        }
+        content.addView(key)
+        action(content, "Salvar chave e ativar trânsito") {
+            if (key.text.isNullOrBlank()) { toast("Informe sua chave TomTom."); return@action }
+            safely {
+                settings.setTrafficApiKey(key.text.toString())
+                key.text.clear()
+                settings.setTrafficEnabled(true)
+                showTraffic()
+            }
+        }
+        if (configured) action(content, "Remover chave TomTom") {
+            safely { settings.setTrafficApiKey(""); showTraffic() }
+        }
+        note(content, "Fluxo: verde indica circulação mais livre; amarelo, laranja e vermelho indicam lentidão crescente. Os incidentes podem estar incompletos ou atrasados. A ausência de marcadores não confirma uma via livre.")
+        note(content, "O ETA e o recálculo continuam usando Geoapify, sem trânsito ao vivo. Esta camada não fornece radares nem o estado vermelho/verde dos semáforos.")
+        note(content, "© TomTom. Disponibilidade e limites dependem da sua conta. O NavSkin não contrata plano pago. Desative a opção para interromper as consultas desta camada.")
+        action(content, "Criar ou consultar chave TomTom") {
+            activity.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://developer.tomtom.com/")))
+        }
+    }
+
     private fun showReplay() {
         val content = sheet("SIMULAÇÃO GPS", "Somente desenvolvimento · não é navegação real")
         note(content, "Reproduz um trajeto local fixo para inspecionar orientação, progresso e chegada. Não consulta rotas pela internet. Para validar navegação real, configure a chave e use GPS real.")
@@ -544,7 +648,7 @@ internal class PhoneNavigationUi(
     private fun sheet(title: String, subtitle: String): LinearLayout {
         closeAppearanceSheet()
         dialog?.dismiss()
-        searchResults = null; searchStatus = null
+        searchResults = null; searchStatus = null; trafficDetails = null
         val newDialog = BottomSheetDialog(activity)
         val content = LinearLayout(activity).apply {
             orientation = LinearLayout.VERTICAL
@@ -559,7 +663,7 @@ internal class PhoneNavigationUi(
             contentDescription = "Painel $title"
         }
         newDialog.setContentView(scroll)
-        newDialog.setOnDismissListener { if (dialog === newDialog) { dialog = null; searchStatus = null; searchResults = null } }
+        newDialog.setOnDismissListener { if (dialog === newDialog) { dialog = null; searchStatus = null; searchResults = null; trafficDetails = null } }
         newDialog.setOnShowListener {
             newDialog.window?.decorView?.let { GameTypography.observe(it) { app.preferences.snapshot().theme } }
             newDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let { frame ->

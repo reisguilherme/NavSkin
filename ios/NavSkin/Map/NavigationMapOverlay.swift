@@ -8,21 +8,64 @@ import NavSkinCore
 final class NavigationMapOverlay {
     private(set) var resourceError: String?
     private weak var style: MLNStyle?
-    private var renderedRoute: [GeoPoint]?
-    private var renderedRemaining: [GeoPoint]?
+    private struct RouteKey: Equatable { let id: String; let calculated: Int64; let count: Int }
+    private struct AccuracyKey: Equatable { let point: GeoPoint; let radius: Double }
+    private var renderedRouteKey: RouteKey?
+    private var geometry: [GeoPoint] = []
+    private var geometryIntact = true
+    private var renderedSegment: Int?
+    private var renderedHead: GeoPoint?
+    private var renderedPalette: MapTheme?
+    private var renderedPosition: GeoPoint?
+    private var renderedBearing: Double?
+    private var renderedOpacity: Double?
+    private var renderedAccuracy: AccuracyKey?
     private var renderedSaved: [SavedPlace]?
     private var renderedSavedVisible: Bool?
     private var renderedDestination: GeoPoint?
     private var renderedVehicle: String?
+    private var vehicleTimer: Timer?
+    private var vehicleTarget: GeoPoint?
+    private var vehicleTargetBearing: Double?
+    private var vehicleFixTimestamp: Int64?
+    private var vehicleSession: Int64?
+    private var vehicleAnimationGeneration: UInt64 = 0
+    private var backgroundObserver: NSObjectProtocol?
     private let images = NSCache<NSString, UIImage>()
     private let prefix = "navskin-nav-"
 
-    func styleLoading() { style = nil }
+    init() {
+        backgroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification,
+            object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in self?.stopVehicleAnimation() }
+            }
+    }
+
+    deinit {
+        vehicleTimer?.invalidate()
+        if let backgroundObserver { NotificationCenter.default.removeObserver(backgroundObserver) }
+    }
+
+    func styleLoading() {
+        stopVehicleAnimation()
+        vehicleTarget = nil; vehicleTargetBearing = nil; vehicleFixTimestamp = nil
+        style = nil
+    }
+
+    func detach() { styleLoading() }
+
+    private func stopVehicleAnimation() {
+        vehicleAnimationGeneration &+= 1
+        vehicleTimer?.invalidate(); vehicleTimer = nil
+    }
 
     func styleLoaded(_ style: MLNStyle) {
+        stopVehicleAnimation()
         self.style = style
         resourceError = nil
-        renderedRoute = nil; renderedRemaining = nil; renderedSaved = nil
+        renderedRouteKey = nil; geometry = []; renderedSegment = nil; renderedHead = nil
+        renderedPalette = nil; renderedPosition = nil; renderedBearing = nil; renderedOpacity = nil
+        renderedAccuracy = nil; renderedSaved = nil
         renderedSavedVisible = nil; renderedDestination = nil; renderedVehicle = nil
         install(style)
     }
@@ -31,30 +74,49 @@ final class NavigationMapOverlay {
         guard let style else { return }
         let snapshot = store.snapshot
         let theme = store.theme
-        let palette = routePalette(theme)
-        for id in ["route-casing", "remaining-casing"] {
-            (style.layer(withIdentifier: prefix + id) as? MLNLineStyleLayer)?.lineColor = NSExpression(forConstantValue: palette.casing)
+        if renderedPalette != theme {
+            let palette = routePalette(theme)
+            for id in ["route-casing", "remaining-casing", "remaining-head-casing"] {
+                (style.layer(withIdentifier: prefix + id) as? MLNLineStyleLayer)?.lineColor = NSExpression(forConstantValue: palette.casing)
+            }
+            for id in ["route-line", "remaining-line", "remaining-head-line"] {
+                (style.layer(withIdentifier: prefix + id) as? MLNLineStyleLayer)?.lineColor = NSExpression(forConstantValue: palette.route)
+            }
+            let destinationLayer = style.layer(withIdentifier: prefix + "destination-circle") as? MLNCircleStyleLayer
+            destinationLayer?.circleColor = NSExpression(forConstantValue: palette.route)
+            destinationLayer?.circleStrokeColor = NSExpression(forConstantValue: palette.casing)
+            (style.layer(withIdentifier: prefix + "accuracy-fill") as? MLNFillStyleLayer)?.fillColor = NSExpression(forConstantValue: palette.route)
+            renderedPalette = theme
         }
-        for id in ["route-line", "remaining-line"] {
-            (style.layer(withIdentifier: prefix + id) as? MLNLineStyleLayer)?.lineColor = NSExpression(forConstantValue: palette.route)
+        // Route IDs identify immutable provider results. Filter/build their long geometry once.
+        let routeKey = snapshot.route.map { RouteKey(id: $0.id, calculated: $0.calculatedAtMs, count: $0.geometry.count) }
+        if renderedRouteKey != routeKey {
+            let requested = snapshot.route?.geometry ?? []
+            geometry = requested.filter(\.isValidMapPoint)
+            geometryIntact = geometry.count == requested.count
+            source("route")?.shape = line(geometry)
+            renderedRouteKey = routeKey
+            renderedSegment = nil
+            renderedHead = nil
         }
-        let destinationLayer = style.layer(withIdentifier: prefix + "destination-circle") as? MLNCircleStyleLayer
-        destinationLayer?.circleColor = NSExpression(forConstantValue: palette.route)
-        destinationLayer?.circleStrokeColor = NSExpression(forConstantValue: palette.casing)
-        (style.layer(withIdentifier: prefix + "accuracy-fill") as? MLNFillStyleLayer)?.fillColor = NSExpression(forConstantValue: palette.route)
-
-        let requestedGeometry = snapshot.route?.geometry ?? []
-        let geometry = requestedGeometry.filter(\.isValidMapPoint)
-        if renderedRoute != geometry { source("route")?.shape = line(geometry); renderedRoute = geometry }
         let progress = snapshot.progress.flatMap { value -> RouteProgress? in
-            guard requestedGeometry.count == geometry.count,
+            guard geometryIntact,
                   snapshot.hasCurrentMapFix, snapshot.location.quality == .good, value.onRoute,
                   value.routeId == snapshot.route?.id, value.segmentIndex >= 0,
                   value.segmentIndex < geometry.count - 1, value.projectedPoint.isValidMapPoint else { return nil }
             return value
         }
-        let remaining = progress.map { [$0.projectedPoint] + Array(geometry.dropFirst($0.segmentIndex + 1)) } ?? geometry
-        if renderedRemaining != remaining { source("remaining")?.shape = line(remaining); renderedRemaining = remaining }
+        let segment = progress?.segmentIndex ?? -1
+        if renderedSegment != segment {
+            source("remaining")?.shape = line(segment >= 0 ? Array(geometry.dropFirst(segment + 1)) : geometry)
+            renderedSegment = segment
+            renderedHead = nil
+            source("remaining-head")?.shape = nil
+        }
+        if let progress, renderedHead != progress.projectedPoint {
+            source("remaining-head")?.shape = line([progress.projectedPoint, geometry[progress.segmentIndex + 1]])
+            renderedHead = progress.projectedPoint
+        }
         let destination = (snapshot.destination ?? snapshot.route?.destination)?.point
         let validDestination = destination.flatMap { $0.isValidMapPoint ? $0 : nil }
         if renderedDestination != validDestination {
@@ -86,18 +148,79 @@ final class NavigationMapOverlay {
                 renderedVehicle = name
             }
         }
-        source("vehicle")?.shape = point(snapshot.mapRenderPosition)
+        updateVehicle(snapshot)
         let vehicleLayer = style.layer(withIdentifier: prefix + "vehicle-symbol") as? MLNSymbolStyleLayer
-        vehicleLayer?.iconRotation = NSExpression(forConstantValue: snapshot.location.bearingDegrees.flatMap { $0.isFinite ? $0 : nil } ?? 0)
-        vehicleLayer?.iconOpacity = NSExpression(forConstantValue: snapshot.mapVehicleOpacity)
+        if renderedOpacity != snapshot.mapVehicleOpacity {
+            vehicleLayer?.iconOpacity = NSExpression(forConstantValue: snapshot.mapVehicleOpacity)
+            renderedOpacity = snapshot.mapVehicleOpacity
+        }
+        let accuracy: AccuracyKey?
         if snapshot.hasCurrentMapFix, let fix = snapshot.location.fix,
            fix.accuracyMeters.isFinite, fix.accuracyMeters > 0, fix.accuracyMeters <= 2_000 {
-            source("accuracy")?.shape = accuracyCircle(center: fix.point, radius: fix.accuracyMeters)
-        } else { source("accuracy")?.shape = nil }
+            accuracy = AccuracyKey(point: fix.point, radius: fix.accuracyMeters)
+        } else { accuracy = nil }
+        if renderedAccuracy != accuracy {
+            source("accuracy")?.shape = accuracy.map { accuracyCircle(center: $0.point, radius: $0.radius) }
+            renderedAccuracy = accuracy
+        }
+    }
+
+    private func updateVehicle(_ snapshot: NavigationSnapshot) {
+        let destination = snapshot.mapRenderPosition
+        let bearing = snapshot.location.bearingDegrees.flatMap { $0.isFinite ? GeoMath.normalizeBearing($0) : nil } ?? renderedBearing ?? 0
+        let timestamp = snapshot.location.fix?.elapsedRealtimeMs
+        let reliable = snapshot.hasCurrentMapFix && snapshot.location.quality == .good &&
+            UIApplication.shared.applicationState == .active && !UIAccessibility.isReduceMotionEnabled
+        let sessionChanged = vehicleSession != snapshot.sessionId
+        if !reliable || sessionChanged { stopVehicleAnimation() }
+        let previousTimestamp = vehicleFixTimestamp
+        vehicleFixTimestamp = timestamp
+        vehicleSession = snapshot.sessionId
+        guard sessionChanged || vehicleTarget != destination || vehicleTargetBearing != bearing else {
+            // An interrupted transition must finish at the last observed fix, never beyond it.
+            if vehicleTimer == nil { renderVehicle(destination, bearing: bearing) }
+            return
+        }
+        vehicleTarget = destination
+        vehicleTargetBearing = bearing
+        stopVehicleAnimation()
+        guard let destination, let start = renderedPosition else { renderVehicle(destination, bearing: bearing); return }
+        let interval = timestamp.flatMap { timestamp in previousTimestamp.map { Double(timestamp) - Double($0) } } ?? 0
+        let duration = VehicleInterpolation.duration(fixIntervalMs: interval,
+            distanceMeters: GeoMath.distanceMeters(start, destination), reliable: reliable && !sessionChanged)
+        guard duration > 0 else { renderVehicle(destination, bearing: bearing); return }
+        let startBearing = renderedBearing ?? bearing
+        let startTime = ProcessInfo.processInfo.systemUptime
+        let expectedGeneration = vehicleAnimationGeneration
+        let timer = Timer(timeInterval: 1.0 / 30, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.vehicleAnimationGeneration == expectedGeneration else { return }
+                guard self.style != nil, UIApplication.shared.applicationState == .active else { self.stopVehicleAnimation(); return }
+                let progress = min(1, max(0, (ProcessInfo.processInfo.systemUptime - startTime) / duration))
+                let eased = progress * progress * (3 - 2 * progress)
+                self.renderVehicle(VehicleInterpolation.position(from: start, to: destination, fraction: eased),
+                    bearing: VehicleInterpolation.bearing(from: startBearing, to: bearing, fraction: eased))
+                if progress >= 1 { self.stopVehicleAnimation() }
+            }
+        }
+        timer.tolerance = 0.006
+        vehicleTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
+    private func renderVehicle(_ position: GeoPoint?, bearing: Double) {
+        if renderedPosition != position {
+            source("vehicle")?.shape = point(position)
+            renderedPosition = position
+        }
+        if renderedBearing != bearing {
+            (style?.layer(withIdentifier: prefix + "vehicle-symbol") as? MLNSymbolStyleLayer)?.iconRotation = NSExpression(forConstantValue: bearing)
+            renderedBearing = bearing
+        }
     }
 
     private func install(_ style: MLNStyle) {
-        for id in ["accuracy", "route", "remaining", "saved", "destination", "vehicle"] {
+        for id in ["accuracy", "route", "remaining", "remaining-head", "saved", "destination", "vehicle"] {
             style.addSource(MLNShapeSource(identifier: prefix + id, shape: nil, options: nil))
         }
         let accuracy = MLNFillStyleLayer(identifier: prefix + "accuracy-fill", source: source("accuracy")!)
@@ -106,7 +229,9 @@ final class NavigationMapOverlay {
         addLine(style, id: "route-casing", source: "route", width: 10, opacity: 0.5)
         addLine(style, id: "route-line", source: "route", width: 6, opacity: 0.4)
         addLine(style, id: "remaining-casing", source: "remaining", width: 10, opacity: 0.95)
+        addLine(style, id: "remaining-head-casing", source: "remaining-head", width: 10, opacity: 0.95)
         addLine(style, id: "remaining-line", source: "remaining", width: 6, opacity: 1)
+        addLine(style, id: "remaining-head-line", source: "remaining-head", width: 6, opacity: 1)
         let saved = MLNSymbolStyleLayer(identifier: prefix + "saved-symbol", source: source("saved")!)
         saved.iconImageName = NSExpression(forKeyPath: "image")
         saved.iconAllowsOverlap = NSExpression(forConstantValue: true)
@@ -191,32 +316,5 @@ final class NavigationMapOverlay {
 }
 
 extension GeoPoint {
-    var isValidMapPoint: Bool { GeoMath.isValid(self) && (-85.051129...85.051129).contains(latitude) }
     var coordinate: CLLocationCoordinate2D { CLLocationCoordinate2D(latitude: latitude, longitude: longitude) }
-}
-
-extension NavigationSnapshot {
-    var hasCurrentMapFix: Bool {
-        location.fix?.point.isValidMapPoint == true &&
-            (location.quality == .good || location.quality == .weak) && location.ageMs <= 5_000
-    }
-    var mapRenderPosition: GeoPoint? {
-        guard let actual = location.fix?.point, actual.isValidMapPoint else { return nil }
-        if navigationActive, hasCurrentMapFix, location.quality == .good, let progress,
-           progress.routeId == route?.id, progress.onRoute, progress.projectedPoint.isValidMapPoint {
-            return progress.projectedPoint
-        }
-        return actual
-    }
-    var mapVehicleOpacity: Double {
-        if location.fix == nil || location.quality == .unavailable { return 0 }
-        if location.quality == .lost || location.ageMs > 15_000 { return 0.35 }
-        if location.quality == .weak || location.ageMs > 5_000 { return 0.65 }
-        return 1
-    }
-    func mapFollowBearing(_ orientation: MapOrientation) -> Double {
-        guard orientation == .movementUp, hasCurrentMapFix,
-              let bearing = location.bearingDegrees, bearing.isFinite else { return 0 }
-        return GeoMath.normalizeBearing(bearing)
-    }
 }

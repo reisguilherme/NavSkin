@@ -175,12 +175,14 @@ class NativeMvpRenderingTest {
                 }
                 // These actual native frames are also the phone carousel's source previews.
                 capture.awaitAndSave("native-v3-${theme.assetName}.png")
+                var beforePan: CameraPosition? = null
                 instrumentation.runOnMainSync {
                     // The following transitions must preserve a camera moved by the user.
                     renderer!!.zoomBy(.5)
+                    beforePan = renderer!!.cameraState
                     renderer!!.panBy(40f, -20f)
-                    camera = renderer!!.cameraState
                 }
+                camera = awaitSurfaceCameraMovement(renderer!!, beforePan!!)
                 capture.expect(Palette.forTheme(theme, night = true))
                 instrumentation.runOnMainSync {
                     renderer!!.applyStyle(repository.styleFor(MapPreferences(theme, emptySet(), MapBaseMode.GOIANIA_OFFLINE), true))
@@ -194,6 +196,21 @@ class NativeMvpRenderingTest {
             instrumentation.runOnMainSync { renderer?.close() }
             capture.close()
         }
+    }
+
+    private fun awaitSurfaceCameraMovement(renderer: CarSurfaceRenderer, before: CameraPosition): CameraPosition {
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+        while (System.nanoTime() < deadline) {
+            var current: CameraPosition? = null
+            instrumentation.runOnMainSync { current = renderer.cameraState }
+            val camera = checkNotNull(current)
+            // Native scrollBy updates its transform before the Java camera cache receives
+            // the rendering callback. Capture the completed pan, not the old cached target.
+            if (abs(camera.target!!.latitude - before.target!!.latitude) > 0.000001 ||
+                abs(camera.target!!.longitude - before.target!!.longitude) > 0.000001) return camera
+            Thread.sleep(25L)
+        }
+        throw AssertionError("Native pan did not update the surface camera")
     }
 
     private fun awaitSurfaceStyle(renderer: CarSurfaceRenderer, enabled: Set<PoiCategory>, after: Int): Int {
@@ -555,6 +572,12 @@ class NativeMvpRenderingTest {
         val preferences = (context.applicationContext as GameMapApplication).preferences
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
         while (preferences.snapshot().enabledCategories != expected && System.nanoTime() < deadline) Thread.sleep(50)
+        if (preferences.snapshot().enabledCategories != expected) {
+            val device = UiDevice.getInstance(instrumentation)
+            val failureRoot = context.getExternalFilesDir(null)!!
+            device.takeScreenshot(java.io.File(failureRoot, "filter-persistence-failure.png"))
+            device.dumpWindowHierarchy(java.io.File(failureRoot, "filter-persistence-failure.xml"))
+        }
         assertEquals("Filter selection was not persisted", expected, preferences.snapshot().enabledCategories)
     }
 

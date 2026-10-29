@@ -41,6 +41,26 @@ class NavigationSettings(
         check(editor.commit()) { "Não foi possível salvar a configuração do serviço" }
     }
 
+    /** Traffic has its own credential and is opt-in, independently of route search. */
+    fun trafficApiKey(): String {
+        val ciphertext = storage.getString(TRAFFIC_CIPHERTEXT, null) ?: return ""
+        return try { keyVault.decrypt(ciphertext) } catch (_: Exception) { "" }
+    }
+
+    fun trafficEnabled(): Boolean = storage.getBoolean(TRAFFIC_ENABLED, false) && trafficApiKey().isNotBlank()
+
+    fun setTrafficApiKey(value: String) {
+        val key = value.trim()
+        require(key.length <= 512 && key.all { it.code in 33..126 }) { "Chave de trânsito inválida" }
+        val editor = storage.edit()
+        if (key.isEmpty()) editor.remove(TRAFFIC_CIPHERTEXT).putBoolean(TRAFFIC_ENABLED, false)
+        else editor.putString(TRAFFIC_CIPHERTEXT, keyVault.encrypt(key))
+        commit(editor)
+    }
+
+    fun setTrafficEnabled(enabled: Boolean) = commit(storage.edit()
+        .putBoolean(TRAFFIC_ENABLED, enabled && trafficApiKey().isNotBlank()))
+
     fun setVehicleId(id: String) {
         require(id.isNotBlank()) { "Escolha um marcador de veículo" }
         commit(storage.edit().putString(VEHICLE_ID, id))
@@ -71,5 +91,7 @@ class NavigationSettings(
         private const val SAVED_VISIBLE = "saved_places_visible"
         private const val ORIENTATION = "orientation"
         private const val API_CIPHERTEXT = "provider_api_ciphertext"
+        private const val TRAFFIC_CIPHERTEXT = "traffic_api_ciphertext"
+        private const val TRAFFIC_ENABLED = "traffic_enabled"
     }
 }

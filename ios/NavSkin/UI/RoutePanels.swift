@@ -17,8 +17,18 @@ struct CompactRouteSummary: View {
                 ProgressView().accessibilityLabel("Aguardando rota")
             }
             Button(action: openDetails) {
-                Text(summary).gameFont(.subheadline, weight: .bold).lineLimit(2).monospacedDigit()
-                .multilineTextAlignment(.center)
+                Group {
+                    if let metrics {
+                        HStack(spacing: 6) {
+                            summaryMetric(metrics.duration, label: "restantes", prominent: true)
+                            summaryMetric(metrics.distance, label: "distância")
+                            summaryMetric(metrics.arrival, label: "chegada")
+                        }
+                    } else {
+                        Text(summary).gameFont(.subheadline, weight: .bold).lineLimit(2).monospacedDigit()
+                            .multilineTextAlignment(.center)
+                    }
+                }
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
                 .contentShape(Rectangle())
             }
@@ -34,6 +44,29 @@ struct CompactRouteSummary: View {
         .foregroundStyle(palette.text).padding(.horizontal, 14).padding(.vertical, 6)
         .background(palette.surface, in: RoundedRectangle(cornerRadius: 18))
         .overlay(RoundedRectangle(cornerRadius: 18).stroke(palette.border, lineWidth: 1))
+    }
+
+    private var metrics: (duration: String, distance: String, arrival: String)? {
+        let snapshot = store.snapshot
+        if snapshot.guidanceAvailable, let progress = snapshot.progress {
+            return (NavSkinFormat.duration(progress.remainingSeconds), NavSkinFormat.distance(progress.remainingDistanceMeters),
+                    NavSkinFormat.arrival(progress.arrivalEpochMs))
+        }
+        if snapshot.phase == .preview, let route = snapshot.route {
+            let arrival = Int64((Date().timeIntervalSince1970 + route.durationSeconds) * 1_000)
+            return (NavSkinFormat.duration(route.durationSeconds), NavSkinFormat.distance(route.distanceMeters), NavSkinFormat.arrival(arrival))
+        }
+        return nil
+    }
+
+    private func summaryMetric(_ value: String, label: String, prominent: Bool = false) -> some View {
+        VStack(spacing: 1) {
+            Text(value).gameFont(prominent ? .title3 : .subheadline, weight: .bold)
+                .foregroundStyle(prominent ? palette.accent : palette.text)
+                .lineLimit(1).minimumScaleFactor(0.75).monospacedDigit()
+            Text(label).gameFont(.caption2).foregroundStyle(palette.muted).lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var title: String {
@@ -73,9 +106,13 @@ struct GuidanceCard: View {
                let route = store.snapshot.route, route.steps.indices.contains(progress.stepIndex) {
                 let step = route.steps[progress.stepIndex]
                 Image(systemName: NavSkinFormat.maneuverSymbol(step.kind))
-                    .font(.system(size: 32, weight: .bold)).frame(width: 48)
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(NavSkinFormat.distance(progress.distanceToManeuverMeters)).gameFont(.title2, weight: .bold)
+                    .font(.system(size: 38, weight: .bold)).frame(width: 62, height: 68)
+                    .foregroundStyle(palette.accent)
+                    .background(palette.soft, in: RoundedRectangle(cornerRadius: 16))
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(NavSkinFormat.distance(progress.distanceToManeuverMeters))
+                        .gameFont(.largeTitle, weight: .bold).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
                     Text(step.instruction).gameFont(.headline).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                     if !step.streetName.isEmpty { Text(step.streetName).gameFont(.subheadline).foregroundStyle(palette.muted).lineLimit(1) }
                 }

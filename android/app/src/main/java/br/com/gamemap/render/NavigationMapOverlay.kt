@@ -1,13 +1,16 @@
 package br.com.gamemap.render
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.LruCache
+import android.os.SystemClock
+import android.view.animation.AccelerateDecelerateInterpolator
+import br.com.gamemap.navigation.MapOrientation
 import br.com.gamemap.navigation.NavigationPreferences
 import br.com.gamemap.navigation.NavigationSnapshot
 import br.com.gamemap.navigation.model.GeoPoint
-import br.com.gamemap.navigation.model.LocationQuality
 import br.com.gamemap.navigation.storage.IconCatalogRepository
 import br.com.gamemap.navigation.storage.SavedPlace
 import br.com.gamemap.preferences.MapTheme
@@ -39,26 +42,59 @@ internal class NavigationMapOverlay(context: Context) {
     private var preferences = NavigationPreferences()
     private var savedPlaces = emptyList<SavedPlace>()
     private var theme = MapTheme.GTA_SA
+    private val routeLines = NavigationRouteLineState()
     private var routeGeometry: List<GeoPoint>? = null
-    private var observedRouteGeometry: List<GeoPoint>? = null
     private var remainingGeometry: List<GeoPoint>? = null
+    private var headGeometry: List<GeoPoint>? = null
     private var renderedSaved: List<SavedPlace>? = null
     private var renderedSavedVisible: Boolean? = null
     private var renderedTheme: MapTheme? = null
     private var vehicleImage: String? = null
+    private var renderedVehicleId: String? = null
+    private var vehiclePoint: GeoPoint? = null
+    private var vehicleBearing: Double? = null
+    private var vehicleAlpha: Float? = null
+    private var vehicleTarget: GeoPoint? = null
+    private var targetHeading: Double? = null
+    private var lastVehicleFixTime: Long? = null
+    private var lastObservedBearing = 0.0
+    private var vehicleAnimator: ValueAnimator? = null
+    private var active = false
+    private var accuracyKey: Pair<GeoPoint, Double>? = null
     private var destinationPoint: GeoPoint? = null
 
-    fun styleLoading() { style = null }
+    fun styleLoading() {
+        vehicleAnimator?.cancel()
+        vehicleAnimator = null
+        style = null
+    }
+
+    fun setActive(value: Boolean) {
+        active = value
+        if (!value) {
+            vehicleAnimator?.cancel()
+            vehicleAnimator = null
+            setVehicleFrame(vehicleTarget, targetHeading ?: lastObservedBearing)
+        }
+    }
 
     fun styleLoaded(loaded: Style) {
         style = loaded
         routeGeometry = null
-        observedRouteGeometry = null
         remainingGeometry = null
+        headGeometry = null
         renderedSaved = null
         renderedSavedVisible = null
         renderedTheme = null
         vehicleImage = null
+        renderedVehicleId = null
+        vehiclePoint = null
+        vehicleBearing = null
+        vehicleAlpha = null
+        vehicleTarget = null
+        targetHeading = null
+        lastVehicleFixTime = null
+        accuracyKey = null
         destinationPoint = null
         if (snapshot != null) installAndRender()
     }
@@ -79,31 +115,29 @@ internal class NavigationMapOverlay(context: Context) {
             val palette = palette(theme)
             loaded.getLayer(ROUTE_CASING)?.setProperties(lineColor(palette.casing))
             loaded.getLayer(REMAINING_CASING)?.setProperties(lineColor(palette.casing))
+            loaded.getLayer(HEAD_CASING)?.setProperties(lineColor(palette.casing))
             loaded.getLayer(ROUTE_LAYER)?.setProperties(lineColor(palette.route))
             loaded.getLayer(REMAINING_LAYER)?.setProperties(lineColor(palette.route))
+            loaded.getLayer(HEAD_LAYER)?.setProperties(lineColor(palette.route))
             loaded.getLayer(DESTINATION_LAYER)?.setProperties(circleColor(palette.route), circleStrokeColor(palette.casing))
             loaded.getLayer(ACCURACY_LAYER)?.setProperties(fillColor(palette.route))
         }
 
-        val requestedGeometry = state.route?.geometry ?: emptyList()
-        val geometry = if (requestedGeometry === observedRouteGeometry) routeGeometry ?: emptyList() else
-            requestedGeometry.takeIf { points -> points.all { it.isValidMapPoint() } }
-                ?: requestedGeometry.filter { it.isValidMapPoint() }
+        routeLines.update(state)
+        val geometry = routeLines.route
         if (routeGeometry != geometry) {
             source(ROUTE_SOURCE)?.setGeoJson(line(geometry))
             routeGeometry = geometry
         }
-        observedRouteGeometry = requestedGeometry
-        val progress = state.progress?.takeIf {
-            state.hasCurrentFix() && state.location.quality == LocationQuality.GOOD && it.onRoute &&
-                it.routeId == state.route?.id && it.segmentIndex in 0 until geometry.lastIndex &&
-                it.projectedPoint.isValidMapPoint()
-        }
-        val remaining = if (progress == null) geometry else
-            listOf(progress.projectedPoint) + geometry.drop(progress.segmentIndex + 1)
+        val remaining = routeLines.remaining
         if (remainingGeometry != remaining) {
             source(REMAINING_SOURCE)?.setGeoJson(line(remaining))
             remainingGeometry = remaining
+        }
+        val head = routeLines.head
+        if (headGeometry != head) {
+            source(HEAD_SOURCE)?.setGeoJson(line(head))
+            headGeometry = head
         }
 
         val destination = (state.destination ?: state.route?.destination)?.point?.takeIf { it.isValidMapPoint() }
@@ -124,32 +158,92 @@ internal class NavigationMapOverlay(context: Context) {
                 }
             }
             source(SAVED_SOURCE)?.setGeoJson(FeatureCollection.fromFeatures(features))
-            renderedSaved = savedPlaces.toList()
+            renderedSaved = savedPlaces
             renderedSavedVisible = preferences.savedPlacesVisible
         }
 
-        val image = catalog.vehicleIcon(preferences.vehicleId, theme).image
-        if (vehicleImage != image) {
-            ensureImage(loaded, image)
-            loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconImage(image))
-            vehicleImage = image
+        if (renderedVehicleId != preferences.vehicleId || renderedTheme != theme) {
+            val image = catalog.vehicleIcon(preferences.vehicleId, theme).image
+            if (vehicleImage != image) {
+                ensureImage(loaded, image)
+                loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconImage(image))
+                vehicleImage = image
+            }
+            renderedVehicleId = preferences.vehicleId
         }
         val vehicle = state.renderPosition()
-        source(VEHICLE_SOURCE)?.setGeoJson(point(vehicle))
-        loaded.getLayer(VEHICLE_LAYER)?.setProperties(
-            iconRotate((state.location.bearingDegrees?.takeIf { it.isFinite() } ?: 0.0).toFloat()),
-            iconOpacity(state.vehicleOpacity()),
-        )
+        val heading = state.followBearing(MapOrientation.MOVEMENT_UP, lastObservedBearing)
+        lastObservedBearing = heading
+        renderVehicle(state, vehicle, heading)
+        val alpha = state.vehicleOpacity()
+        if (vehicleAlpha != alpha) {
+            loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconOpacity(alpha))
+            vehicleAlpha = alpha
+        }
         // The uncertainty ring is centered on the measured fix, never the snapped route point.
         val fix = state.location.fix
         val accuracy = fix?.accuracyMeters?.takeIf { it.isFinite() && it > 0.0 && it <= 2_000.0 }
-        source(ACCURACY_SOURCE)?.setGeoJson(if (state.hasCurrentFix() && fix != null && accuracy != null)
-            accuracyCircle(fix.point, accuracy) else EMPTY)
+        val accuracyInput = if (state.hasCurrentFix() && fix != null && accuracy != null) fix.point to accuracy else null
+        if (accuracyInput != accuracyKey) {
+            source(ACCURACY_SOURCE)?.setGeoJson(accuracyInput?.let { accuracyCircle(it.first, it.second) } ?: EMPTY)
+            accuracyKey = accuracyInput
+        }
         renderedTheme = theme
     }
 
+    private fun renderVehicle(state: NavigationSnapshot, target: GeoPoint?, heading: Double) {
+        val fixTime = state.location.fix?.elapsedRealtimeMs
+        val elapsed = fixTime?.let { now -> lastVehicleFixTime?.let { now - it } }
+        lastVehicleFixTime = fixTime
+        if (!state.hasCurrentFix() || !active) {
+            vehicleAnimator?.cancel()
+            vehicleAnimator = null
+            vehicleTarget = target
+            targetHeading = heading
+            setVehicleFrame(target, heading)
+            return
+        }
+        // ETA/status ticks do not restart animation, even while a transition is in flight.
+        if (vehicleTarget == target && targetHeading == heading) return
+        vehicleAnimator?.cancel()
+        vehicleAnimator = null
+        vehicleTarget = target
+        targetHeading = heading
+        val from = vehiclePoint
+        if (from == null || target == null || elapsed == null || elapsed !in 1..5_000) {
+            setVehicleFrame(target, heading)
+            return
+        }
+        val transition = ObservedVehicleTransition(from, target, vehicleBearing ?: heading, heading)
+        var lastFrameAt = 0L
+        vehicleAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = (elapsed * 0.85).toLong().coerceIn(200L, 1_000L)
+            interpolator = AccelerateDecelerateInterpolator()
+            addUpdateListener { animator ->
+                val fraction = (animator.animatedValue as Float).toDouble()
+                val now = SystemClock.uptimeMillis()
+                if (fraction < 1.0 && now - lastFrameAt < 32L) return@addUpdateListener
+                lastFrameAt = now
+                val frame = transition.sample(fraction)
+                setVehicleFrame(frame.point, frame.bearing)
+            }
+            start()
+        }
+    }
+
+    private fun setVehicleFrame(position: GeoPoint?, heading: Double) {
+        if (vehiclePoint != position) {
+            source(VEHICLE_SOURCE)?.setGeoJson(point(position))
+            vehiclePoint = position
+        }
+        if (vehicleBearing != heading) {
+            style?.getLayer(VEHICLE_LAYER)?.setProperties(iconRotate(heading.toFloat()))
+            vehicleBearing = heading
+        }
+    }
+
     private fun install(loaded: Style) {
-        for (id in listOf(ACCURACY_SOURCE, ROUTE_SOURCE, REMAINING_SOURCE, SAVED_SOURCE, DESTINATION_SOURCE, VEHICLE_SOURCE)) {
+        for (id in listOf(ACCURACY_SOURCE, ROUTE_SOURCE, REMAINING_SOURCE, HEAD_SOURCE, SAVED_SOURCE, DESTINATION_SOURCE, VEHICLE_SOURCE)) {
             loaded.addSource(GeoJsonSource(id, EMPTY))
         }
         loaded.addLayer(FillLayer(ACCURACY_LAYER, ACCURACY_SOURCE).withProperties(fillOpacity(0.12f)))
@@ -162,7 +256,13 @@ internal class NavigationMapOverlay(context: Context) {
         loaded.addLayer(LineLayer(REMAINING_CASING, REMAINING_SOURCE).withProperties(
             lineCap("round"), lineJoin("round"), lineWidth(10f), lineOpacity(0.95f),
         ))
+        loaded.addLayer(LineLayer(HEAD_CASING, HEAD_SOURCE).withProperties(
+            lineCap("round"), lineJoin("round"), lineWidth(10f), lineOpacity(0.95f),
+        ))
         loaded.addLayer(LineLayer(REMAINING_LAYER, REMAINING_SOURCE).withProperties(
+            lineCap("round"), lineJoin("round"), lineWidth(6f), lineOpacity(1f),
+        ))
+        loaded.addLayer(LineLayer(HEAD_LAYER, HEAD_SOURCE).withProperties(
             lineCap("round"), lineJoin("round"), lineWidth(6f), lineOpacity(1f),
         ))
         loaded.addLayer(SymbolLayer(SAVED_LAYER, SAVED_SOURCE).withProperties(
@@ -225,14 +325,17 @@ internal class NavigationMapOverlay(context: Context) {
     companion object {
         internal const val ROUTE_SOURCE = "gamemap-nav-route"
         internal const val REMAINING_SOURCE = "gamemap-nav-remaining"
+        internal const val HEAD_SOURCE = "gamemap-nav-head"
         internal const val SAVED_SOURCE = "gamemap-nav-saved"
         internal const val DESTINATION_SOURCE = "gamemap-nav-destination"
         internal const val VEHICLE_SOURCE = "gamemap-nav-vehicle"
         internal const val ACCURACY_SOURCE = "gamemap-nav-accuracy"
         internal const val ROUTE_LAYER = "gamemap-nav-route-line"
         internal const val REMAINING_LAYER = "gamemap-nav-remaining-line"
+        internal const val HEAD_LAYER = "gamemap-nav-head-line"
         internal const val ROUTE_CASING = "gamemap-nav-route-casing"
         internal const val REMAINING_CASING = "gamemap-nav-remaining-casing"
+        internal const val HEAD_CASING = "gamemap-nav-head-casing"
         internal const val SAVED_LAYER = "gamemap-nav-saved-symbol"
         internal const val DESTINATION_LAYER = "gamemap-nav-destination-circle"
         internal const val VEHICLE_LAYER = "gamemap-nav-vehicle-symbol"

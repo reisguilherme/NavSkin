@@ -8,6 +8,7 @@ struct APIKeySheet: View {
     @State private var key = ""
     @State private var saved = false
     @State private var removing = false
+    @State private var trafficKey = ""
     @FocusState private var focused: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -32,6 +33,38 @@ struct APIKeySheet: View {
                     }
                     Link("Gerenciar chave na Geoapify", destination: URL(string: "https://myprojects.geoapify.com/")!)
                 } header: { Text("Busca e rotas online") }
+                Section("Trânsito opcional · TomTom") {
+                    Toggle("Mostrar fluxo e incidentes", isOn: Binding(
+                        get: { store.traffic.enabled }, set: { store.traffic.setEnabled($0) }))
+                    Text("A chave TomTom fica no Keychain deste iPhone e é enviada somente à TomTom. Sem chave ou com a camada desligada, não há consultas. O uso consome a cota da sua conta.")
+                        .gameFont(.footnote).foregroundStyle(.secondary)
+                    SecureField(store.traffic.configured ? "Nova chave TomTom para substituir" : "Chave da API TomTom", text: $trafficKey)
+                        .textInputAutocapitalization(.never).autocorrectionDisabled().privacySensitive()
+                    Button(store.traffic.configured ? "Substituir chave TomTom" : "Salvar chave TomTom") {
+                        if store.traffic.saveKey(trafficKey) { trafficKey = "" }
+                    }
+                    .disabled(trafficKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if store.traffic.configured {
+                        Button("Remover chave TomTom", role: .destructive) { _ = store.traffic.saveKey(""); trafficKey = "" }
+                    }
+                    Text(store.traffic.message).gameFont(.footnote)
+                    if store.traffic.flowUnavailable {
+                        Text("Fluxo no mapa indisponível. Confira sua conexão, chave e cota TomTom.").gameFont(.footnote).foregroundStyle(.secondary)
+                    }
+                    if let updated = store.traffic.lastUpdated {
+                        HStack { Text("Incidentes atualizados"); Text(updated, style: .relative) }.gameFont(.caption)
+                    }
+                    Text("Incidentes são consultados na área visível, no máximo a cada 2 minutos. A estimativa da rota Geoapify continua sem trânsito ao vivo. Radares em operação e fases dos semáforos não estão disponíveis.")
+                        .gameFont(.footnote).foregroundStyle(.secondary)
+                    if !store.traffic.incidents.isEmpty {
+                        ForEach(store.traffic.incidents.prefix(8)) { incident in
+                            Label(incident.description, systemImage: "exclamationmark.triangle")
+                                .gameFont(.caption).lineLimit(2)
+                        }
+                    }
+                    Link("Gerenciar chave e cota TomTom", destination: URL(string: "https://my.tomtom.com/")!)
+                    Text("© TomTom · © OpenStreetMap contributors").gameFont(.caption2).foregroundStyle(.secondary)
+                }
                 Section("Localização") {
                     Label(locationDescription, systemImage: "location.circle")
                     Button("Ativar GPS") { store.activateGPS() }
@@ -60,12 +93,12 @@ struct APIKeySheet: View {
             }
             .tint(palette.accent)
             .gameNavigationTitle("Configurações").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Concluir") { key = ""; dismiss() }.gameFont(.body) } }
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Concluir") { key = ""; trafficKey = ""; dismiss() }.gameFont(.body) } }
             .confirmationDialog("Remover a chave salva?", isPresented: $removing, titleVisibility: .visible) {
                 Button("Remover chave", role: .destructive) { store.removeAPIKey(); saved = false; key = "" }
                 Button("Cancelar", role: .cancel) {}
             }
-            .onDisappear { key = "" }
+            .onDisappear { key = ""; trafficKey = "" }
         }
     }
 

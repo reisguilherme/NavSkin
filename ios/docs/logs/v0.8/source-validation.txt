@@ -1,0 +1,2 @@
+PASS: actual resource resolver, six worldwide + six offline styles, world default, mode cache, all catalog previews, OpenStep project references and XML property lists
+PASS: Swift syntax for app and Apple-platform tests (does not type-check Apple frameworks)
