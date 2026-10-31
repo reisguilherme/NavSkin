@@ -67,13 +67,13 @@ final class PlacesStoreTests: XCTestCase {
         XCTAssertEqual(restored.recents.last?.destination.id, "id-5")
     }
 
-    func testResumePersistsOnlyDestinationAndCanBeCleared() throws {
+    func testResumePersistsOnlyItineraryAndCanBeCleared() throws {
         let store = PlacesStore(fileURL: file)
         let destination = Destination(id: "park", name: "Parque", point: point, address: "Goiânia")
         try store.setResumeDestination(destination)
         XCTAssertEqual(PlacesStore(fileURL: file).snapshot.resumeDestination, destination)
         let source = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: file)) as? [String: Any])
-        XCTAssertEqual(Set(source.keys), ["schemaVersion", "savedPlaces", "recents", "homeId", "workId", "resumeDestination"])
+        XCTAssertEqual(Set(source.keys), ["schemaVersion", "savedPlaces", "recents", "homeId", "workId", "resumeDestination", "resumeIntermediateStops"])
         try store.setResumeDestination(nil)
         XCTAssertNil(PlacesStore(fileURL: file).snapshot.resumeDestination)
     }

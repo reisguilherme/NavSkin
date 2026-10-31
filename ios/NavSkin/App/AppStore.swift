@@ -12,6 +12,8 @@ final class AppStore: ObservableObject {
     @Published private(set) var navigationPreferences: NavigationPreferences
     @Published private(set) var places = LocalPlacesState()
     @Published private(set) var following = true
+    @Published private(set) var vibing = false
+    @Published private(set) var vibingExitVisible = false
     @Published private(set) var mapStatus: String? = "Carregando mapa…"
     @Published private(set) var resourceError: String?
     @Published private(set) var uiError: String?
@@ -28,6 +30,7 @@ final class AppStore: ObservableObject {
     private var timer: Timer?
     private var trafficChanges: AnyCancellable?
     private var previousAccess: LocationAccess = .notRequested
+    private var vibingExitTask: Task<Void, Never>?
 
     init() {
         let defaults = UserDefaults.standard
@@ -81,6 +84,7 @@ final class AppStore: ObservableObject {
             guard let self else { return }
             self.session.setLocationStatus(access: access, running: running, message: message)
             if access != self.previousAccess, (access == .denied || access == .disabled), let message {
+                if self.vibing { self.exitVibing() }
                 self.uiError = message
             }
             self.previousAccess = access
@@ -94,7 +98,65 @@ final class AppStore: ObservableObject {
     func activateGPS() { session.activateGPS() }
     func search(_ query: String) { session.search(query) }
     func selectDestination(_ destination: Destination) { mapSelection = nil; session.selectDestination(destination) }
+    func addStop(_ destination: Destination) {
+        mapSelection = nil
+        session.addStop(destination)
+        if session.snapshot.pendingIntermediateStops == nil && !session.snapshot.updatingStops {
+            uiError = session.snapshot.message ?? "Não foi possível adicionar esta parada."
+        }
+    }
+    func removeStop(id: String) { session.removeStop(id: id) }
     func startNavigation() { session.startNavigation() }
+    func enterVibing() {
+        guard !vibing else { return }
+        guard !snapshot.simulation else {
+            uiError = "Encerre a simulação para usar o Vibing com GPS real."
+            return
+        }
+        guard snapshot.destination == nil || snapshot.navigationActive || [.preview, .arrived].contains(snapshot.phase) else {
+            uiError = "Conclua o cálculo da rota ou limpe o destino para sair dirigindo sem rota."
+            return
+        }
+        session.activateGPS()
+        guard snapshot.locationAccess != .denied, snapshot.locationAccess != .disabled else {
+            uiError = snapshot.message ?? "Ative a localização precisa nos Ajustes do iPhone para usar o Vibing."
+            return
+        }
+        if snapshot.phase == .preview {
+            session.startNavigation()
+            guard snapshot.navigationActive else {
+                uiError = snapshot.message ?? "Aguarde uma posição GPS precisa para iniciar esta rota."
+                return
+            }
+        }
+        mapSelection = nil
+        vibing = true
+        mapCommand = MapCommand(kind: .recenter)
+        revealVibingExit()
+    }
+    func exitVibing() {
+        guard vibing else { return }
+        vibingExitTask?.cancel(); vibingExitTask = nil
+        vibing = false
+        vibingExitVisible = false
+        mapCommand = MapCommand(kind: .recenter)
+    }
+    func revealVibingExit() {
+        guard vibing else { return }
+        vibingExitTask?.cancel()
+        vibingExitVisible = true
+        // A map tap also recovers GPS follow after the user explored by gesture.
+        mapCommand = MapCommand(kind: .recenter)
+        vibingExitTask = Task { [weak self] in
+            do { try await Task.sleep(for: .seconds(4)) } catch { return }
+            self?.vibingExitVisible = false
+        }
+    }
+    func clearDestination() {
+        guard !snapshot.navigationActive, !snapshot.simulation else { return }
+        mapSelection = nil
+        session.clearDestination()
+    }
     func stopNavigation() { session.stopNavigation() }
     func retryRoute() { session.retryRoute() }
     func resumeDestination() { session.resumeDestination() }
@@ -102,7 +164,10 @@ final class AppStore: ObservableObject {
         session.setForeground(foreground)
         traffic.setForeground(foreground)
         // Refresh freshness immediately after suspension before presenting old guidance again.
-        if foreground { session.tick() }
+        if foreground {
+            session.tick()
+            if vibing { session.activateGPS() }
+        }
     }
     func recenter() { session.activateGPS(); mapCommand = MapCommand(kind: .recenter) }
     func showOverview() { mapCommand = MapCommand(kind: .overview) }
@@ -125,8 +190,19 @@ final class AppStore: ObservableObject {
         if enabled { enabledCategories.insert(id) } else { enabledCategories.remove(id) }
         preferences.set(enabledCategories.sorted(), forKey: "poi_categories")
     }
-    func setVehicle(_ id: String) { navigationPreferences.vehicleId = id; savePreferences() }
+    var vehicleID: String { navigationPreferences.vehicleID(theme: theme.rawValue) }
+    func setVehicle(_ id: String) {
+        navigationPreferences.vehicleId = id
+        navigationPreferences.vehicleSelectionExplicit = true
+        savePreferences()
+    }
     func setSavedVisible(_ visible: Bool) { navigationPreferences.savedPlacesVisible = visible; savePreferences() }
+    var map3D: Bool { vibing || navigationPreferences.map3D(navigationActive: snapshot.navigationActive) }
+    var mapOrientation: MapOrientation { vibing ? .movementUp : navigationPreferences.orientation }
+    func setMap3D(_ enabled: Bool) {
+        navigationPreferences.setMap3D(enabled, navigationActive: snapshot.navigationActive)
+        savePreferences()
+    }
     func toggleOrientation() {
         navigationPreferences.orientation = navigationPreferences.orientation == .northUp ? .movementUp : .northUp
         savePreferences()

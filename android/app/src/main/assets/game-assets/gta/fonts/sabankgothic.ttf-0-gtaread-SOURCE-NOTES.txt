@@ -1,0 +1,7 @@
+Source: https://raw.githubusercontent.com/multitheftauto/mtasa-blue/master/Shared/data/MTA%20San%20Andreas/MTA/cgui/sabankgothic.ttf
+
+Public MTA distribution of Bank Gothic Medium. Readability adaptation, not asserted to be the exact cartographic font of the original game.
+
+Embedded copyright: Copyright 1990-1993 Bitstream Inc.  All rights reserved.
+
+Public availability is not a redistribution grant. Retained as requested in the local game asset package, outside the code license.

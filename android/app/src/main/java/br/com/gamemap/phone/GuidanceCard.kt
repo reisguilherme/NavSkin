@@ -11,53 +11,65 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.widget.TextViewCompat
+import br.com.gamemap.R
 import br.com.gamemap.navigation.model.ManeuverKind
 
 /** Stable views: location ticks update content without rebuilding the guidance hierarchy. */
 internal class GuidanceCard(context: Context) : LinearLayout(context) {
     private val arrow = ManeuverIcon(context)
-    private val distance = context.phoneText("", 27f, true)
-    private val instruction = context.phoneText("", 15f, true)
+    private val distance = context.phoneText("", 36f, true)
+    private val instruction = context.phoneText("", 14f, true)
     private val street = context.phoneText("", 12f)
+    val menu = PhoneAction(context, R.drawable.phone_menu, "Menu NavSkin").apply { id = R.id.phone_main_menu }
     private var compact = false
     init {
         orientation = HORIZONTAL
+        id = R.id.phone_guidance
         gravity = Gravity.CENTER_VERTICAL
-        setPadding(context.dip(14), context.dip(12), context.dip(16), context.dip(12))
-        addView(arrow, LayoutParams(context.dip(50), context.dip(50)).apply { marginEnd = context.dip(14) })
+        minimumHeight = context.dip(102)
+        setPadding(context.dip(15), context.dip(16), context.dip(12), context.dip(16))
+        addView(arrow, LayoutParams(context.dip(40), context.dip(44)).apply { marginEnd = context.dip(11) })
         addView(LinearLayout(context).apply {
             orientation = VERTICAL
             addView(distance)
             addView(instruction, LayoutParams(-1, -2).apply { topMargin = context.dip(3) })
             addView(street, LayoutParams(-1, -2).apply { topMargin = context.dip(3) })
         }, LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        attachMenu()
         instruction.maxLines = 2; instruction.ellipsize = TextUtils.TruncateAt.END
         street.maxLines = 1; street.ellipsize = TextUtils.TruncateAt.END
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
-        descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+        descendantFocusability = FOCUS_AFTER_DESCENDANTS
+    }
+    fun attachMenu() {
+        (menu.parent as? ViewGroup)?.removeView(menu)
+        addView(menu, LayoutParams(context.dip(48), context.dip(48)).apply { marginStart = context.dip(8) })
     }
     fun bind(palette: PhonePalette) {
-        surface(palette, 24)
-        distance.setTextColor(palette.accent)
+        surface(palette, 23)
+        distance.setTextColor(palette.text)
         instruction.setTextColor(palette.text)
         street.setTextColor(palette.muted)
         arrow.color = palette.accent
-        arrow.background = context.rounded(palette.soft, 16)
+        menu.bind(palette)
+        menu.touchSurface(0x6bffffff, 100, 0xbdffffff.toInt())
     }
     fun compact(value: Boolean) {
         if (compact == value) return
         compact = value
-        distance.textSize = if (value) 23f else 27f
+        minimumHeight = context.dip(if (value) 88 else 102)
+        distance.textSize = if (value) 30f else 36f
         instruction.maxLines = if (value) 1 else 2
         street.visibility = if (value || street.text.isNullOrBlank()) GONE else VISIBLE
-        setPadding(context.dip(14), context.dip(if (value) 10 else 12), context.dip(16), context.dip(if (value) 10 else 12))
+        setPadding(context.dip(15), context.dip(if (value) 10 else 16), context.dip(12), context.dip(if (value) 10 else 16))
     }
     fun update(meters: String?, cue: String, road: String?, kind: ManeuverKind?) {
         distance.updateText(meters.orEmpty())
         distance.visibility = if (meters == null) GONE else VISIBLE
         instruction.updateText(cue)
         street.updateText(road.orEmpty())
-        street.visibility = if (compact || road.isNullOrBlank()) GONE else VISIBLE
+        // Providers usually include the road in their instruction. Avoid repeating it.
+        street.visibility = if (compact || road.isNullOrBlank() || cue.contains(road, ignoreCase = true)) GONE else VISIBLE
         arrow.kind = kind
         arrow.visibility = if (kind == null) GONE else VISIBLE
         val description = listOfNotNull(meters, cue, road?.takeIf { it.isNotBlank() }).joinToString(". ")
@@ -125,12 +137,12 @@ private class ManeuverIcon(context: Context) : View(context) {
 
 internal class TripMetrics(context: Context) : LinearLayout(context) {
     private val values = listOf("TEMPO", "DISTÂNCIA", "CHEGADA").map { caption ->
-        val value = context.phoneText("", 19f, true).apply {
+        val value = context.phoneText("", 23f, true).apply {
             gravity = Gravity.CENTER; maxLines = 1; ellipsize = TextUtils.TruncateAt.END
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(this, 11, 19, 1,
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(this, 14, 23, 1,
                 android.util.TypedValue.COMPLEX_UNIT_SP)
         }
-        val label = context.phoneText(caption, 9f).apply { gravity = Gravity.CENTER; maxLines = 1 }
+        val label = context.phoneText(caption, 10f).apply { gravity = Gravity.CENTER; maxLines = 1 }
         val column = LinearLayout(context).apply {
             orientation = VERTICAL; gravity = Gravity.CENTER
             addView(value, LayoutParams(-1, -2))
@@ -139,9 +151,9 @@ internal class TripMetrics(context: Context) : LinearLayout(context) {
         addView(column, LayoutParams(0, -2, 1f))
         value to label
     }
-    init { orientation = HORIZONTAL; gravity = Gravity.CENTER; setPadding(0, context.dip(3), 0, context.dip(3)) }
+    init { orientation = HORIZONTAL; gravity = Gravity.CENTER; minimumHeight = context.dip(64); setPadding(0, context.dip(7), 0, context.dip(7)) }
     fun bind(palette: PhonePalette) = values.forEachIndexed { index, pair ->
-        pair.first.setTextColor(if (index == 0) palette.accent else palette.text)
+        pair.first.setTextColor(palette.text)
         pair.second.setTextColor(palette.muted)
     }
     fun update(duration: String, distance: String, arrival: String) {

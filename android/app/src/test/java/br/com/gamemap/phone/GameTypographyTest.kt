@@ -43,4 +43,20 @@ class GameTypographyTest {
             }
         }
     }
+
+    @Test fun newThemeFontsRegisterDeclaredRolesWithoutInventingMissingAssets() {
+        for ((id, stack) in listOf("smw" to "NavSkinSmw", "cyberpunk" to "NavSkinCyberpunk",
+            "pipboy" to "NavSkinCyberpunk", "hollow" to "NavSkinRdrMap", "crossy" to "GameMapSans")) {
+            val catalog = GameAssetCatalog.fromJson("""{"schemaVersion":1,"themes":{"$id":{"map":{"road":"$stack","poi":"$stack"}}}}""")
+            assertEquals(setOf(stack), catalog.fontStacks)
+            assertNull("No supplied UI font must retain the native font", catalog.themes[id]?.ui)
+            assertFalse(catalog.themes.getValue(id).map.containsKey("place"))
+        }
+    }
+
+    @Test fun retiredThemesDoNotRegisterFontProfiles() {
+        val catalog = GameAssetCatalog.fromJson("""{"schemaVersion":1,"themes":{"minecraft":{"map":{"road":"NavSkinMinecraft"}},"gta5":{"map":{"road":"NavSkinGta5"}}}}""")
+        assertTrue(catalog.themes.isEmpty())
+        assertTrue(catalog.fontStacks.isEmpty())
+    }
 }

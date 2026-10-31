@@ -12,6 +12,7 @@ import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import br.com.gamemap.BuildConfig
 import br.com.gamemap.navigation.core.EngineUpdate
+import br.com.gamemap.navigation.core.GeoMath
 import br.com.gamemap.navigation.core.NavigationEngine
 import br.com.gamemap.navigation.model.*
 import br.com.gamemap.navigation.provider.GeoapifyProvider
@@ -62,6 +63,7 @@ class NavigationRuntime(
     @Volatile private var state = NavigationSnapshot(
         phase = if (places.snapshot().resumeDestination != null) NavigationPhase.RESUME_AVAILABLE else NavigationPhase.IDLE,
         resumeDestination = places.snapshot().resumeDestination,
+        resumeIntermediateStops = places.snapshot().resumeIntermediateStops,
         providerConfigured = settings.apiKey().isNotBlank(),
         message = places.snapshot().loadError,
     )
@@ -88,7 +90,8 @@ class NavigationRuntime(
         }
     }
     private val removePlacesListener = places.addListener { value ->
-        onMain { publish(state.copy(resumeDestination = value.resumeDestination)) }
+        onMain { publish(state.copy(resumeDestination = value.resumeDestination,
+            resumeIntermediateStops = value.resumeIntermediateStops)) }
     }
 
     fun snapshot(): NavigationSnapshot = state
@@ -192,19 +195,65 @@ class NavigationRuntime(
     }
 
     fun selectDestination(destination: Destination) = onMain {
+        selectItinerary(destination, emptyList())
+    }
+
+    private fun selectItinerary(destination: Destination, stops: List<Destination>) {
         if (state.simulation) stopReplay()
         cancelRouteRequest()
         engine.stop()
         saveResume(null)
         pendingPreview = true
         publish(state.copy(phase = NavigationPhase.IDLE, destination = destination, route = null,
-            progress = null, message = null, sessionId = state.sessionId + 1))
+            progress = null, intermediateStops = stops.toList(), pendingIntermediateStops = null,
+            message = null, sessionId = state.sessionId + 1))
         if (finePermission && !state.serviceRunning && !serviceRequested) activateLocation()
         requestRoute(recalculation = false)
     }
 
+    fun addStop(destination: Destination) = onMain {
+        if (state.simulation) {
+            publish(state.copy(message = "SIMULAÇÃO GPS: adicionar paradas pela internet está desativado."))
+            return@onMain
+        }
+        val final = state.destination ?: return@onMain
+        if (!state.navigationActive && state.phase != NavigationPhase.PREVIEW) return@onMain
+        val stops = state.pendingIntermediateStops ?: state.intermediateStops
+        val message = when {
+            destination.id.isBlank() || destination.name.isBlank() || !GeoMath.isValid(destination.point) ->
+                "Escolha um local válido para a parada."
+            (stops + final).any { it.id == destination.id || GeoMath.distanceMeters(it.point, destination.point) <= 5.0 } ->
+                "Esse local já está no percurso."
+            state.location.quality == LocationQuality.GOOD && state.location.fix?.let {
+                GeoMath.distanceMeters(it.point, destination.point) <= 5.0
+            } == true -> "Você já está nesse local. Escolha outra parada."
+            else -> null
+        }
+        if (message != null) publish(state.copy(message = message))
+        else editStops(stops + destination)
+    }
+
+    fun removeStop(id: String) = onMain {
+        if (state.simulation || state.destination == null ||
+            !state.navigationActive && state.phase != NavigationPhase.PREVIEW) return@onMain
+        val stops = state.pendingIntermediateStops ?: state.intermediateStops
+        if (stops.none { it.id == id }) return@onMain
+        editStops(stops.filterNot { it.id == id })
+    }
+
+    private fun editStops(stops: List<Destination>) {
+        val active = state.navigationActive
+        cancelRouteRequest()
+        publish(state.copy(pendingIntermediateStops = stops.toList()))
+        requestRoute(active)
+    }
+
     fun startNavigation() = onMain {
         if (state.phase != NavigationPhase.PREVIEW || state.route == null) return@onMain
+        if (state.pendingIntermediateStops != null) {
+            publish(state.copy(message = "Recalcule as paradas pendentes antes de iniciar a navegação."))
+            return@onMain
+        }
         applyEngine(engine.onTick(elapsedClock(), wallClock()))
         if (!finePermission || !state.serviceRunning || state.location.quality != LocationQuality.GOOD) {
             publish(state.copy(message = "Ative o GPS preciso no celular e aguarde uma posição atual antes de iniciar."))
@@ -222,6 +271,12 @@ class NavigationRuntime(
         startTicker()
     }
 
+    /** The search-bar X only cancels preparation; an active trip keeps its explicit Stop action. */
+    fun clearDestination() = onMain {
+        if (state.navigationActive || state.simulation) return@onMain
+        stopNavigation()
+    }
+
     fun stopNavigation() = onMain {
         val wasSimulation = state.simulation
         cancelRouteRequest()
@@ -232,9 +287,12 @@ class NavigationRuntime(
         if (wasSimulation) engine = NavigationEngine() else engine.stop()
         saveResume(null)
         publish(state.copy(phase = NavigationPhase.IDLE, destination = null, route = null, progress = null,
+            intermediateStops = emptyList(), pendingIntermediateStops = null,
+            resumeDestination = null, resumeIntermediateStops = emptyList(),
             location = if (wasSimulation) LocationState() else state.location,
             locationAccess = if (wasSimulation) LocationAccess.WAITING else state.locationAccess,
-            message = null, searching = false, simulation = false, sessionId = state.sessionId + 1))
+            message = null, searching = false, searchResults = emptyList(), searchError = null,
+            simulation = false, sessionId = state.sessionId + 1))
         scheduleIdleStop()
     }
 
@@ -246,7 +304,7 @@ class NavigationRuntime(
     }
 
     fun resumeDestination() = onMain {
-        state.resumeDestination?.let { selectDestination(it) }
+        state.resumeDestination?.let { selectItinerary(it, state.resumeIntermediateStops) }
     }
 
     fun onServiceStarted() = onMain {
@@ -263,6 +321,7 @@ class NavigationRuntime(
             engine.stop()
             publish(state.copy(serviceRunning = false, phase = NavigationPhase.RESUME_AVAILABLE,
                 locationAccess = LocationAccess.NEEDS_PHONE_START, progress = null, route = null,
+                pendingIntermediateStops = null,
                 message = locationNotice("GPS interrompido. Abra o celular e recalcule o destino para retomar.")))
         } else if (pendingPreview && state.phase == NavigationPhase.WAITING_FOR_LOCATION) {
             publish(state.copy(serviceRunning = false, locationAccess = when {
@@ -304,6 +363,7 @@ class NavigationRuntime(
         engine.start(route)
         val generation = ++replayEpoch
         publish(state.copy(phase = NavigationPhase.NAVIGATING, route = route, destination = route.destination,
+            intermediateStops = route.intermediateStops.map { it.destination }, pendingIntermediateStops = null,
             simulation = true, progress = null, message = "SIMULAÇÃO GPS DE DESENVOLVIMENTO", sessionId = state.sessionId + 1))
         fun replay(index: Int) {
             if (closed || generation != replayEpoch || !state.simulation) return
@@ -324,20 +384,22 @@ class NavigationRuntime(
     private fun requestRoute(recalculation: Boolean) {
         if (routeInFlight != null || state.simulation) return
         val destination = state.destination ?: return
+        val requestedStops = (state.pendingIntermediateStops ?: state.intermediateStops).toList()
+        val editingStops = state.pendingIntermediateStops != null
         val fix = state.location.fix
         val block = requestBlockMessage()
         if (block != null) {
             pendingPreview = false
-            publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.ERROR,
-                progress = null, message = block))
+            publishRouteFailure(block, recalculation, editingStops)
             return
         }
         if (!finePermission || state.location.quality != LocationQuality.GOOD || fix == null ||
             elapsedClock() - fix.elapsedRealtimeMs !in 0L..5_000L || !providersEnabled) {
-            if (!recalculation) pendingPreview = true
-            publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.WAITING_FOR_LOCATION,
-                progress = null, message = if (recalculation) "Aguarde uma posição GPS atual e precisa para calcular a rota."
-                    else "A rota será calculada automaticamente quando o GPS tiver uma posição atual e precisa."))
+            if (!recalculation && !editingStops) pendingPreview = true
+            publishRouteFailure(if (recalculation || editingStops)
+                    "Aguarde uma posição GPS atual e precisa para calcular a rota."
+                    else "A rota será calculada automaticamente quando o GPS tiver uma posição atual e precisa.",
+                recalculation, editingStops, waitingForLocation = true)
             return
         }
         val generation = ++routeEpoch
@@ -347,19 +409,20 @@ class NavigationRuntime(
         publish(state.copy(phase = if (recalculation) NavigationPhase.RECALCULATING else NavigationPhase.CALCULATING,
             progress = null, message = if (recalculation) "Recalculando rota…" else "Calculando rota…"))
         routeTask = worker.submit {
-            val result = runCatching { provider.route(origin, destination) }
+            val result = runCatching { provider.route(origin, destination, requestedStops) }
             onMain {
                 if (generation != routeEpoch || state.destination?.id != destination.id) return@onMain
                 routeInFlight = null
                 result.fold({ route ->
                     if (recalculation) engine.start(route)
-                    publish(state.copy(route = route, progress = null,
+                    publish(state.copy(route = route, progress = null, intermediateStops = requestedStops,
+                        pendingIntermediateStops = null,
                         phase = if (recalculation) NavigationPhase.NAVIGATING else NavigationPhase.PREVIEW,
                         message = "Estimativa sem trânsito em tempo real."))
+                    if (recalculation) saveResume(destination)
                 }, { error ->
                     recordRateLimit(error)
-                    publish(state.copy(phase = if (recalculation) NavigationPhase.REROUTE_FAILED else NavigationPhase.ERROR,
-                        route = state.route.takeIf { recalculation }, progress = null, message = safeMessage(error)))
+                    publishRouteFailure(safeMessage(error), recalculation, editingStops)
                 })
                 scheduleIdleStop()
             }
@@ -379,19 +442,40 @@ class NavigationRuntime(
         var next = state.copy(location = location, locationAccess = accessFor(location),
             progress = if (state.phase == NavigationPhase.NAVIGATING && location.quality == LocationQuality.GOOD)
                 update.progress else if (state.navigationActive) null else state.progress)
+        // Only accepted progress along this provider route can consume an intermediate stop.
+        // Endpoint/centroid proximity alone would remove stops on a parallel road or later loop.
+        val passedIds = if (state.navigationActive && location.quality == LocationQuality.GOOD &&
+            update.progress?.onRoute == true && update.progress.routeId == state.route?.id) {
+            val progress = update.progress
+            state.route!!.intermediateStops.filter { boundary ->
+                boundary.alongRouteMeters <= progress.alongRouteMeters + 0.01 &&
+                    state.intermediateStops.any { it.id == boundary.destination.id }
+            }.map { it.destination.id }.toSet()
+        } else emptySet()
+        val refreshPendingRoute = passedIds.isNotEmpty() && routeInFlight != null
+        if (passedIds.isNotEmpty()) {
+            next = next.copy(intermediateStops = next.intermediateStops.filterNot { it.id in passedIds },
+                pendingIntermediateStops = next.pendingIntermediateStops?.filterNot { it.id in passedIds })
+            if (refreshPendingRoute) cancelRouteRequest()
+        }
         if (!state.simulation && location.quality == LocationQuality.GOOD) {
             // Only dismiss a notice still owned by the location lifecycle; newer route errors survive.
             if (next.message == locationLifecycleMessage) next = next.copy(message = null)
             locationLifecycleMessage = null
         }
-        if (state.navigationActive && update.arrived) {
+        val arrived = state.phase == NavigationPhase.NAVIGATING && state.pendingIntermediateStops == null &&
+            location.quality == LocationQuality.GOOD && update.arrived
+        if (arrived) {
             next = next.copy(phase = NavigationPhase.ARRIVED, progress = update.progress,
-                resumeDestination = null, message = "Você chegou ao destino.")
-            saveResume(null)
+                resumeDestination = null, resumeIntermediateStops = emptyList(), intermediateStops = emptyList(),
+                message = "Você chegou ao destino.")
             engine.stop()
         }
         publish(next)
+        if (arrived) saveResume(null)
+        else if (passedIds.isNotEmpty() && !state.simulation) saveResume(state.destination)
         calculatePendingPreview()
+        if (refreshPendingRoute) requestRoute(recalculation = true)
         if (update.shouldRecalculate && state.phase in setOf(NavigationPhase.NAVIGATING, NavigationPhase.REROUTE_FAILED)) {
             if (state.simulation) publish(state.copy(phase = NavigationPhase.REROUTE_FAILED, progress = null,
                 message = "SIMULAÇÃO GPS: desvio confirmado; cálculo pela internet desativado nesta reprodução."))
@@ -456,8 +540,31 @@ class NavigationRuntime(
         routeInFlight = null
     }
 
+    private fun routeFailureMessage(message: String, editingStops: Boolean) = if (editingStops)
+        "$message A alteração das paradas não foi aplicada; tente novamente." else message
+
+    private fun publishRouteFailure(message: String, recalculation: Boolean, editingStops: Boolean,
+                                    waitingForLocation: Boolean = false) {
+        // A failed itinerary edit does not invalidate an otherwise usable committed route.
+        // Genuine off-route reroutes and weak/lost GPS still suspend its instructions.
+        val safeProgress = if (recalculation && editingStops && finePermission && providersEnabled && state.serviceRunning)
+            engine.onTick(elapsedClock(), wallClock()).takeIf { it.location.quality == LocationQuality.GOOD }
+                ?.progress?.takeIf { it.onRoute && it.routeId == state.route?.id }
+            else null
+        val phase = when {
+            safeProgress != null -> NavigationPhase.NAVIGATING
+            recalculation -> NavigationPhase.REROUTE_FAILED
+            editingStops && state.route != null -> NavigationPhase.PREVIEW
+            waitingForLocation -> NavigationPhase.WAITING_FOR_LOCATION
+            else -> NavigationPhase.ERROR
+        }
+        publish(state.copy(phase = phase, route = state.route.takeIf { recalculation || editingStops },
+            progress = safeProgress, message = routeFailureMessage(message, editingStops)))
+    }
+
     private fun saveResume(destination: Destination?) {
-        runCatching { places.setResumeDestination(destination) }
+        runCatching { places.setResumeDestination(destination,
+            if (destination == null) emptyList() else state.intermediateStops) }
             .onFailure { publish(state.copy(message = "Não foi possível salvar o destino para retomada.")) }
     }
 

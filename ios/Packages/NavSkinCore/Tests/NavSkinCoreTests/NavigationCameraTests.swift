@@ -2,6 +2,93 @@ import XCTest
 @testable import NavSkinCore
 
 final class NavigationCameraTests: XCTestCase {
+    func testVibingWithoutRouteUsesDrivingZoomAndHeadingWithoutCreatingNavigation() throws {
+        var value = snapshot(heading: 125, speed: 20)
+        value.phase = .idle
+        value.route = nil
+        value.progress = nil
+        let original = value
+        var policy = NavigationCameraPolicy()
+        let camera = try XCTUnwrap(policy.update(value, orientation: .northUp, map3D: false, vibing: true))
+        XCTAssertEqual(camera.pitch, 48)
+        XCTAssertEqual(camera.zoom, 17)
+        XCTAssertEqual(camera.bearing, 125)
+        XCTAssertEqual(value, original)
+        XCTAssertFalse(value.navigationActive)
+    }
+
+    func testLeavingVibingRestoresChosenDimensionAndOrientation() throws {
+        let preferences = NavigationPreferences(orientation: .northUp, browsing3D: false, navigation3D: false)
+        var policy = NavigationCameraPolicy()
+        let value = snapshot(heading: 125)
+        let immersive = try XCTUnwrap(policy.update(value, orientation: preferences.orientation,
+            map3D: preferences.map3D(navigationActive: true), vibing: true))
+        XCTAssertEqual(immersive.pitch, 48)
+        XCTAssertEqual(immersive.bearing, 125)
+        policy.reset()
+        let regular = try XCTUnwrap(policy.update(value, orientation: preferences.orientation,
+            map3D: preferences.map3D(navigationActive: true), vibing: false))
+        XCTAssertEqual(regular.pitch, 0)
+        XCTAssertEqual(regular.bearing, 0)
+        XCTAssertFalse(preferences.navigation3D)
+        XCTAssertFalse(preferences.browsing3D)
+    }
+
+    func testVibingStillUsesRouteTurnApproachAndRejectsStaleFixes() throws {
+        var value = snapshot(speed: 90)
+        value.progress?.distanceToManeuverMeters = 20
+        var policy = NavigationCameraPolicy()
+        let camera = try XCTUnwrap(policy.update(value, orientation: .movementUp, vibing: true))
+        XCTAssertGreaterThan(camera.zoom, 17)
+        value.location.ageMs = 6_000
+        XCTAssertNil(policy.update(value, orientation: .movementUp, vibing: true))
+    }
+
+    func testPendingRoutePreviewCannotFlattenVibingFreeDriveCamera() throws {
+        var value = snapshot()
+        value.phase = .preview
+        var policy = NavigationCameraPolicy()
+        XCTAssertEqual(policy.update(value, orientation: .northUp, map3D: false, vibing: true)?.pitch, 48)
+        XCTAssertEqual(value.phase, .preview)
+    }
+
+    func testNavigationTiltsByDefaultButBrowsingAndRoutePreviewStayFlat() throws {
+        var policy = NavigationCameraPolicy()
+        let driving = snapshot()
+        XCTAssertEqual(try XCTUnwrap(policy.update(driving, orientation: .movementUp)).pitch, 48)
+        var preview = driving
+        preview.phase = .preview
+        XCTAssertEqual(try XCTUnwrap(policy.update(preview, orientation: .movementUp, map3D: true)).pitch, 0)
+        preview.phase = .idle
+        XCTAssertEqual(try XCTUnwrap(policy.update(preview, orientation: .movementUp)).pitch, 0)
+        XCTAssertEqual(try XCTUnwrap(policy.update(preview, orientation: .movementUp, map3D: true)).pitch, 48)
+    }
+
+    func testTwoDimensionalNavigationRemainsFlatAcrossFixesAndChangesWithoutANewFix() throws {
+        var policy = NavigationCameraPolicy()
+        let driving = snapshot()
+        let tilted = try XCTUnwrap(policy.update(driving, orientation: .movementUp, map3D: true))
+        let flat = try XCTUnwrap(policy.update(driving, orientation: .movementUp, map3D: false))
+        XCTAssertEqual(flat.pitch, 0)
+        XCTAssertEqual(flat.point, tilted.point)
+        XCTAssertEqual(flat.zoom, tilted.zoom)
+        XCTAssertEqual(flat.bearing, tilted.bearing)
+        let later = try XCTUnwrap(policy.update(snapshot(time: 2_000), orientation: .movementUp, map3D: false))
+        XCTAssertEqual(later.pitch, 0)
+        XCTAssertEqual(policy.update(snapshot(time: 2_000), orientation: .movementUp, map3D: false), later)
+    }
+
+    func testDimensionChangeStillAppliesWithWeakGPSWithoutMovingReliableFraming() throws {
+        var policy = NavigationCameraPolicy()
+        let tilted = try XCTUnwrap(policy.update(snapshot(), orientation: .movementUp, map3D: true))
+        let weak = snapshot(time: 2_000, heading: 230, speed: 80, latitude: -16.001, quality: .weak)
+        let flat = try XCTUnwrap(policy.update(weak, orientation: .movementUp, map3D: false))
+        XCTAssertEqual(flat.pitch, 0)
+        XCTAssertEqual(flat.point, tilted.point)
+        XCTAssertEqual(flat.zoom, tilted.zoom)
+        XCTAssertEqual(flat.bearing, tilted.bearing)
+    }
+
     func testUrbanDrivingAndApproachingTurnsRevealMoreStreetDetail() {
         let highway = NavigationCameraPolicy.targetZoom(speedKmh: 100, maneuver: nil, distanceMeters: nil)
         let urban = NavigationCameraPolicy.targetZoom(speedKmh: 25, maneuver: nil, distanceMeters: nil)

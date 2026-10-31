@@ -59,6 +59,19 @@ class NavigationSettingsTest {
         }
     }
 
+    @Test fun pinkUsesTheThemedCarOnlyUntilTheUserChoosesAMarker() {
+        val vault = MemoryVault()
+        NavigationSettings(context, vault).use { settings ->
+            assertEquals("themed", settings.snapshot().vehicleIdFor(MapTheme.ROSA_POP))
+            assertEquals("arrow", settings.snapshot().vehicleIdFor(MapTheme.GTA_SA))
+            settings.setVehicleId("arrow")
+            assertEquals("arrow", settings.snapshot().vehicleIdFor(MapTheme.ROSA_POP))
+        }
+        NavigationSettings(context, vault).use { restored ->
+            assertEquals("arrow", restored.snapshot().vehicleIdFor(MapTheme.ROSA_POP))
+        }
+    }
+
     @Test fun apiKeyIsStoredAsAuthenticatedCiphertextAndBecomesUnconfiguredWhenVaultIsLost() {
         val vault = MemoryVault()
         val value = "sample-test-token-not-a-real-credential"

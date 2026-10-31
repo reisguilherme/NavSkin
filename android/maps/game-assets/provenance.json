@@ -17,7 +17,6 @@
         "gta/fonts/pricedow.ttf-3-copyright"
       ],
       "aliases": [
-        "NavSkinGtaRoad",
         "NavSkinGtaDisplay"
       ]
     },
@@ -55,6 +54,63 @@
       ],
       "aliases": [
         "NavSkinRdrMap"
+      ]
+    },
+    {
+      "id": "gtaread",
+      "name": "BankGothic Md BT",
+      "file": "gta/fonts/sabankgothic.ttf",
+      "postScriptName": "BankGothicBT-Medium",
+      "sha256": "3a0e078160d7a0e9d0d17c246ba3937ebe4ae264c0a19955f59b2557c4500a95",
+      "sourceUrl": "https://raw.githubusercontent.com/multitheftauto/mtasa-blue/master/Shared/data/MTA%20San%20Andreas/MTA/cgui/sabankgothic.ttf",
+      "copyrightStatus": "Copyright 1990-1993 Bitstream Inc.  All rights reserved.",
+      "provenance": "Public MTA distribution of Bank Gothic Medium. Readability adaptation, not asserted to be the exact cartographic font of the original game.",
+      "sourceSha256": "3a0e078160d7a0e9d0d17c246ba3937ebe4ae264c0a19955f59b2557c4500a95",
+      "conversion": "Unmodified TTF source",
+      "notices": [
+        "gta/fonts/sabankgothic.ttf-0-gtaread-SOURCE-NOTES.txt"
+      ],
+      "aliases": [
+        "NavSkinGtaRoad"
+      ]
+    },
+    {
+      "id": "smw",
+      "name": "SMW Whole-Pixel Spacing",
+      "file": "smw/fonts/SMW.ttf",
+      "postScriptName": "SMWWhole-PixelSpacing",
+      "sha256": "9d3318585c695fb22e8ef9e5d5f4908fac67b0734871addc31ed2d00f4aa4bc3",
+      "sourceUrl": "https://github.com/vvye/smw-font/releases/download/v1.1/SMW.Whole-Pixel.Spacing.ttf",
+      "copyrightStatus": "Adapted from the font used in Super Mario World",
+      "provenance": "Author Eric Kaiser / wye recreation of SNES SMW text, with character improvements. CC BY-NC 4.0; not a raw Nintendo font binary.",
+      "sourceSha256": "9d3318585c695fb22e8ef9e5d5f4908fac67b0734871addc31ed2d00f4aa4bc3",
+      "conversion": "Unmodified TTF source",
+      "notices": [
+        "smw/fonts/SMW.ttf-0-smw-SOURCE-NOTES.txt",
+        "smw/fonts/SMW.ttf-1-SMW-LICENSE.md",
+        "smw/fonts/SMW.ttf-2-smw-readme.txt"
+      ],
+      "aliases": [
+        "NavSkinSmw"
+      ]
+    },
+    {
+      "id": "cyberpunk",
+      "name": "Blender Pro Bold",
+      "file": "cyberpunk/fonts/BlenderPro-Bold.ttf",
+      "postScriptName": "BlenderPro-Bold",
+      "sha256": "f4feaaa78d44a180432f6fe79564b14a0110a70a0c15feb559ef9aac74ad3262",
+      "sourceUrl": "https://www.cyberpunk.net/build/fonts/BlenderPro-Bold-c11a01ca.woff",
+      "copyrightStatus": "Published by Die Gestalten Verlag GmbH & Co. KG, 2008\rCopyright © by Binnenland and re-p.org, 2008. All rights reserved. This software may not be reproduced, used, displayed, modified, disclosed or transferred without the express written approval of (Binnenland). ",
+      "provenance": "Blender Pro Bold served by the official Cyberpunk website. WOFF decompressed to sfnt, outlines and names preserved. Not a claim of extraction from game UI.",
+      "sourceSha256": "1c0ab7fb634bd5fdfde6e9bc91d5aba8e4a43337818e4e6a7c6fd354238b46b8",
+      "conversion": "FontTools 4.68.0 WOFF decompression; original names/outlines retained",
+      "notices": [
+        "cyberpunk/fonts/BlenderPro-Bold.ttf-0-cyberpunk-SOURCE-NOTES.txt",
+        "cyberpunk/fonts/BlenderPro-Bold.ttf-1-BlenderPro-Bold.woff"
+      ],
+      "aliases": [
+        "NavSkinCyberpunk"
       ]
     }
   ],
@@ -234,5 +290,42 @@
     "kerning": "Glyph PBF stores metrics, not TTF kerning tables.",
     "unicodeFallback": "Missing codepoints merge Noto Sans Bold; other world blocks use the online Noto font."
   },
-  "mapFontNotes": "RDR Lino is an extracted Rockstar family selected for the game identity. This research does not prove RDR Lino is the exact original geographic-map label face; Effra map identification remains unconfirmed by primary game-file evidence."
+  "mapFontNotes": "GTA streets and POIs use Bank Gothic Medium for readability; Pricedown only large area titles. Expansion provenance distinguishes published originals, author reconstruction and generated glyph adaptations. No geographical shapes are changed.",
+  "authoredCollection": [
+    {
+      "theme": "pipboy",
+      "origin": "NavSkin-authored approved browser study",
+      "source": "scripts/theme-art/pipboy.mjs",
+      "license": "CC0-1.0; fonts retain their existing notices",
+      "geometry": "Real source coordinates preserved; textures are illustrations."
+    },
+    {
+      "theme": "hollow",
+      "origin": "NavSkin-authored approved browser study",
+      "source": "scripts/theme-art/hollow.mjs",
+      "license": "CC0-1.0; fonts retain their existing notices",
+      "geometry": "Real source coordinates preserved; textures are illustrations."
+    },
+    {
+      "theme": "crossy",
+      "origin": "NavSkin-authored approved browser study",
+      "source": "scripts/theme-art/crossy.mjs",
+      "license": "CC0-1.0; fonts retain their existing notices",
+      "geometry": "Real source coordinates preserved; textures are illustrations."
+    }
+  ],
+  "fontCopies": [
+    {
+      "theme": "pipboy",
+      "file": "game-assets/pipboy/fonts/BlenderPro-Bold.ttf",
+      "sourceTheme": "cyberpunk",
+      "note": "Byte-identical theme-local UI font copy with the original notices. Not an original font from the inspired game."
+    },
+    {
+      "theme": "hollow",
+      "file": "game-assets/hollow/fonts/HapnaSlabSerif-DemiBold.ttf",
+      "sourceTheme": "rdr2",
+      "note": "Byte-identical theme-local UI font copy with the original notices. Not an original font from the inspired game."
+    }
+  ]
 }

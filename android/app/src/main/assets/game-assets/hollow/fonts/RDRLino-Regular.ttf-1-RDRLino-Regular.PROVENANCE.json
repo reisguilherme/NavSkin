@@ -1,0 +1,26 @@
+{
+  "family": "RDR Lino",
+  "postscriptName": "RDRLino-Regular",
+  "copyright": "Copyright (c) 2017 by Rockstar Games. All rights reserved.",
+  "manufacturer": "Rockstar Games",
+  "designer": "Euan Duncan",
+  "version": "Version 3.000",
+  "conversionAuthor": "Peter1501 (attributed by public source)",
+  "sourceCatalog": "https://www.worldofmods.com/rdr-2/tools/56923-rdr-2-font-russian-cyrillic-latin.html",
+  "sourceArchive": "rdr2-fonts-peter1501.zip",
+  "sourceArchiveSha256": "311790b203504048947174d63732713f48650e7760e6b303ffd144e6c74a3608",
+  "originality": "The public pack and its bundled README claim conversion from RDR2. These are extracted/conversion files, not verified byte-for-byte original game binaries. No redesign is described in the source. Metadata agrees with original commercial/Rockstar font families.",
+  "licenseStatus": "No license granting outside-game redistribution is included or verified. Keep this local package and all generated derivatives Git-ignored. fsType=0 is technical metadata, not a copyright permission.",
+  "files": [
+    {
+      "path": "TTF/RDRLino-Regular.ttf",
+      "bytes": 832152,
+      "sha256": "f1c1d83487c9607e5d9fb22ba6fc74464947134302ceb97aabb4a5e2bafea99f"
+    },
+    {
+      "path": "OTF/RDRLino-Regular.otf",
+      "bytes": 1213936,
+      "sha256": "a8cc6ca36bafa142ce6d2d5b13fb8abad9356df97b1e2a072e07d36e4398e21c"
+    }
+  ]
+}

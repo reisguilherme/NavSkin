@@ -109,9 +109,13 @@ public struct NavRoute: Codable, Equatable, Sendable {
     public var durationSeconds: Double
     public var destination: Destination
     public var calculatedAtMs: Int64
+    public var intermediateStops: [Destination]
+    /// Geometry vertex at the end of each intermediate leg, in itinerary order.
+    public var intermediateStopIndices: [Int]
 
     public init(id: String, geometry: [GeoPoint], steps: [RouteStep], distanceMeters: Double,
-                durationSeconds: Double, destination: Destination, calculatedAtMs: Int64) {
+                durationSeconds: Double, destination: Destination, calculatedAtMs: Int64,
+                intermediateStops: [Destination] = [], intermediateStopIndices: [Int] = []) {
         self.id = id
         self.geometry = geometry
         self.steps = steps
@@ -119,6 +123,22 @@ public struct NavRoute: Codable, Equatable, Sendable {
         self.durationSeconds = durationSeconds
         self.destination = destination
         self.calculatedAtMs = calculatedAtMs
+        self.intermediateStops = intermediateStops
+        self.intermediateStopIndices = intermediateStopIndices
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, geometry, steps, distanceMeters, durationSeconds, destination, calculatedAtMs
+        case intermediateStops, intermediateStopIndices
+    }
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(id: try values.decode(String.self, forKey: .id), geometry: try values.decode([GeoPoint].self, forKey: .geometry),
+            steps: try values.decode([RouteStep].self, forKey: .steps), distanceMeters: try values.decode(Double.self, forKey: .distanceMeters),
+            durationSeconds: try values.decode(Double.self, forKey: .durationSeconds), destination: try values.decode(Destination.self, forKey: .destination),
+            calculatedAtMs: try values.decode(Int64.self, forKey: .calculatedAtMs),
+            intermediateStops: try values.decodeIfPresent([Destination].self, forKey: .intermediateStops) ?? [],
+            intermediateStopIndices: try values.decodeIfPresent([Int].self, forKey: .intermediateStopIndices) ?? [])
     }
 }
 
@@ -170,14 +190,50 @@ public enum MapOrientation: String, Codable, Equatable, Sendable, CaseIterable {
 
 public struct NavigationPreferences: Codable, Equatable, Sendable {
     public var vehicleId: String
+    public var vehicleSelectionExplicit: Bool
     public var savedPlacesVisible: Bool
     public var orientation: MapOrientation
+    public var browsing3D: Bool
+    public var navigation3D: Bool
 
     public init(vehicleId: String = "arrow", savedPlacesVisible: Bool = true,
-                orientation: MapOrientation = .movementUp) {
+                orientation: MapOrientation = .movementUp, browsing3D: Bool = false, navigation3D: Bool = true,
+                vehicleSelectionExplicit: Bool = false) {
         self.vehicleId = vehicleId
+        self.vehicleSelectionExplicit = vehicleSelectionExplicit || vehicleId != "arrow"
         self.savedPlacesVisible = savedPlacesVisible
         self.orientation = orientation
+        self.browsing3D = browsing3D
+        self.navigation3D = navigation3D
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case vehicleId, vehicleSelectionExplicit, savedPlacesVisible, orientation, browsing3D, navigation3D
+    }
+
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(vehicleId: try values.decode(String.self, forKey: .vehicleId),
+                  savedPlacesVisible: try values.decode(Bool.self, forKey: .savedPlacesVisible),
+                  orientation: try values.decode(MapOrientation.self, forKey: .orientation),
+                  browsing3D: try values.decodeIfPresent(Bool.self, forKey: .browsing3D) ?? false,
+                  navigation3D: try values.decodeIfPresent(Bool.self, forKey: .navigation3D) ?? true,
+                  // Legacy preferences cannot distinguish a chosen arrow from the old default.
+                  // Preserve that stored choice; only a new, unchosen default adapts to its theme.
+                  vehicleSelectionExplicit: try values.decodeIfPresent(Bool.self, forKey: .vehicleSelectionExplicit) ?? true)
+    }
+
+    public func vehicleID(theme: String) -> String {
+        theme == "rosa" && !vehicleSelectionExplicit ? "themed" : vehicleId
+    }
+
+    public func map3D(navigationActive: Bool) -> Bool {
+        navigationActive ? navigation3D : browsing3D
+    }
+
+    public mutating func setMap3D(_ enabled: Bool, navigationActive: Bool) {
+        if navigationActive { navigation3D = enabled }
+        else { browsing3D = enabled }
     }
 }
 
@@ -197,13 +253,19 @@ public struct NavigationSnapshot: Codable, Equatable, Sendable {
     public var simulation: Bool
     public var sessionId: Int64
     public var resumeDestination: Destination?
+    public var intermediateStops: [Destination]
+    public var pendingIntermediateStops: [Destination]?
+    public var resumeIntermediateStops: [Destination]
+    public var updatingStops: Bool
 
     public init(phase: NavigationPhase = .idle, location: LocationState = LocationState(),
                 locationAccess: LocationAccess = .notRequested, destination: Destination? = nil,
                 route: NavRoute? = nil, progress: RouteProgress? = nil, message: String? = nil,
                 searching: Bool = false, searchResults: [Destination] = [], searchError: String? = nil,
                 providerConfigured: Bool = false, serviceRunning: Bool = false, simulation: Bool = false,
-                sessionId: Int64 = 0, resumeDestination: Destination? = nil) {
+                sessionId: Int64 = 0, resumeDestination: Destination? = nil,
+                intermediateStops: [Destination] = [], pendingIntermediateStops: [Destination]? = nil,
+                resumeIntermediateStops: [Destination] = [], updatingStops: Bool = false) {
         self.phase = phase
         self.location = location
         self.locationAccess = locationAccess
@@ -219,6 +281,31 @@ public struct NavigationSnapshot: Codable, Equatable, Sendable {
         self.simulation = simulation
         self.sessionId = sessionId
         self.resumeDestination = resumeDestination
+        self.intermediateStops = intermediateStops
+        self.pendingIntermediateStops = pendingIntermediateStops
+        self.resumeIntermediateStops = resumeIntermediateStops
+        self.updatingStops = updatingStops
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case phase, location, locationAccess, destination, route, progress, message, searching, searchResults, searchError
+        case providerConfigured, serviceRunning, simulation, sessionId, resumeDestination
+        case intermediateStops, pendingIntermediateStops, resumeIntermediateStops, updatingStops
+    }
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(phase: try values.decode(NavigationPhase.self, forKey: .phase), location: try values.decode(LocationState.self, forKey: .location),
+            locationAccess: try values.decode(LocationAccess.self, forKey: .locationAccess),
+            destination: try values.decodeIfPresent(Destination.self, forKey: .destination), route: try values.decodeIfPresent(NavRoute.self, forKey: .route),
+            progress: try values.decodeIfPresent(RouteProgress.self, forKey: .progress), message: try values.decodeIfPresent(String.self, forKey: .message),
+            searching: try values.decode(Bool.self, forKey: .searching), searchResults: try values.decode([Destination].self, forKey: .searchResults),
+            searchError: try values.decodeIfPresent(String.self, forKey: .searchError), providerConfigured: try values.decode(Bool.self, forKey: .providerConfigured),
+            serviceRunning: try values.decode(Bool.self, forKey: .serviceRunning), simulation: try values.decode(Bool.self, forKey: .simulation),
+            sessionId: try values.decode(Int64.self, forKey: .sessionId), resumeDestination: try values.decodeIfPresent(Destination.self, forKey: .resumeDestination),
+            intermediateStops: try values.decodeIfPresent([Destination].self, forKey: .intermediateStops) ?? [],
+            pendingIntermediateStops: try values.decodeIfPresent([Destination].self, forKey: .pendingIntermediateStops),
+            resumeIntermediateStops: try values.decodeIfPresent([Destination].self, forKey: .resumeIntermediateStops) ?? [],
+            updatingStops: try values.decodeIfPresent(Bool.self, forKey: .updatingStops) ?? false)
     }
 
     public var navigationActive: Bool {

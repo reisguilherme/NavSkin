@@ -2,13 +2,18 @@
 import { mkdir, readFile, writeFile, copyFile, readdir, access } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import sharp from 'sharp';
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import { buildStyle } from '../src/style.js';
-import { prepareWorldMaps, WORLD_VARIANTS, roadDirectionLayer, poiIconExpression } from './prepare-world-maps.mjs';
+import { prepareWorldMaps, buildWorldStyle, MAP_THEMES, WORLD_VARIANTS, roadDirectionLayer, poiIconExpression } from './prepare-world-maps.mjs';
 import { applyGameTypography, copyGameAssetFiles } from './game-asset-typography.mjs';
+import { applyGameMapArtDirection, gameMaterialSprites } from './game-map-art-direction.mjs';
+import { applyCollectionArt, collectionImages, COLLECTION_ART } from './collection-art.mjs';
+import { applyMapVolumes } from './map-volumes.mjs';
+import { applyApprovedMapArt, approvedMapImages } from './approved-map-art.mjs';
+import { preparePinkAssets } from './prepare-pink-assets.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = path.join(root, 'android/app/src/main/assets/maps');
@@ -23,11 +28,8 @@ const writeJson = async (name, value) => {
 };
 const exists = async name => access(name).then(() => true, () => false);
 const attribution = '© OpenStreetMap contributors · Overture Maps Foundation · Google Open Buildings · Microsoft Global ML Building Footprints';
-const themes = {
-  gta: { title: 'GTA SA', font: 'GameMapSans' },
-  rosa: { title: 'Rosa Pop', font: 'GameMapSans' },
-  rdr2: { title: 'RDR2', font: 'GameMapSerif' },
-};
+const themes = Object.fromEntries(Object.entries(MAP_THEMES)
+  .map(([id, title]) => [id, { title, font: id === 'rdr2' ? 'GameMapSerif' : 'GameMapSans' }]));
 const variants = Object.keys(themes).flatMap(theme => [theme, `${theme}-night`]);
 const categories = [
   { id: 'parks', label: 'Parques', maki: 'park', color: '#70D648', minzoom: 12.2 },
@@ -111,7 +113,7 @@ async function createTokensIfMissing() {
   return tokens;
 }
 
-function nativeStyle(mode, tokens) {
+export function buildNativeStyle(mode, tokens) {
   const style = buildStyle('gta');
   const p = tokens.palettes[mode];
   const theme = mode.replace(/-night$/, '');
@@ -210,6 +212,10 @@ function nativeStyle(mode, tokens) {
   });
   style.layers.push(placeLabels);
   applyGameTypography(style, theme, true);
+  applyGameMapArtDirection(style, theme, night, p);
+  applyCollectionArt(style, theme, night);
+  applyApprovedMapArt(style, theme, night);
+  applyMapVolumes(style, theme, night, p);
   const errors = validateStyleMin(style);
   if (errors.length) throw new Error(errors.map(e => e.message).join('\n'));
   return style;
@@ -244,9 +250,13 @@ async function ensureEditableIcons() {
   for (const mode of Object.keys(themes)) {
     const directory = path.join(source, 'icons', mode);
     await mkdir(directory, { recursive: true });
+    if (COLLECTION_ART[mode]) continue; // Reproducible authored sources are prepared by prepare-collection-assets.mjs.
     for (const category of categories) {
       const destination = path.join(directory, `poi-${category.id}.svg`);
       if (await exists(destination)) continue;
+      if (!['gta', 'rosa', 'rdr2'].includes(mode)) {
+        throw new Error(`Missing authored ${mode} symbol: ${destination}. Restore its editable SVG source.`);
+      }
       if (mode === 'rdr2') {
         const body = '<path d="M4 2h24l2 3v24l-3 1H4l-2-3V5Z" fill="#EFDEBA" stroke="#FFF1CD" stroke-width="2"/><path d="M5 4h22v24H5Z" fill="none" stroke="#6D5435" stroke-width=".65"/>'
           + `<g fill="none" stroke="#443222" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${rdr2Drawings[category.id]}</g>`;
@@ -264,11 +274,49 @@ async function ensureEditableIcons() {
   }
 }
 
-async function buildSprites() {
+async function buildSprites(tokens) {
   await mkdir(path.join(output, 'sprites'), { recursive: true });
   for (const mode of Object.keys(themes)) {
+    if (COLLECTION_ART[mode]) {
+      const images = await collectionImages(mode);
+      const aliases = { cafe: 'food', 'fast-food': 'food', restaurant: 'food', bar: 'food', pharmacy: 'health', hospital: 'health', clinic: 'health', school: 'education', museum: 'culture', theatre: 'culture', worship: 'religion' };
+      for (const [name, category] of Object.entries(aliases)) images[`poi-${name}`] ??= images[`poi-${category}`];
+      for (const ratio of [1, 2]) {
+        const index = {}, composites = [];
+        const atlasWidth = 512 * ratio;
+        let x = 2 * ratio, y = 2 * ratio, rowHeight = 0;
+        for (const [id, image] of Object.entries(images)) {
+          const width = Math.round(image.width / image.pixelRatio * ratio), height = Math.round(image.height / image.pixelRatio * ratio);
+          if (x + width + 2 * ratio > atlasWidth) { x = 2 * ratio; y += rowHeight + 4 * ratio; rowHeight = 0; }
+          index[id] = { width, height, x, y, pixelRatio: ratio };
+          const buffer = ratio === image.pixelRatio ? Buffer.from(image.data)
+            : await sharp(Buffer.from(image.data), { raw: {width: image.width, height: image.height, channels: 4} })
+              .resize(width, height, { kernel: mode === 'hollow' ? 'lanczos3' : 'nearest' }).raw().toBuffer();
+          composites.push({ input: buffer, left: x, top: y, width, height });
+          x += width + 4 * ratio; rowHeight = Math.max(rowHeight, height);
+        }
+        const suffix = ratio === 2 ? '@2x' : '';
+        const atlasHeight = y + rowHeight + 2 * ratio, pixels = Buffer.alloc(atlasWidth * atlasHeight * 4);
+        // Direct blitting avoids premultiplied-alpha compositing rounding on the ink strokes.
+        for (const tile of composites) for (let row = 0; row < tile.height; row++) {
+          tile.input.copy(pixels, ((tile.top + row) * atlasWidth + tile.left) * 4, row * tile.width * 4, (row + 1) * tile.width * 4);
+        }
+        await sharp(pixels, { raw: {width: atlasWidth, height: atlasHeight, channels:4} })
+          .png().toFile(path.join(output, 'sprites', `${mode}${suffix}.png`));
+        await writeJson(path.join(output, 'sprites', `${mode}${suffix}.json`), index);
+      }
+      continue;
+    }
     const iconNames = (await readdir(path.join(source, 'icons', mode)))
       .filter(name => /^[a-z0-9-]+\.svg$/.test(name)).sort().map(name => name.slice(0, -4));
+    const usedPatterns = new Set([false, true].flatMap(night => {
+      const variant = mode + (night ? '-night' : '');
+      return [buildNativeStyle(variant, tokens), buildWorldStyle(variant)].flatMap(style => style.layers.flatMap(layer =>
+        [layer.paint?.['fill-pattern'], layer.paint?.['background-pattern']].filter(value => typeof value === 'string')));
+    }));
+    const materials = Object.fromEntries(Object.entries(gameMaterialSprites(mode, tokens)).filter(([id]) => usedPatterns.has(id)));
+    const approvedMaterials = Object.fromEntries(Object.entries(approvedMapImages(mode)).filter(([id]) => usedPatterns.has(id)));
+    iconNames.push(...Object.keys(materials));
     const columns = 8;
     const rows = Math.max(1, Math.ceil(iconNames.length / columns));
     for (const ratio of [1, 2]) {
@@ -279,10 +327,21 @@ async function buildSprites() {
         const x = ((i % columns) * 36 + 2) * ratio;
         const y = (Math.floor(i / columns) * 36 + 2) * ratio;
         index[id] = { width: 32 * ratio, height: 32 * ratio, x, y, pixelRatio: ratio };
-        composites.push({ input: await sharp(await readFile(path.join(source, 'icons', mode, `${id}.svg`)), { density: 72 * ratio }).resize(32 * ratio, 32 * ratio).png().toBuffer(), left: x, top: y });
+        const svgBytes = materials[id] ? Buffer.from(materials[id]) : await readFile(path.join(source, 'icons', mode, `${id}.svg`));
+        composites.push({ input: await sharp(svgBytes, { density: 72 * ratio }).resize(32 * ratio, 32 * ratio).png().toBuffer(), left: x, top: y });
       }
       const suffix = ratio === 2 ? '@2x' : '';
-      await sharp({ create: { width: columns * 36 * ratio, height: rows * 36 * ratio, channels: 4, background: '#00000000' } }).composite(composites).png().toFile(path.join(output, 'sprites', `${mode}${suffix}.png`));
+      const materialRows = Math.ceil(Object.keys(approvedMaterials).length / 4);
+      let materialIndex = 0;
+      for (const [id, image] of Object.entries(approvedMaterials)) {
+        const x = ((materialIndex % 4) * 68 + 2) * ratio;
+        const y = (rows * 36 + Math.floor(materialIndex / 4) * 68 + 2) * ratio;
+        index[id] = { width: image.width * ratio, height: image.height * ratio, x, y, pixelRatio: ratio };
+        composites.push({ input: await sharp(Buffer.from(image.data), {raw:{width:image.width,height:image.height,channels:4}})
+          .resize(image.width * ratio, image.height * ratio, {kernel:'nearest'}).png().toBuffer(), left:x, top:y });
+        materialIndex++;
+      }
+      await sharp({ create: { width: columns * 36 * ratio, height: (rows * 36 + materialRows * 68) * ratio, channels: 4, background: '#00000000' } }).composite(composites).png().toFile(path.join(output, 'sprites', `${mode}${suffix}.png`));
       await writeJson(path.join(output, 'sprites', `${mode}${suffix}.json`), index);
     }
   }
@@ -300,10 +359,13 @@ async function walk(directory) {
 
 async function copy(input, destination) {
   await mkdir(path.dirname(destination), { recursive: true });
+  // Do not rewrite the large immutable geography pack when preparing only styles.
+  if (await exists(destination) && (await readFile(input)).equals(await readFile(destination))) return;
   await copyFile(input, destination);
 }
 
 async function prepare() {
+  await preparePinkAssets();
   const tokens = await createTokensIfMissing();
   const origins = new Map();
   const add = async (input, relative) => {
@@ -340,8 +402,8 @@ async function prepare() {
   await add('android/maps/fonts/GameMapSerif/LICENSE.md', 'credits/Noto-Serif-OFL-1.1.md');
   await add('node_modules/@mapbox/maki/LICENSE.txt', 'credits/Maki-CC0.txt');
   await ensureEditableIcons();
-  await buildSprites();
-  for (const mode of variants) await writeJson(path.join(output, 'styles', `${mode}.json`), nativeStyle(mode, tokens));
+  await buildSprites(tokens);
+  for (const mode of variants) await writeJson(path.join(output, 'styles', `${mode}.json`), buildNativeStyle(mode, tokens));
   const poiMetadata = await parse('android/maps/pois-metadata.json');
   const creditData = {
     attribution,
@@ -353,6 +415,7 @@ async function prepare() {
       { name: 'Maki 8.2.0 / Mapbox fallback symbols', license: 'CC0-1.0', url: 'https://github.com/mapbox/maki' },
       { name: 'Rosa Pop original NavSkin geometric artwork', license: 'CC0-1.0; excludes imported game assets' },
       { name: 'Original NavSkin pen/vector adaptations', license: 'CC0-1.0; excludes imported game assets' },
+      { name: 'NavSkin-authored Super Mario World / Cyberpunk 2077 / Pip-Boy / Hollow Knight / Crossy Road inspired symbols and materials', license: 'CC0-1.0; these authored adaptations are not original game artwork' },
       { name: 'Imported GTA SA / RDR2 symbols and selected game fonts', license: 'Original rights retained by their respective holders; see game-assets-provenance.json for individual notices' },
       { name: 'Noto Sans Bold Unicode fallback (local GameMapSans URL alias)', license: 'SIL-OFL-1.1', url: 'https://github.com/maplibre/demotiles/tree/601ae60796ceceda2cbd2ed3d2ea92d17a84be4b/font/Noto%20Sans%20Bold' },
       { name: 'Noto Serif Bold fallback (local GameMapSerif URL alias)', license: 'SIL-OFL-1.1', url: 'https://tiles.openstreetmap.us/fonts/' },
@@ -394,7 +457,8 @@ async function prepare() {
   }
   const buildInputs = [];
   for (const input of [
-    'scripts/prepare-android-maps.mjs', 'scripts/prepare-world-maps.mjs', 'android/maps/world-source.json',
+    'scripts/prepare-android-maps.mjs', 'scripts/prepare-world-maps.mjs', 'scripts/game-map-art-direction.mjs', 'scripts/collection-art.mjs',
+    'scripts/map-volumes.mjs', 'scripts/prepare-collection-assets.mjs', 'scripts/approved-map-art.mjs', 'scripts/prepare-pink-assets.mjs', ...await walk(path.join(root, 'scripts/theme-art')), 'android/maps/world-source.json',
     'src/style.js', 'public/styles/tokens.json', 'android/maps/theme-tokens.json',
     ...await walk(path.join(source, 'icons')), ...await walk(path.join(source, 'fonts')),
   ]) {
@@ -414,4 +478,4 @@ async function prepare() {
   console.log(`Prepared ${files.length} native assets (${(files.reduce((n, f) => n + f.bytes, 0) / 1048576).toFixed(1)} MiB), 729 copied building tiles, ${poiMetadata.counts.total} real POIs, glyph ranges ${glyphRanges.join(', ')}.`);
 }
 
-await prepare();
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) await prepare();

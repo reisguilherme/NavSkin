@@ -1,0 +1,158 @@
+
+> navskin@0.10.0 test
+> node --test tests/*.test.mjs
+
+✔ offline oneway symbols keep original OSM direction and never invent missing or two-way restrictions (421.1508ms)
+✔ native subtype icons distinguish original OSM amenity while keeping category fallbacks (63.7306ms)
+✔ native filters cover every actual road grade and the real Praça Cívica park (6089.1859ms)
+✔ all day/night native variants satisfy the schema and share geographic sources (215.2116ms)
+✔ nine independent POI layers cover every available offline POI once and keep green areas separate (53.6754ms)
+✔ hiding all nine categories removes every POI while preserving traffic directions and geographic layers (34.4273ms)
+✔ source GeoJSON bytes and prepared building MVTs are copied without coordinate edits (605.225ms)
+✔ local Noto glyph PBFs cover all label codepoints including uppercase and accents (90.7968ms)
+✖ both sprite atlases include every editable icon, nine categories, subtype aliases and the traffic arrow (29.9756ms)
+✔ GTA uses measured TO-BE colors while every theme preserves the same real road hierarchy (18.235ms)
+✖ host night variants retain the same seven themes, geometry, symbols and readable palettes (38.0254ms)
+✔ Rosa stays candy pink and mint in both appearances while RDR2 uses parchment and dark ink (5.9331ms)
+✔ all requested OSM tags map to nine semantic categories with the six existing IDs preserved (3.2972ms)
+✔ education, culture, worship and drinking POIs retain exact original subtypes and provenance (16.8279ms)
+✔ a fuel site with a convenience shop has one category and unchanged raw provenance (0.5269ms)
+✔ shops are exported using their real tags, never the internal adapter category (0.3897ms)
+✔ deduplication reuses node and area rules, preserves every original source tag (1.6617ms)
+✔ polygon points lie inside complete geometry, outside holes, and incomplete ways are omitted (0.8633ms)
+✔ dedicated query includes all nine groups from one attributable snapshot (0.1946ms)
+✔ prepared Android package matches cached OSM source, metadata and point geometry (80.2585ms)
+✔ inline styles resolve their sprite against the local HTTP origin (5.9982ms)
+✔ illustrated map materials resolve locally without adding geographic sources or markers (674.8276ms)
+✔ readable theme fonts retain POI caption zoom gates in both coverages (139.4845ms)
+✔ new offline styles retain the bundled sources, road topology and all semantic filters (359.5425ms)
+✔ all seven themes build day and night world maps with identical real geography and category semantics (80.5605ms)
+✔ new theme sprites cover every category, subtype and traffic direction with visible standalone authored artwork (305.0785ms)
+Prepared 126 navigation choices (1 original game raster) and 252 transparent PNGs across 7 themes.
+✔ navigation generator emits all seven skins while retaining saved and vehicle preference IDs (1326.4836ms)
+✔ legacy font manifest cannot silently replace the current theme pack (198.8586ms)
+✔ game UI files retain exact source hashes and notices instead of renamed system fonts (20.889ms)
+✔ map glyphs have real game outlines, Portuguese accents and fallback glyph coverage (15.9696ms)
+✔ original sprites carry game names and copyrights while missing categories are explicit adaptations (23.7153ms)
+✔ GTA street names have placement priority over discretionary POI captions and direction hints (26.1419ms)
+✔ GTA readable labels use a separate font face with open spacing and restrained outlines (17.5218ms)
+✔ each new map has a sourced local font family and fallback glyphs for Portuguese (2.1784ms)
+✔ iOS bundle retains original geographic bytes and all local map variants (1833.5057ms)
+✔ iOS catalog choices all resolve to actual transparent artwork in every theme (563.638ms)
+✔ checked-in Xcode project includes every app source and local resources (15.7566ms)
+✔ saved choices and vehicle choices keep stable semantic ids in all seven theme catalogs (120.8109ms)
+✔ every runtime image has a local source and distinct visible transparent pixels (764.9743ms)
+✔ raster builder rejects external SVG references before emitting runtime files (316.9001ms)
+Prepared 126 navigation choices (1 original game raster) and 252 transparent PNGs across 7 themes.
+✔ raster builder uses an edited SVG without overwriting the source or changing its semantic choice (1440.5909ms)
+Prepared 126 navigation choices (1 original game raster) and 252 transparent PNGs across 7 themes.
+✔ GTA player raster overrides only its PNGs and preserves original pixels, source and provenance (1725.6534ms)
+✔ Flamboyant resolves the verified park rather than its homonymous district (4.112ms)
+✔ classification keeps hospital and clinic separate and covers requested POIs (1.3326ms)
+✔ representative points stay inside concave polygons and outside holes (0.8385ms)
+✔ crossing polygons get an interior point in the output bbox (0.3026ms)
+✔ only safe same-name node/area duplicates merge and retain all source IDs (16.6851ms)
+✔ incomplete polygon geometry and out-of-bounds nodes are omitted with reasons (0.2605ms)
+✔ multipolygon holes are preserved and tagged relation/member duplicates merge (0.8311ms)
+✔ shipped POIs have real OSM sources, correct categories, valid coordinates and attribution (56.5473ms)
+✔ style builder exists for local GeoJSON cartography (1.3248ms)
+✔ both visual modes use identical local geographic sources and no remote assets (5.4624ms)
+✔ crossings stay open: all road casings precede all fills within each grade (1.8073ms)
+✔ visual overrides change paint but preserve source, filters and topology (5.1958ms)
+✔ unknown style is rejected instead of silently rendering another preset (0.7457ms)
+✔ bus corridors are visible and elevated footbridges draw above ground roads (1.7204ms)
+✔ both generated styles satisfy the installed MapLibre schema (97.7933ms)
+✔ actual OSM road and area classes retain drawing rules, including the OSM building fallback (762.4222ms)
+✔ building sources are exclusive and real service categories have icon layers (1.8568ms)
+✔ world styles load the existing dense local building tiles within their declared coverage (164.8838ms)
+✔ world building coverage replaces real polygons in Goiânia and retains buildings beyond every edge (12.21ms)
+✔ world local building source resolves the dense university tile without stacking world footprints (21.9087ms)
+✔ world oneway arrows follow real directions and never infer missing road restrictions (11.0036ms)
+✔ GTA navigation names use readable sizes and light outlines without decorative letter spacing (8.4082ms)
+✔ world subtype icons retain nine visibility groups while distinguishing actual place subtypes (54.3136ms)
+✔ world builder produces fourteen valid variants using the production planet service (220.186ms)
+✔ world POI filters classify nine independent categories across all themes (107.0781ms)
+✔ hiding world categories preserves park fills, buildings and geographic labels (120.8412ms)
+✔ world roads preserve tunnels, ground roads and bridges without casing cuts at intersections (8.0694ms)
+✔ world themes keep their palettes and global font coverage without changing geometry (87.3074ms)
+✔ prepared asset manifest declares online world and the separate bundled offline map (2.7328ms)
+ℹ tests 71
+ℹ suites 0
+ℹ pass 69
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7877.731
+
+✖ failing tests:
+
+test at tests\android-native-assets.test.mjs:215:1
+✖ both sprite atlases include every editable icon, nine categories, subtype aliases and the traffic arrow (29.9756ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'material-grass-day',
+  +   'material-grass-night',
+  +   'material-roof-day',
+  +   'material-roof-night',
+  +   'material-water-day',
+  +   'material-water-night',
+      'poi-bar',
+      'poi-cafe',
+      'poi-clinic',
+      'poi-culture',
+      'poi-education',
+  
+      at TestContext.<anonymous> (file:///C:/Users/Guilherme/Downloads/GameMap/tests/android-native-assets.test.mjs:223:14)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [
+      'material-grass-day',  'material-grass-night',
+      'material-roof-day',   'material-roof-night',
+      'material-water-day',  'material-water-night',
+      'poi-bar',             'poi-cafe',
+      'poi-clinic',          'poi-culture',
+      'poi-education',       'poi-fast-food',
+      'poi-food',            'poi-fuel',
+      'poi-health',          'poi-hospital',
+      'poi-museum',          'poi-parking',
+      'poi-parks',           'poi-pharmacy',
+      'poi-religion',        'poi-restaurant',
+      'poi-school',          'poi-shops',
+      'poi-theatre',         'poi-worship',
+      'road-oneway-forward'
+    ],
+    expected: [
+      'poi-bar',             'poi-cafe',
+      'poi-clinic',          'poi-culture',
+      'poi-education',       'poi-fast-food',
+      'poi-food',            'poi-fuel',
+      'poi-health',          'poi-hospital',
+      'poi-museum',          'poi-parking',
+      'poi-parks',           'poi-pharmacy',
+      'poi-religion',        'poi-restaurant',
+      'poi-school',          'poi-shops',
+      'poi-theatre',         'poi-worship',
+      'road-oneway-forward'
+    ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\android-native-assets.test.mjs:276:1
+✖ host night variants retain the same seven themes, geometry, symbols and readable palettes (38.0254ms)
+  AssertionError [ERR_ASSERTION]: minecraft: road/urban contrast
+      at TestContext.<anonymous> (file:///C:/Users/Guilherme/Downloads/GameMap/tests/android-native-assets.test.mjs:292:12)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

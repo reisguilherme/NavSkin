@@ -1,0 +1,7 @@
+Source: https://github.com/vvye/smw-font/releases/download/v1.1/SMW.Whole-Pixel.Spacing.ttf
+
+Author Eric Kaiser / wye recreation of SNES SMW text, with character improvements. CC BY-NC 4.0; not a raw Nintendo font binary.
+
+Embedded copyright: Adapted from the font used in Super Mario World
+
+Public availability is not a redistribution grant. Retained as requested in the local game asset package, outside the code license.

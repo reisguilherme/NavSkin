@@ -1,8 +1,16 @@
 <resources>
     <item name="phone_header" type="id"/>
     <item name="phone_search" type="id"/>
+    <item name="phone_clear_destination" type="id"/>
     <item name="phone_speed" type="id"/>
     <item name="phone_recenter" type="id"/>
     <item name="phone_main_menu" type="id"/>
     <item name="phone_route_summary" type="id"/>
+    <item name="phone_stop_navigation" type="id"/>
+    <item name="phone_add_stop" type="id"/>
+    <item name="phone_stops" type="id"/>
+    <item name="phone_guidance" type="id"/>
+    <item name="phone_vibing" type="id"/>
+    <item name="phone_vibing_exit" type="id"/>
+    <item name="phone_vibing_recenter" type="id"/>
 </resources>

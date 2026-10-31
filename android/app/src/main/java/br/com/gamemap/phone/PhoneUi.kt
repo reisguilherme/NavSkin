@@ -26,16 +26,39 @@ internal data class PhonePalette(
 ) {
     companion object {
         fun forTheme(theme: MapTheme) = when (theme.assetName) {
-            "rosa" -> PhonePalette(color("#FFF7FA"), color("#542840"), color("#93647A"),
-                color("#D92376"), color("#FFE2EE"), color("#F7CADF"))
-            "rdr2" -> PhonePalette(color("#FFF9EA"), color("#483722"), color("#7D654C"),
-                color("#A13228"), color("#F0E3C4"), color("#DED0B0"))
-            else -> PhonePalette(color("#FFFCF4"), color("#252A1E"), color("#6A705D"),
-                color("#4C692B"), color("#E8EEDB"), color("#E0E4D6"))
+            "rosa" -> PhonePalette(color("#FFF8FB"), color("#4B213D"), color("#876678"),
+                color("#DF258B"), color("#FFE7F3"), color("#F0D6E3"))
+            "rdr2" -> PhonePalette(color("#FBF9F4"), color("#31291F"), color("#786D5C"),
+                color("#9B3D2C"), color("#F5E7D8"), color("#E5DDCF"))
+            else -> PhonePalette(color("#F5F8F6"), color("#16222B"), color("#63716A"),
+                color("#008EDF"), color("#E4F5FF"), color("#DCE5E0"))
         }
         private fun color(value: String) = Color.parseColor(value)
     }
 }
+
+internal fun themePreviewDescription(theme: MapTheme) = when (theme) {
+    MapTheme.GTA_SA -> "O clássico das ruas"
+    MapTheme.ROSA_POP -> "Cores doces, cidade viva"
+    MapTheme.RDR2 -> "Papel, terra e horizonte"
+    MapTheme.SUPER_MARIO_WORLD -> "Ilhas, caminhos e aventura"
+    MapTheme.CYBERPUNK_2077 -> "Neon e cidade noturna"
+    MapTheme.PIP_BOY -> "Fósforo verde e exploração"
+    MapTheme.HOLLOW_KNIGHT -> "Tinta, névoa e caminhos"
+    MapTheme.CROSSY_ROAD -> "Blocos, cores e travessias"
+}
+
+/** Only the map preview changes color; new themes keep the approved glass controls. */
+internal fun themePreviewBackground(theme: MapTheme): Int = Color.parseColor(when (theme) {
+    MapTheme.GTA_SA -> "#8BA875"
+    MapTheme.ROSA_POP -> "#FFE7F3"
+    MapTheme.RDR2 -> "#E8D8B3"
+    MapTheme.SUPER_MARIO_WORLD -> "#73C941"
+    MapTheme.CYBERPUNK_2077 -> "#10202B"
+    MapTheme.PIP_BOY -> "#071B10"
+    MapTheme.HOLLOW_KNIGHT -> "#111922"
+    MapTheme.CROSSY_ROAD -> "#83BC55"
+})
 
 internal fun Context.dip(value: Int): Int = (value * resources.displayMetrics.density + .5f).toInt()
 
@@ -48,8 +71,15 @@ internal fun Context.rounded(color: Int, radius: Int = 20, stroke: Int? = null, 
     }
 
 internal fun View.surface(palette: PhonePalette, radius: Int = 20, stroke: Boolean = false) {
-    background = context.rounded(palette.surface, radius, if (stroke) palette.border else null)
-    elevation = context.dip(6).toFloat()
+    // Native translucent fill + white rim: no map capture, bitmap blur, or GPS-frame work.
+    background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(
+        Color.argb(226, 255, 255, 255),
+        (palette.surface and 0x00ffffff) or (208 shl 24),
+    )).apply {
+        cornerRadius = context.dip(radius).toFloat()
+        setStroke(context.dip(1), if (stroke) palette.border else 0xeeffffff.toInt())
+    }
+    elevation = context.dip(8).toFloat()
     outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
     clipToOutline = true
 }

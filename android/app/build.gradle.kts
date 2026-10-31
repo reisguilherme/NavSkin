@@ -9,8 +9,8 @@ android {
         applicationId = "br.com.gamemap.goiania"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "0.8.0"
+        versionCode = 12
+        versionName = "0.12.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { buildConfig = true }
@@ -52,11 +52,22 @@ val verifyGameAssets by tasks.registering {
             "game-assets/gta/fonts/pricedow.ttf",
             "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf",
             "game-assets/rdr2/fonts/RDRLino-Regular.ttf",
+            "game-assets/gta/fonts/sabankgothic.ttf",
+            "game-assets/smw/fonts/SMW.ttf",
+            "game-assets/cyberpunk/fonts/BlenderPro-Bold.ttf",
             "maps/glyphs/NavSkinGtaRoad/0-255.pbf",
             "maps/glyphs/NavSkinRdrMap/0-255.pbf",
             "maps/sprites/gta.png", "maps/sprites/rdr2.png",
             "navigation-icons/gta/vehicles/arrow.png", "navigation-icons/gta/vehicles/arrow@2x.png",
-        )
+        ) + listOf("smw", "cyberpunk", "pipboy", "hollow", "crossy").flatMap { theme ->
+            listOf("maps/styles/$theme.json", "maps/styles/world-$theme.json", "maps/sprites/$theme.png",
+                "navigation-icons/$theme/vehicles/arrow.png")
+        } + listOf("NavSkinSmw", "NavSkinCyberpunk").map {
+            "maps/glyphs/$it/0-255.pbf"
+        } + listOf("navigation-3d/catalog.json") +
+            listOf("gta", "rosa", "rdr2", "smw", "cyberpunk", "pipboy", "hollow", "crossy").map {
+            "navigation-3d/$it/p55/a00.png"
+        }
         val missing = required.filterNot { file("src/main/assets/$it").isFile }
         check(missing.isEmpty()) {
             "Original game asset pack is missing: ${missing.joinToString()}. " +

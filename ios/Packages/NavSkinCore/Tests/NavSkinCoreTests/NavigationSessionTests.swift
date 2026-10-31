@@ -4,6 +4,115 @@ import XCTest
 
 final class NavigationSessionTests: XCTestCase {
     @MainActor
+    func testClearingDestinationDiscardsPendingRouteAndSearchCompletions() async throws {
+        let provider = DelayedSessionProvider()
+        let context = try SessionContext(provider: provider)
+        context.ready()
+        context.session.selectDestination(context.destination("A"))
+        context.session.search("place")
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .calculating)
+        XCTAssertTrue(context.session.snapshot.searching)
+
+        context.session.clearDestination()
+        await provider.completeRoute(id: "A")
+        await provider.completeSearch(query: "place")
+        await settle()
+
+        XCTAssertEqual(context.session.snapshot.phase, .idle)
+        XCTAssertNil(context.session.snapshot.destination)
+        XCTAssertNil(context.session.snapshot.route)
+        XCTAssertNil(context.session.snapshot.progress)
+        XCTAssertTrue(context.session.snapshot.intermediateStops.isEmpty)
+        XCTAssertNil(context.session.snapshot.pendingIntermediateStops)
+        XCTAssertFalse(context.session.snapshot.updatingStops)
+        XCTAssertFalse(context.session.snapshot.searching)
+        XCTAssertTrue(context.session.snapshot.searchResults.isEmpty)
+        XCTAssertNil(context.session.snapshot.searchError)
+    }
+
+    @MainActor
+    func testClearingPreviewRemovesResumeStopsAndSearchResults() async throws {
+        let context = try SessionContext()
+        let destination = context.destination("B")
+        let stop = context.destination("A")
+        try context.places.setResumeDestination(destination, intermediateStops: [stop])
+        context.ready()
+        context.session.resumeDestination()
+        context.session.search("place")
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .preview)
+        XCTAssertEqual(context.session.snapshot.intermediateStops, [stop])
+        XCTAssertFalse(context.session.snapshot.searchResults.isEmpty)
+
+        context.session.clearDestination()
+
+        XCTAssertEqual(context.session.snapshot.phase, .idle)
+        XCTAssertNil(context.session.snapshot.destination)
+        XCTAssertNil(context.session.snapshot.route)
+        XCTAssertTrue(context.session.snapshot.intermediateStops.isEmpty)
+        XCTAssertTrue(context.session.snapshot.resumeIntermediateStops.isEmpty)
+        XCTAssertNil(context.places.snapshot.resumeDestination)
+        XCTAssertTrue(context.session.snapshot.searchResults.isEmpty)
+    }
+
+    @MainActor
+    func testClearingDestinationCannotStopActiveNavigation() async throws {
+        let context = try SessionContext()
+        context.ready()
+        context.session.selectDestination(context.destination("A"))
+        await settle()
+        context.session.startNavigation()
+        let active = context.session.snapshot
+        XCTAssertTrue(active.navigationActive)
+
+        context.session.clearDestination()
+
+        XCTAssertEqual(context.session.snapshot, active)
+        XCTAssertEqual(context.places.snapshot.resumeDestination, active.destination)
+    }
+
+    @MainActor
+    func testClearingDestinationCannotDismissArrivedReplay() async throws {
+        let context = try SessionContext()
+        let arrived = expectation(description: "Replay reaches its destination")
+        context.session.onChange = { [weak context] state in
+            guard let context else { return }
+            if state.location.fix != nil { context.elapsed += 1_000 }
+            if state.phase == .arrived {
+                context.session.onChange = nil
+                arrived.fulfill()
+            }
+        }
+        let fix = context.locationFix(x: 111.2)
+        context.session.startReplay(route: sessionRoute(context.destination("A")), fixes: [fix, fix], intervalMs: 250)
+        await fulfillment(of: [arrived], timeout: 3)
+        await settle()
+        let replay = context.session.snapshot
+        XCTAssertEqual(replay.phase, .arrived)
+        XCTAssertTrue(replay.simulation)
+        XCTAssertFalse(replay.navigationActive)
+
+        context.session.clearDestination()
+
+        XCTAssertEqual(context.session.snapshot, replay)
+        context.session.stopReplay()
+    }
+
+    @MainActor
+    func testClearingDestinationWaitingForGPSDoesNotRestoreRouteAfterFix() async throws {
+        let context = try SessionContext()
+        context.session.selectDestination(context.destination("A"))
+        XCTAssertEqual(context.session.snapshot.phase, .waitingForLocation)
+        context.session.clearDestination()
+        context.ready()
+        await settle()
+        XCTAssertEqual(context.session.snapshot.phase, .idle)
+        XCTAssertNil(context.session.snapshot.destination)
+        XCTAssertNil(context.session.snapshot.route)
+    }
+
+    @MainActor
     func testSelectedDestinationWaitsForCurrentGPSAndAutomaticallyPreviews() async throws {
         let transport = SessionHTTPFixture()
         let context = try SessionContext(provider: GeoapifyProvider(apiKey: "fixture-test-key", transport: transport))
@@ -521,6 +630,12 @@ private func sessionRoute(_ destination: Destination) -> NavRoute {
 private struct ImmediateSessionProvider: NavigationProviding {
     func search(query: String, bias: GeoPoint?) async throws -> [Destination] { [Destination(id: query, name: query, point: GeoPoint(latitude: 0, longitude: 0.001))] }
     func route(origin: GeoPoint, destination: Destination) async throws -> NavRoute { sessionRoute(destination) }
+    func route(origin: GeoPoint, destination: Destination, intermediateStops: [Destination]) async throws -> NavRoute {
+        if intermediateStops.isEmpty { return sessionRoute(destination) }
+        return NavRoute(id: "route-\(destination.id)", geometry: [origin] + intermediateStops.map(\.point) + [destination.point],
+            steps: [], distanceMeters: 222.4, durationSeconds: 120, destination: destination, calculatedAtMs: 1_000_000,
+            intermediateStops: intermediateStops, intermediateStopIndices: Array(1...intermediateStops.count))
+    }
 }
 
 /// Ignores cancellation intentionally, like an HTTP completion already enqueued by the OS.

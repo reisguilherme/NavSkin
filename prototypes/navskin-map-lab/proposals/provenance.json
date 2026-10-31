@@ -1,0 +1,14 @@
+{
+  "bounds": [
+    -49.266,
+    -16.6855,
+    -49.257,
+    -16.679
+  ],
+  "buildingCount": 742,
+  "roadSegments": 156,
+  "areaPolygons": 34,
+  "source": "Local NavSkin data / OpenStreetMap, Overture, Google Open Buildings, Microsoft",
+  "geometry": "Coordinates are projected into SVG, without snapping or invented terrain. Decorative outlines do not represent elevation.",
+  "assets": "Original SVG drawing studies; no copied game art or game fonts."
+}

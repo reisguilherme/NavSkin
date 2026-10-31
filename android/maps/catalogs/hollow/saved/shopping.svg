@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="shopping">
+  <title>hollow · saved · shopping</title>
+  <!-- NavSkin authored collection navigation adaptation, CC0-1.0.  Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M15 22H49L53 54H11Z" fill="#e5d9bb" /><path d="M23 24V17Q23 8 32 8Q41 8 41 17V24" fill="none" /><path d="M25 34L29 38L40 29" fill="none" stroke-width="4"/></g></defs>
+  <use href="#art" stroke="#373e43" stroke-width="6.2"/>
+  <use href="#art" stroke="#8b9994" stroke-width="3.2"/>
+</svg>

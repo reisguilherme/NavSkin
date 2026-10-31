@@ -145,5 +145,47 @@
     "x": 146,
     "y": 74,
     "pixelRatio": 1
+  },
+  "lab-rosa-paper-day": {
+    "width": 64,
+    "height": 64,
+    "x": 2,
+    "y": 110,
+    "pixelRatio": 1
+  },
+  "lab-rosa-roof-day": {
+    "width": 64,
+    "height": 64,
+    "x": 70,
+    "y": 110,
+    "pixelRatio": 1
+  },
+  "lab-rosa-water-day": {
+    "width": 64,
+    "height": 64,
+    "x": 138,
+    "y": 110,
+    "pixelRatio": 1
+  },
+  "lab-rosa-paper-night": {
+    "width": 64,
+    "height": 64,
+    "x": 206,
+    "y": 110,
+    "pixelRatio": 1
+  },
+  "lab-rosa-roof-night": {
+    "width": 64,
+    "height": 64,
+    "x": 2,
+    "y": 178,
+    "pixelRatio": 1
+  },
+  "lab-rosa-water-night": {
+    "width": 64,
+    "height": 64,
+    "x": 70,
+    "y": 178,
+    "pixelRatio": 1
   }
 }

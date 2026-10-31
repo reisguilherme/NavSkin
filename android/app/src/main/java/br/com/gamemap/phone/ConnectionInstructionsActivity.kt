@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import br.com.gamemap.GameMapApplication
 import br.com.gamemap.R
+import br.com.gamemap.preferences.MapTheme
 import org.json.JSONObject
 
 /** Local attribution and connection help, reachable from the floating info action. */
@@ -48,7 +49,7 @@ class ConnectionInstructionsActivity : ComponentActivity() {
             }, LinearLayout.LayoutParams(MATCH, WRAP))
         }
         paragraph("Um mapa para explorar", """
-            Três estilos para explorar o mundo: GTA SA, Rosa Pop e RDR2. Mova e amplie o mapa com os dedos; use Temas e Filtros para escolher a aparência, a cobertura e os locais que quer ver.
+            ${MapTheme.entries.size} estilos para explorar o mundo: ${MapTheme.entries.joinToString { it.label }}. Mova e amplie o mapa com os dedos; use Temas e Filtros para escolher a aparência, a cobertura e os locais que quer ver.
 
             Mundo online carrega mapas OpenFreeMap / OpenStreetMap pela internet, sem uma chave de mapa. Goiânia offline conserva o recorte incluído no aparelho e funciona sem conexão dentro desse limite. Trocar a cobertura não encerra o GPS nem a viagem. Busca de endereços e cálculo de rotas usam Geoapify pela internet, com sua chave configurada no celular. O GPS preciso é ativado ao solicitar localização ou navegação. Não há orientação por voz.
         """.trimIndent())

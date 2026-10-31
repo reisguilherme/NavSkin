@@ -15,12 +15,13 @@ public struct GameAssetCatalog: Decodable {
     public let schemaVersion: Int
     public let themes: [String: GameThemeAssets]
     public static let empty = GameAssetCatalog(schemaVersion: 1, themes: [:])
+    private static let supportedThemes: Set<String> = ["gta", "rosa", "rdr2", "smw", "cyberpunk", "pipboy", "hollow", "crossy"]
 
     public init(data: Data) throws {
         let value = try JSONDecoder().decode(Self.self, from: data)
         guard value.schemaVersion == 1 else { throw CocoaError(.fileReadCorruptFile) }
         for (theme, entry) in value.themes {
-            guard ["gta", "rosa", "rdr2"].contains(theme) else { continue }
+            guard Self.supportedThemes.contains(theme) else { continue }
             if let font = entry.ui {
                 let pattern = "^game-assets/\(theme)/fonts/[A-Za-z0-9_.-]+\\.(ttf|otf)$"
                 guard font.file.range(of: pattern, options: .regularExpression) != nil,
@@ -46,7 +47,7 @@ public struct GameAssetCatalog: Decodable {
     }
 
     public var fontStacks: Set<String> {
-        Set(themes.filter { ["gta", "rosa", "rdr2"].contains($0.key) }.values.flatMap { entry in
+        Set(themes.filter { Self.supportedThemes.contains($0.key) }.values.flatMap { entry in
             (entry.map ?? [:]).filter { ["road", "poi", "place"].contains($0.key) }.map(\.value)
         })
     }

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "themes": {
+    "gta": {
+      "ui": {
+        "file": "game-assets/gta/fonts/pricedow.ttf",
+        "postScriptName": "Pricedown"
+      },
+      "map": {
+        "road": "NavSkinGtaRoad",
+        "poi": "NavSkinGtaRoad",
+        "place": "NavSkinGtaDisplay"
+      }
+    },
+    "rdr2": {
+      "ui": {
+        "file": "game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf",
+        "postScriptName": "HapnaSlabSerif-DemiBold"
+      },
+      "map": {
+        "road": "NavSkinRdrMap",
+        "poi": "NavSkinRdrUi",
+        "place": "NavSkinRdrMap"
+      }
+    },
+    "smw": {
+      "ui": {
+        "file": "game-assets/smw/fonts/SMW.ttf",
+        "postScriptName": "SMWWhole-PixelSpacing"
+      },
+      "map": {
+        "road": "NavSkinSmw",
+        "poi": "NavSkinSmw",
+        "place": "NavSkinSmw"
+      }
+    },
+    "cyberpunk": {
+      "ui": {
+        "file": "game-assets/cyberpunk/fonts/BlenderPro-Bold.ttf",
+        "postScriptName": "BlenderPro-Bold"
+      },
+      "map": {
+        "road": "NavSkinCyberpunk",
+        "poi": "NavSkinCyberpunk",
+        "place": "NavSkinCyberpunk"
+      }
+    },
+    "pipboy": {
+      "ui": {
+        "file": "game-assets/pipboy/fonts/BlenderPro-Bold.ttf",
+        "postScriptName": "BlenderPro-Bold"
+      },
+      "map": {
+        "road": "NavSkinCyberpunk",
+        "poi": "NavSkinCyberpunk",
+        "place": "NavSkinCyberpunk"
+      },
+      "origin": "Existing Blender Pro typography reused by the approved terminal study; not a Fallout font."
+    },
+    "hollow": {
+      "ui": {
+        "file": "game-assets/hollow/fonts/HapnaSlabSerif-DemiBold.ttf",
+        "postScriptName": "HapnaSlabSerif-DemiBold"
+      },
+      "map": {
+        "road": "NavSkinRdrMap",
+        "poi": "NavSkinRdrMap",
+        "place": "NavSkinRdrMap"
+      },
+      "origin": "Existing serif typography reused by the approved ink study; not a Hollow Knight font."
+    },
+    "crossy": {
+      "map": {
+        "road": "GameMapSans",
+        "poi": "GameMapSans",
+        "place": "GameMapSans"
+      },
+      "origin": "Bundled Noto Sans with system UI; not an original Crossy Road font."
+    }
+  }
+}

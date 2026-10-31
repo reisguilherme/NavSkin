@@ -4,9 +4,24 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { PbfReader } from 'pbf';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import os from 'node:os';
 import { buildWorldStyle } from '../scripts/prepare-world-maps.mjs';
 const root = path.resolve('android/maps/game-assets');
 const catalog = JSON.parse(await fs.readFile(path.join(root, 'catalog.json')));
+
+test('legacy font manifest cannot silently replace the current theme pack', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'navskin-font-manifest-'));
+  const before = await fs.readFile(path.join(root, 'catalog.json'));
+  try {
+    const manifest = path.join(directory, 'old.json');
+    await fs.writeFile(manifest, JSON.stringify({ fonts: { gta: {}, rdr2ui: {}, rdr2map: {} } }));
+    await assert.rejects(promisify(execFile)(process.execPath, ['scripts/prepare-game-assets.mjs', manifest]),
+      error => /expanded six-font import manifest/.test(error.stderr));
+    assert.deepEqual(await fs.readFile(path.join(root, 'catalog.json')), before);
+  } finally { await fs.rm(directory, { recursive: true, force: true }); }
+});
 function glyphs(bytes) {
   const result = new Map();
   new PbfReader(bytes).readFields((tag, _, p) => {
@@ -18,7 +33,7 @@ function glyphs(bytes) {
 }
 test('game UI files retain exact source hashes and notices instead of renamed system fonts', async () => {
   const provenance = JSON.parse(await fs.readFile(path.join(root, 'provenance.json')));
-  assert.equal(provenance.fonts.length, 3);
+  assert.equal(provenance.fonts.length, 6);
   for (const entry of provenance.fonts) {
     const bytes = await fs.readFile(path.join(root, 'runtime', entry.file));
     assert.equal(createHash('sha256').update(bytes).digest('hex'), entry.sha256);
@@ -34,7 +49,8 @@ test('map glyphs have real game outlines, Portuguese accents and fallback glyph 
   for (const alias of [...new Set(Object.values(catalog.themes).flatMap(theme => Object.values(theme.map)))]) {
     const actual = glyphs(await fs.readFile(path.join(root, 'glyphs', alias, '0-255.pbf')));
     for (const char of 'NavSkinGoiâniaSãoPauloFarmáciaÁÉÇãéç0123456789') assert.ok(actual.has(char.codePointAt(0)), `${alias}: missing ${char}`);
-    assert.notDeepEqual(actual.get(71), noto.get(71), `${alias}: renamed Noto is not an authentic game font`);
+    if (alias === 'GameMapSans') assert.deepEqual(actual.get(71), noto.get(71), 'Crossy explicitly uses the approved Noto fallback, not a claimed game font');
+    else assert.notDeepEqual(actual.get(71), noto.get(71), `${alias}: renamed Noto is not an authentic game font`);
   }
 });
 test('original sprites carry game names and copyrights while missing categories are explicit adaptations', async () => {
@@ -53,4 +69,27 @@ test('GTA street names have placement priority over discretionary POI captions a
   const style = buildWorldStyle('gta');
   assert.equal(style.layers.at(-1).id, 'road-labels');
   assert.ok(style.layers.at(-1).layout['symbol-spacing'] <= 180);
+});
+
+test('GTA readable labels use a separate font face with open spacing and restrained outlines', async () => {
+  const style = buildWorldStyle('gta');
+  const road = style.layers.find(layer => layer.id === 'road-labels');
+  assert.deepEqual(road.layout['text-font'], ['NavSkinGtaRoad']);
+  assert.equal(road.layout['text-transform'], 'none');
+  assert.ok(road.layout['text-letter-spacing'] <= 0.05);
+  assert.ok(road.paint['text-halo-width'] <= 1.25);
+  const poi = style.layers.find(layer => layer.id.startsWith('poi-') && layer.layout?.['text-field']);
+  assert.deepEqual(poi.layout['text-font'], ['NavSkinGtaRoad']);
+  const roadGlyphs = glyphs(await fs.readFile(path.join(root, 'glyphs/NavSkinGtaRoad/0-255.pbf')));
+  const display = glyphs(await fs.readFile(path.join(root, 'glyphs/NavSkinGtaDisplay/0-255.pbf')));
+  assert.notDeepEqual(roadGlyphs.get(97), display.get(97), 'road font must not reuse decorative Pricedown outlines');
+});
+
+test('each new map has a sourced local font family and fallback glyphs for Portuguese', async () => {
+  for (const id of ['smw', 'cyberpunk']) {
+    const profile = catalog.themes[id];
+    assert.ok(profile?.ui?.postScriptName, `${id} missing local font profile`);
+    for (const role of ['road', 'poi', 'place']) assert.ok(profile.map[role].startsWith('NavSkin'));
+    assert.ok((await fs.stat(path.join(root, 'runtime', profile.ui.file.replace(/^game-assets\//, '')))).size > 1000);
+  }
 });

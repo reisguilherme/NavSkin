@@ -13,10 +13,10 @@ const sourceRoot = path.join(root, 'android/maps/catalogs');
 const assetRoot = path.join(root, 'android/app/src/main/assets/navigation-icons');
 const savedIds = ['home', 'work', 'favorite', 'restaurant', 'cafe', 'park', 'shopping', 'gym', 'health', 'parking', 'meeting', 'special'];
 const vehicleIds = ['arrow', 'compact', 'sport', 'suv', 'motorcycle', 'themed'];
-const themes = ['gta', 'rosa', 'rdr2'];
+const themes = ['gta', 'rosa', 'rdr2', 'smw', 'cyberpunk', 'pipboy', 'hollow', 'crossy'];
 const catalog = async () => JSON.parse(await readFile(path.join(assetRoot, 'catalog.json'), 'utf8'));
 
-test('saved choices and vehicle choices keep stable semantic ids in all three theme catalogs', async () => {
+test('saved choices and vehicle choices keep stable semantic ids in all eight theme catalogs', async () => {
   const data = await catalog();
   assert.equal(data.schemaVersion, 1);
   assert.deepEqual(data.themes, themes);
@@ -95,7 +95,7 @@ test('every runtime image has a local source and distinct visible transparent pi
       }
     }
   }
-  assert.equal(hashes.size, 54);
+  assert.equal(hashes.size, 144);
 });
 
 test('raster builder rejects external SVG references before emitting runtime files', async () => {

@@ -94,6 +94,19 @@
         },
         "catalog": "game-assets/catalog.json",
         "unicodeFallback": "Noto for codepoints absent from the selected game font"
+      },
+      "artDirection": {
+        "theme": "rdr2",
+        "source": "scripts/theme-art/five-worlds.mjs",
+        "origin": "Approved NavSkin map-lab drawings promoted to production.",
+        "geometry": "Original feature coordinates, footprints, road grades and POIs retained. Paper, shadow and hatch effects are illustrations."
+      },
+      "volumes": {
+        "layerPrefix": "navskin-3d-",
+        "defaultVisibility": "none",
+        "navigationPitch": 48,
+        "geometry": "Existing real footprints; same filters and local/world replacement as the flat map.",
+        "heights": "Existing height/render_height or levels × 3; displayed 5–120 m. Missing values use deterministic illustrative 6–25 m volumes, not measurements."
       }
     }
   },
@@ -102,8 +115,10 @@
       "id": "background",
       "type": "background",
       "paint": {
-        "background-color": "#D9C69E"
-      }
+        "background-color": "#e6d4ac",
+        "background-pattern": "lab-rdr2-paper-day"
+      },
+      "layout": {}
     },
     {
       "id": "landuse-urban",
@@ -138,9 +153,11 @@
         ]
       ],
       "paint": {
-        "fill-color": "#D8C49D",
-        "fill-opacity": 1
-      }
+        "fill-color": "#e6d4ac",
+        "fill-opacity": 1,
+        "fill-pattern": "lab-rdr2-paper-day"
+      },
+      "layout": {}
     },
     {
       "id": "landuse-commercial",
@@ -175,7 +192,8 @@
       "paint": {
         "fill-color": "#D0B68C",
         "fill-opacity": 1
-      }
+      },
+      "layout": {}
     },
     {
       "id": "landuse-industrial",
@@ -212,7 +230,8 @@
       "paint": {
         "fill-color": "#C8B394",
         "fill-opacity": 1
-      }
+      },
+      "layout": {}
     },
     {
       "id": "vegetation-grass",
@@ -247,9 +266,11 @@
         ]
       ],
       "paint": {
-        "fill-color": "#C4BD96",
-        "fill-opacity": 1
-      }
+        "fill-color": "#c4bf96",
+        "fill-opacity": 1,
+        "fill-pattern": "lab-rdr2-grass-day"
+      },
+      "layout": {}
     },
     {
       "id": "vegetation-wood",
@@ -281,9 +302,11 @@
         ]
       ],
       "paint": {
-        "fill-color": "#93916D",
-        "fill-opacity": 1
-      }
+        "fill-color": "#c4bf96",
+        "fill-opacity": 1,
+        "fill-pattern": "lab-rdr2-forest-day"
+      },
+      "layout": {}
     },
     {
       "id": "protected-areas",
@@ -302,9 +325,11 @@
         ]
       ],
       "paint": {
-        "fill-color": "#B5AF88",
-        "fill-opacity": 1
-      }
+        "fill-color": "#c4bf96",
+        "fill-opacity": 1,
+        "fill-pattern": "lab-rdr2-grass-day"
+      },
+      "layout": {}
     },
     {
       "id": "vegetation-parks",
@@ -341,8 +366,72 @@
         ]
       ],
       "paint": {
-        "fill-color": "#B5AF88",
-        "fill-opacity": 1
+        "fill-color": "#c4bf96",
+        "fill-opacity": 1,
+        "fill-pattern": "lab-rdr2-grass-day"
+      },
+      "layout": {}
+    },
+    {
+      "id": "lab-park-edge-vegetation-parks",
+      "type": "line",
+      "source": "world",
+      "source-layer": "landuse",
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Polygon"
+        ],
+        [
+          "in",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "literal",
+            [
+              "park",
+              "garden",
+              "recreation_ground",
+              "village_green",
+              "golf_course",
+              "cemetery"
+            ]
+          ]
+        ]
+      ],
+      "minzoom": 0,
+      "metadata": {
+        "navskinArt": {
+          "illustration": true,
+          "follows": "vegetation-parks"
+        }
+      },
+      "paint": {
+        "line-color": "#51402d",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.35,
+          18,
+          1.2
+        ],
+        "line-opacity": 0.65,
+        "line-dasharray": [
+          6,
+          1
+        ]
       }
     },
     {
@@ -378,6 +467,47 @@
       "paint": {
         "fill-color": "#E8D7AD",
         "fill-opacity": 1
+      },
+      "layout": {}
+    },
+    {
+      "id": "lab-shore-outer-water-fill",
+      "type": "line",
+      "source": "world",
+      "source-layer": "water",
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Polygon"
+        ]
+      ],
+      "minzoom": 0,
+      "metadata": {
+        "navskinArt": {
+          "illustration": true,
+          "follows": "water-fill"
+        }
+      },
+      "paint": {
+        "line-color": "#829985",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          2,
+          18,
+          5
+        ],
+        "line-opacity": 0.44
       }
     },
     {
@@ -397,9 +527,11 @@
         ]
       ],
       "paint": {
-        "fill-color": "#A8B9AD",
-        "fill-opacity": 1
-      }
+        "fill-color": "#b7c7b3",
+        "fill-opacity": 1,
+        "fill-pattern": "lab-rdr2-water-day"
+      },
+      "layout": {}
     },
     {
       "id": "water-outline",
@@ -414,7 +546,7 @@
         "Polygon"
       ],
       "paint": {
-        "line-color": "#5C746F",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -423,12 +555,13 @@
           [
             "zoom"
           ],
-          9,
-          0.4,
-          17,
-          1.4
+          13,
+          0.5,
+          18,
+          1.8
         ]
-      }
+      },
+      "layout": {}
     },
     {
       "id": "waterways",
@@ -456,6 +589,72 @@
           17,
           5
         ]
+      }
+    },
+    {
+      "id": "lab-roof-shadow-building-footprints",
+      "type": "fill",
+      "source": "world",
+      "source-layer": "building",
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Polygon"
+        ],
+        [
+          ">",
+          [
+            "distance",
+            {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -49.325,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.755
+                  ]
+                ]
+              ]
+            }
+          ],
+          0
+        ]
+      ],
+      "minzoom": 13.4,
+      "metadata": {
+        "navskinArt": {
+          "illustration": true,
+          "follows": "building-footprints"
+        }
+      },
+      "paint": {
+        "fill-color": "#8f7856",
+        "fill-translate": [
+          0.7,
+          1
+        ],
+        "fill-translate-anchor": "map",
+        "fill-opacity": 0.55
       }
     },
     {
@@ -509,9 +708,115 @@
         ]
       ],
       "paint": {
-        "fill-color": "#B6A17A",
+        "fill-color": "#d4bf94",
         "fill-opacity": 1,
-        "fill-outline-color": "#8C7757"
+        "fill-outline-color": "#51402d",
+        "fill-antialias": true,
+        "fill-pattern": "lab-rdr2-roof-day"
+      },
+      "layout": {}
+    },
+    {
+      "id": "lab-roof-edge-building-footprints",
+      "type": "line",
+      "source": "world",
+      "source-layer": "building",
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Polygon"
+        ],
+        [
+          ">",
+          [
+            "distance",
+            {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -49.325,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.755
+                  ]
+                ]
+              ]
+            }
+          ],
+          0
+        ]
+      ],
+      "minzoom": 14.2,
+      "metadata": {
+        "navskinArt": {
+          "illustration": true,
+          "follows": "building-footprints"
+        }
+      },
+      "paint": {
+        "line-color": "#51402d",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.15,
+          18,
+          0.7
+        ],
+        "line-opacity": 0.9
+      }
+    },
+    {
+      "id": "lab-roof-shadow-building-footprints-local",
+      "type": "fill",
+      "source": "buildings-local",
+      "source-layer": "buildings",
+      "filter": [
+        "==",
+        [
+          "geometry-type"
+        ],
+        "Polygon"
+      ],
+      "minzoom": 13.4,
+      "metadata": {
+        "navskinArt": {
+          "illustration": true,
+          "follows": "building-footprints-local"
+        }
+      },
+      "paint": {
+        "fill-color": "#8f7856",
+        "fill-translate": [
+          0.7,
+          1
+        ],
+        "fill-translate-anchor": "map",
+        "fill-opacity": 0.55
       }
     },
     {
@@ -528,9 +833,49 @@
         "Polygon"
       ],
       "paint": {
-        "fill-color": "#B6A17A",
+        "fill-color": "#d4bf94",
         "fill-opacity": 1,
-        "fill-outline-color": "#8C7757"
+        "fill-outline-color": "#51402d",
+        "fill-antialias": true,
+        "fill-pattern": "lab-rdr2-roof-day"
+      },
+      "layout": {}
+    },
+    {
+      "id": "lab-roof-edge-building-footprints-local",
+      "type": "line",
+      "source": "buildings-local",
+      "source-layer": "buildings",
+      "filter": [
+        "==",
+        [
+          "geometry-type"
+        ],
+        "Polygon"
+      ],
+      "minzoom": 14.2,
+      "metadata": {
+        "navskinArt": {
+          "illustration": true,
+          "follows": "building-footprints-local"
+        }
+      },
+      "paint": {
+        "line-color": "#51402d",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.15,
+          18,
+          0.7
+        ],
+        "line-opacity": 0.9
       }
     },
     {
@@ -581,7 +926,8 @@
           3,
           2
         ]
-      }
+      },
+      "layout": {}
     },
     {
       "id": "paths--1",
@@ -644,7 +990,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#8D7957",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -653,12 +999,16 @@
           [
             "zoom"
           ],
-          14,
-          0.6,
-          17,
-          2.1
+          13,
+          0.45,
+          18,
+          1.6
         ],
-        "line-opacity": 0.5
+        "line-opacity": 0.85,
+        "line-dasharray": [
+          3,
+          2
+        ]
       }
     },
     {
@@ -718,7 +1068,7 @@
         ]
       ],
       "paint": {
-        "line-color": "#6F5340",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -727,16 +1077,17 @@
           [
             "zoom"
           ],
-          9,
+          13,
           0.4,
-          17,
-          2.7
+          18,
+          1.7
         ],
         "line-dasharray": [
-          3,
-          1.2
+          4,
+          1.5
         ]
-      }
+      },
+      "layout": {}
     },
     {
       "id": "road--1-service-casing",
@@ -803,7 +1154,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -813,17 +1164,17 @@
             "zoom"
           ],
           5,
-          0.32,
+          0.20800000000000002,
           8,
-          0.69,
+          0.44849999999999995,
           11,
-          0.85,
+          0.5525,
           13,
-          1.1,
+          0.7150000000000001,
           15,
-          2.2,
+          1.4300000000000002,
           17,
-          4.6
+          2.9899999999999998
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -897,7 +1248,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -907,17 +1258,17 @@
             "zoom"
           ],
           5,
-          0.33999999999999997,
+          0.22099999999999997,
           8,
-          0.73,
+          0.4745,
           11,
-          1.2,
+          0.78,
           13,
-          1.8499999999999999,
+          1.2025,
           15,
-          4.1,
+          2.665,
           17,
-          8.7
+          5.654999999999999
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -991,7 +1342,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -1001,17 +1352,17 @@
             "zoom"
           ],
           5,
-          0.38,
+          0.24700000000000003,
           8,
-          0.81,
+          0.5265000000000001,
           11,
-          1.6,
+          1.04,
           13,
-          2.6,
+          1.6900000000000002,
           15,
-          5.2,
+          3.3800000000000003,
           17,
-          10.9
+          7.085000000000001
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1085,7 +1436,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -1095,17 +1446,17 @@
             "zoom"
           ],
           5,
-          0.42000000000000004,
+          0.273,
           8,
-          0.8900000000000001,
+          0.5785000000000001,
           11,
-          2.1,
+          1.3650000000000002,
           13,
-          3.5,
+          2.275,
           15,
-          6.800000000000001,
+          4.420000000000001,
           17,
-          14.1
+          9.165000000000001
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1180,7 +1531,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -1190,17 +1541,17 @@
             "zoom"
           ],
           5,
-          0.4,
+          0.26,
           8,
-          0.8500000000000001,
+          0.5525000000000001,
           11,
-          1.9,
+          1.2349999999999999,
           13,
-          3,
+          1.9500000000000002,
           15,
-          5.8,
+          3.77,
           17,
-          12
+          7.800000000000001
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1274,7 +1625,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -1284,17 +1635,17 @@
             "zoom"
           ],
           5,
-          0.46,
+          0.29900000000000004,
           8,
-          0.97,
+          0.6305,
           11,
-          2.6,
+          1.6900000000000002,
           13,
-          4.3,
+          2.795,
           15,
-          8.3,
+          5.3950000000000005,
           17,
-          16.3
+          10.595
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1368,7 +1719,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -1378,17 +1729,17 @@
             "zoom"
           ],
           5,
-          0.52,
+          0.338,
           8,
-          1.09,
+          0.7085000000000001,
           11,
-          3.4000000000000004,
+          2.2100000000000004,
           13,
-          5.4,
+          3.5100000000000002,
           15,
-          10.1,
+          6.565,
           17,
-          19.6
+          12.740000000000002
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1462,7 +1813,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -1472,17 +1823,17 @@
             "zoom"
           ],
           5,
-          0.6000000000000001,
+          0.39000000000000007,
           8,
-          1.25,
+          0.8125,
           11,
-          4.3,
+          2.795,
           13,
-          6.7,
+          4.355,
           15,
-          12.5,
+          8.125,
           17,
-          24
+          15.600000000000001
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1556,7 +1907,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#877154",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -1566,19 +1917,19 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.25,
+          0.105,
           13,
-          0.5,
+          0.21,
           15,
-          1.6,
+          0.672,
           17,
-          4
+          1.68
         ],
-        "line-opacity": 0.55,
+        "line-opacity": 0.76,
         "line-dasharray": [
           2,
           1.4
@@ -1650,7 +2001,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#4C3928",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -1660,19 +2011,19 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.5,
+          0.21,
           13,
-          1.15,
+          0.48299999999999993,
           15,
-          3.4,
+          1.428,
           17,
-          8
+          3.36
         ],
-        "line-opacity": 0.55,
+        "line-opacity": 0.76,
         "line-dasharray": [
           2,
           1.4
@@ -1744,7 +2095,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#756047",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -1754,17 +2105,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.7,
+          0.294,
           13,
-          1.7,
+          0.714,
           15,
-          4.3,
+          1.8059999999999998,
           17,
-          10
+          4.2
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1838,7 +2189,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#65503B",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -1848,17 +2199,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1,
+          0.42,
           13,
-          2.4,
+          1.008,
           15,
-          5.7,
+          2.394,
           17,
-          13
+          5.46
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -1933,7 +2284,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#8D4331",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -1943,17 +2294,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.9,
+          0.378,
           13,
-          2,
+          0.84,
           15,
-          4.8,
+          2.016,
           17,
-          11
+          4.62
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -2027,7 +2378,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#5C4030",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -2037,17 +2388,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1.3,
+          0.546,
           13,
-          3,
+          1.26,
           15,
-          7,
+          2.94,
           17,
-          15
+          6.3
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -2121,7 +2472,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#6C2C25",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -2131,17 +2482,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1.8,
+          0.756,
           13,
-          3.8,
+          1.5959999999999999,
           15,
-          8.5,
+          3.57,
           17,
-          18
+          7.56
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -2215,7 +2566,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#6C2C25",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -2225,17 +2576,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          2.3,
+          0.9659999999999999,
           13,
-          4.7,
+          1.974,
           15,
-          10.5,
+          4.41,
           17,
-          22
+          9.24
         ],
         "line-opacity": 0.55,
         "line-dasharray": [
@@ -2304,7 +2655,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A84837",
+        "line-color": "#a86548",
         "line-width": [
           "interpolate",
           [
@@ -2313,14 +2664,16 @@
           [
             "zoom"
           ],
-          12,
-          0.6,
-          15,
-          2.8,
-          17,
-          5
+          13,
+          0.4,
+          18,
+          0.8
         ],
-        "line-opacity": 0.5
+        "line-opacity": 0.5,
+        "line-dasharray": [
+          5,
+          3
+        ]
       }
     },
     {
@@ -2384,7 +2737,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#8D7957",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -2393,12 +2746,16 @@
           [
             "zoom"
           ],
-          14,
-          0.6,
-          17,
-          2.1
+          13,
+          0.45,
+          18,
+          1.6
         ],
-        "line-opacity": 1
+        "line-opacity": 0.85,
+        "line-dasharray": [
+          3,
+          2
+        ]
       }
     },
     {
@@ -2458,7 +2815,7 @@
         ]
       ],
       "paint": {
-        "line-color": "#6F5340",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -2467,16 +2824,17 @@
           [
             "zoom"
           ],
-          9,
+          13,
           0.4,
-          17,
-          2.7
+          18,
+          1.7
         ],
         "line-dasharray": [
-          3,
-          1.2
+          4,
+          1.5
         ]
-      }
+      },
+      "layout": {}
     },
     {
       "id": "road-0-service-casing",
@@ -2543,7 +2901,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -2553,17 +2911,17 @@
             "zoom"
           ],
           5,
-          0.32,
+          0.20800000000000002,
           8,
-          0.69,
+          0.44849999999999995,
           11,
-          0.85,
+          0.5525,
           13,
-          1.1,
+          0.7150000000000001,
           15,
-          2.2,
+          1.4300000000000002,
           17,
-          4.6
+          2.9899999999999998
         ],
         "line-opacity": 1
       }
@@ -2633,7 +2991,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -2643,17 +3001,17 @@
             "zoom"
           ],
           5,
-          0.33999999999999997,
+          0.22099999999999997,
           8,
-          0.73,
+          0.4745,
           11,
-          1.2,
+          0.78,
           13,
-          1.8499999999999999,
+          1.2025,
           15,
-          4.1,
+          2.665,
           17,
-          8.7
+          5.654999999999999
         ],
         "line-opacity": 1
       }
@@ -2723,7 +3081,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -2733,17 +3091,17 @@
             "zoom"
           ],
           5,
-          0.38,
+          0.24700000000000003,
           8,
-          0.81,
+          0.5265000000000001,
           11,
-          1.6,
+          1.04,
           13,
-          2.6,
+          1.6900000000000002,
           15,
-          5.2,
+          3.3800000000000003,
           17,
-          10.9
+          7.085000000000001
         ],
         "line-opacity": 1
       }
@@ -2813,7 +3171,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -2823,17 +3181,17 @@
             "zoom"
           ],
           5,
-          0.42000000000000004,
+          0.273,
           8,
-          0.8900000000000001,
+          0.5785000000000001,
           11,
-          2.1,
+          1.3650000000000002,
           13,
-          3.5,
+          2.275,
           15,
-          6.800000000000001,
+          4.420000000000001,
           17,
-          14.1
+          9.165000000000001
         ],
         "line-opacity": 1
       }
@@ -2904,7 +3262,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -2914,17 +3272,17 @@
             "zoom"
           ],
           5,
-          0.4,
+          0.26,
           8,
-          0.8500000000000001,
+          0.5525000000000001,
           11,
-          1.9,
+          1.2349999999999999,
           13,
-          3,
+          1.9500000000000002,
           15,
-          5.8,
+          3.77,
           17,
-          12
+          7.800000000000001
         ],
         "line-opacity": 1
       }
@@ -2994,7 +3352,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -3004,17 +3362,17 @@
             "zoom"
           ],
           5,
-          0.46,
+          0.29900000000000004,
           8,
-          0.97,
+          0.6305,
           11,
-          2.6,
+          1.6900000000000002,
           13,
-          4.3,
+          2.795,
           15,
-          8.3,
+          5.3950000000000005,
           17,
-          16.3
+          10.595
         ],
         "line-opacity": 1
       }
@@ -3084,7 +3442,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -3094,17 +3452,17 @@
             "zoom"
           ],
           5,
-          0.52,
+          0.338,
           8,
-          1.09,
+          0.7085000000000001,
           11,
-          3.4000000000000004,
+          2.2100000000000004,
           13,
-          5.4,
+          3.5100000000000002,
           15,
-          10.1,
+          6.565,
           17,
-          19.6
+          12.740000000000002
         ],
         "line-opacity": 1
       }
@@ -3174,7 +3532,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -3184,17 +3542,17 @@
             "zoom"
           ],
           5,
-          0.6000000000000001,
+          0.39000000000000007,
           8,
-          1.25,
+          0.8125,
           11,
-          4.3,
+          2.795,
           13,
-          6.7,
+          4.355,
           15,
-          12.5,
+          8.125,
           17,
-          24
+          15.600000000000001
         ],
         "line-opacity": 1
       }
@@ -3264,7 +3622,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#877154",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3274,19 +3632,19 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.25,
+          0.105,
           13,
-          0.5,
+          0.21,
           15,
-          1.6,
+          0.672,
           17,
-          4
+          1.68
         ],
-        "line-opacity": 1
+        "line-opacity": 0.76
       }
     },
     {
@@ -3354,7 +3712,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#4C3928",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3364,19 +3722,19 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.5,
+          0.21,
           13,
-          1.15,
+          0.48299999999999993,
           15,
-          3.4,
+          1.428,
           17,
-          8
+          3.36
         ],
-        "line-opacity": 1
+        "line-opacity": 0.76
       }
     },
     {
@@ -3444,7 +3802,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#756047",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3454,17 +3812,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.7,
+          0.294,
           13,
-          1.7,
+          0.714,
           15,
-          4.3,
+          1.8059999999999998,
           17,
-          10
+          4.2
         ],
         "line-opacity": 1
       }
@@ -3534,7 +3892,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#65503B",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3544,17 +3902,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1,
+          0.42,
           13,
-          2.4,
+          1.008,
           15,
-          5.7,
+          2.394,
           17,
-          13
+          5.46
         ],
         "line-opacity": 1
       }
@@ -3625,7 +3983,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#8D4331",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3635,17 +3993,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.9,
+          0.378,
           13,
-          2,
+          0.84,
           15,
-          4.8,
+          2.016,
           17,
-          11
+          4.62
         ],
         "line-opacity": 1
       }
@@ -3715,7 +4073,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#5C4030",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3725,17 +4083,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1.3,
+          0.546,
           13,
-          3,
+          1.26,
           15,
-          7,
+          2.94,
           17,
-          15
+          6.3
         ],
         "line-opacity": 1
       }
@@ -3805,7 +4163,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#6C2C25",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3815,17 +4173,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1.8,
+          0.756,
           13,
-          3.8,
+          1.5959999999999999,
           15,
-          8.5,
+          3.57,
           17,
-          18
+          7.56
         ],
         "line-opacity": 1
       }
@@ -3895,7 +4253,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#6C2C25",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -3905,17 +4263,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          2.3,
+          0.9659999999999999,
           13,
-          4.7,
+          1.974,
           15,
-          10.5,
+          4.41,
           17,
-          22
+          9.24
         ],
         "line-opacity": 1
       }
@@ -3980,7 +4338,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A84837",
+        "line-color": "#a86548",
         "line-width": [
           "interpolate",
           [
@@ -3989,14 +4347,16 @@
           [
             "zoom"
           ],
-          12,
-          0.6,
-          15,
-          2.8,
-          17,
-          5
+          13,
+          0.4,
+          18,
+          0.8
         ],
-        "line-opacity": 1
+        "line-opacity": 1,
+        "line-dasharray": [
+          5,
+          3
+        ]
       }
     },
     {
@@ -4060,7 +4420,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#8D7957",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -4069,12 +4429,16 @@
           [
             "zoom"
           ],
-          14,
-          0.6,
-          17,
-          2.1
+          13,
+          0.45,
+          18,
+          1.6
         ],
-        "line-opacity": 1
+        "line-opacity": 0.85,
+        "line-dasharray": [
+          3,
+          2
+        ]
       }
     },
     {
@@ -4134,7 +4498,7 @@
         ]
       ],
       "paint": {
-        "line-color": "#6F5340",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -4143,16 +4507,17 @@
           [
             "zoom"
           ],
-          9,
+          13,
           0.4,
-          17,
-          2.7
+          18,
+          1.7
         ],
         "line-dasharray": [
-          3,
-          1.2
+          4,
+          1.5
         ]
-      }
+      },
+      "layout": {}
     },
     {
       "id": "road-1-service-casing",
@@ -4219,7 +4584,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4229,17 +4594,17 @@
             "zoom"
           ],
           5,
-          0.32,
+          0.20800000000000002,
           8,
-          0.69,
+          0.44849999999999995,
           11,
-          0.85,
+          0.5525,
           13,
-          1.1,
+          0.7150000000000001,
           15,
-          2.2,
+          1.4300000000000002,
           17,
-          4.6
+          2.9899999999999998
         ],
         "line-opacity": 1
       }
@@ -4309,7 +4674,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4319,17 +4684,17 @@
             "zoom"
           ],
           5,
-          0.33999999999999997,
+          0.22099999999999997,
           8,
-          0.73,
+          0.4745,
           11,
-          1.2,
+          0.78,
           13,
-          1.8499999999999999,
+          1.2025,
           15,
-          4.1,
+          2.665,
           17,
-          8.7
+          5.654999999999999
         ],
         "line-opacity": 1
       }
@@ -4399,7 +4764,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4409,17 +4774,17 @@
             "zoom"
           ],
           5,
-          0.38,
+          0.24700000000000003,
           8,
-          0.81,
+          0.5265000000000001,
           11,
-          1.6,
+          1.04,
           13,
-          2.6,
+          1.6900000000000002,
           15,
-          5.2,
+          3.3800000000000003,
           17,
-          10.9
+          7.085000000000001
         ],
         "line-opacity": 1
       }
@@ -4489,7 +4854,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4499,17 +4864,17 @@
             "zoom"
           ],
           5,
-          0.42000000000000004,
+          0.273,
           8,
-          0.8900000000000001,
+          0.5785000000000001,
           11,
-          2.1,
+          1.3650000000000002,
           13,
-          3.5,
+          2.275,
           15,
-          6.800000000000001,
+          4.420000000000001,
           17,
-          14.1
+          9.165000000000001
         ],
         "line-opacity": 1
       }
@@ -4580,7 +4945,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4590,17 +4955,17 @@
             "zoom"
           ],
           5,
-          0.4,
+          0.26,
           8,
-          0.8500000000000001,
+          0.5525000000000001,
           11,
-          1.9,
+          1.2349999999999999,
           13,
-          3,
+          1.9500000000000002,
           15,
-          5.8,
+          3.77,
           17,
-          12
+          7.800000000000001
         ],
         "line-opacity": 1
       }
@@ -4670,7 +5035,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4680,17 +5045,17 @@
             "zoom"
           ],
           5,
-          0.46,
+          0.29900000000000004,
           8,
-          0.97,
+          0.6305,
           11,
-          2.6,
+          1.6900000000000002,
           13,
-          4.3,
+          2.795,
           15,
-          8.3,
+          5.3950000000000005,
           17,
-          16.3
+          10.595
         ],
         "line-opacity": 1
       }
@@ -4760,7 +5125,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4770,17 +5135,17 @@
             "zoom"
           ],
           5,
-          0.52,
+          0.338,
           8,
-          1.09,
+          0.7085000000000001,
           11,
-          3.4000000000000004,
+          2.2100000000000004,
           13,
-          5.4,
+          3.5100000000000002,
           15,
-          10.1,
+          6.565,
           17,
-          19.6
+          12.740000000000002
         ],
         "line-opacity": 1
       }
@@ -4850,7 +5215,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#E7D4AD",
+        "line-color": "#e6d4ac",
         "line-width": [
           "interpolate",
           [
@@ -4860,17 +5225,17 @@
             "zoom"
           ],
           5,
-          0.6000000000000001,
+          0.39000000000000007,
           8,
-          1.25,
+          0.8125,
           11,
-          4.3,
+          2.795,
           13,
-          6.7,
+          4.355,
           15,
-          12.5,
+          8.125,
           17,
-          24
+          15.600000000000001
         ],
         "line-opacity": 1
       }
@@ -4940,7 +5305,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#877154",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -4950,19 +5315,19 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.25,
+          0.105,
           13,
-          0.5,
+          0.21,
           15,
-          1.6,
+          0.672,
           17,
-          4
+          1.68
         ],
-        "line-opacity": 1
+        "line-opacity": 0.76
       }
     },
     {
@@ -5030,7 +5395,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#4C3928",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5040,19 +5405,19 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.5,
+          0.21,
           13,
-          1.15,
+          0.48299999999999993,
           15,
-          3.4,
+          1.428,
           17,
-          8
+          3.36
         ],
-        "line-opacity": 1
+        "line-opacity": 0.76
       }
     },
     {
@@ -5120,7 +5485,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#756047",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5130,17 +5495,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.7,
+          0.294,
           13,
-          1.7,
+          0.714,
           15,
-          4.3,
+          1.8059999999999998,
           17,
-          10
+          4.2
         ],
         "line-opacity": 1
       }
@@ -5210,7 +5575,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#65503B",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5220,17 +5585,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1,
+          0.42,
           13,
-          2.4,
+          1.008,
           15,
-          5.7,
+          2.394,
           17,
-          13
+          5.46
         ],
         "line-opacity": 1
       }
@@ -5301,7 +5666,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#8D4331",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5311,17 +5676,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          0.9,
+          0.378,
           13,
-          2,
+          0.84,
           15,
-          4.8,
+          2.016,
           17,
-          11
+          4.62
         ],
         "line-opacity": 1
       }
@@ -5391,7 +5756,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#5C4030",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5401,17 +5766,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1.3,
+          0.546,
           13,
-          3,
+          1.26,
           15,
-          7,
+          2.94,
           17,
-          15
+          6.3
         ],
         "line-opacity": 1
       }
@@ -5481,7 +5846,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#6C2C25",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5491,17 +5856,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          1.8,
+          0.756,
           13,
-          3.8,
+          1.5959999999999999,
           15,
-          8.5,
+          3.57,
           17,
-          18
+          7.56
         ],
         "line-opacity": 1
       }
@@ -5571,7 +5936,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#6C2C25",
+        "line-color": "#51402d",
         "line-width": [
           "interpolate",
           [
@@ -5581,17 +5946,17 @@
             "zoom"
           ],
           5,
-          0.2,
+          0.1,
           8,
-          0.45,
+          0.189,
           11,
-          2.3,
+          0.9659999999999999,
           13,
-          4.7,
+          1.974,
           15,
-          10.5,
+          4.41,
           17,
-          22
+          9.24
         ],
         "line-opacity": 1
       }
@@ -5656,7 +6021,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A84837",
+        "line-color": "#a86548",
         "line-width": [
           "interpolate",
           [
@@ -5665,14 +6030,395 @@
           [
             "zoom"
           ],
-          12,
-          0.6,
-          15,
-          2.8,
-          17,
-          5
+          13,
+          0.4,
+          18,
+          0.8
         ],
-        "line-opacity": 1
+        "line-opacity": 1,
+        "line-dasharray": [
+          5,
+          3
+        ]
+      }
+    },
+    {
+      "id": "navskin-3d-building-footprints",
+      "type": "fill-extrusion",
+      "source": "world",
+      "source-layer": "building",
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "geometry-type"
+          ],
+          "Polygon"
+        ],
+        [
+          ">",
+          [
+            "distance",
+            {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -49.325,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.755
+                  ],
+                  [
+                    -49.205,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.64
+                  ],
+                  [
+                    -49.325,
+                    -16.755
+                  ]
+                ]
+              ]
+            }
+          ],
+          0
+        ]
+      ],
+      "minzoom": 14,
+      "layout": {
+        "visibility": "none"
+      },
+      "metadata": {
+        "navskin3d": {
+          "footprintLayer": "building-footprints",
+          "height": "Source height or levels where present; deterministic illustrative fallback, not surveyed geometry."
+        }
+      },
+      "paint": {
+        "fill-extrusion-color": "#d4bf94",
+        "fill-extrusion-height": [
+          "min",
+          120,
+          [
+            "max",
+            5,
+            [
+              "case",
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "height"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "to-number",
+                [
+                  "get",
+                  "height"
+                ],
+                0
+              ],
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "render_height"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "to-number",
+                [
+                  "get",
+                  "render_height"
+                ],
+                0
+              ],
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "levels"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "*",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "levels"
+                  ],
+                  0
+                ],
+                3
+              ],
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "building:levels"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "*",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "building:levels"
+                  ],
+                  0
+                ],
+                3
+              ],
+              [
+                "+",
+                6,
+                [
+                  "%",
+                  [
+                    "*",
+                    [
+                      "max",
+                      0,
+                      [
+                        "index-of",
+                        [
+                          "slice",
+                          [
+                            "to-string",
+                            [
+                              "coalesce",
+                              [
+                                "get",
+                                "gers_id"
+                              ],
+                              [
+                                "get",
+                                "osm_id"
+                              ],
+                              [
+                                "id"
+                              ],
+                              "7"
+                            ]
+                          ],
+                          0,
+                          1
+                        ],
+                        "0123456789abcdef"
+                      ]
+                    ],
+                    7
+                  ],
+                  20
+                ]
+              ]
+            ]
+          ]
+        ],
+        "fill-extrusion-base": 0,
+        "fill-extrusion-opacity": 0.96,
+        "fill-extrusion-vertical-gradient": true
+      }
+    },
+    {
+      "id": "navskin-3d-building-footprints-local",
+      "type": "fill-extrusion",
+      "source": "buildings-local",
+      "source-layer": "buildings",
+      "filter": [
+        "==",
+        [
+          "geometry-type"
+        ],
+        "Polygon"
+      ],
+      "minzoom": 14,
+      "layout": {
+        "visibility": "none"
+      },
+      "metadata": {
+        "navskin3d": {
+          "footprintLayer": "building-footprints-local",
+          "height": "Source height or levels where present; deterministic illustrative fallback, not surveyed geometry."
+        }
+      },
+      "paint": {
+        "fill-extrusion-color": "#d4bf94",
+        "fill-extrusion-height": [
+          "min",
+          120,
+          [
+            "max",
+            5,
+            [
+              "case",
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "height"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "to-number",
+                [
+                  "get",
+                  "height"
+                ],
+                0
+              ],
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "render_height"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "to-number",
+                [
+                  "get",
+                  "render_height"
+                ],
+                0
+              ],
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "levels"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "*",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "levels"
+                  ],
+                  0
+                ],
+                3
+              ],
+              [
+                ">",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "building:levels"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "*",
+                [
+                  "to-number",
+                  [
+                    "get",
+                    "building:levels"
+                  ],
+                  0
+                ],
+                3
+              ],
+              [
+                "+",
+                6,
+                [
+                  "%",
+                  [
+                    "*",
+                    [
+                      "max",
+                      0,
+                      [
+                        "index-of",
+                        [
+                          "slice",
+                          [
+                            "to-string",
+                            [
+                              "coalesce",
+                              [
+                                "get",
+                                "gers_id"
+                              ],
+                              [
+                                "get",
+                                "osm_id"
+                              ],
+                              [
+                                "id"
+                              ],
+                              "7"
+                            ]
+                          ],
+                          0,
+                          1
+                        ],
+                        "0123456789abcdef"
+                      ]
+                    ],
+                    7
+                  ],
+                  20
+                ]
+              ]
+            ]
+          ]
+        ],
+        "fill-extrusion-base": 0,
+        "fill-extrusion-opacity": 0.96,
+        "fill-extrusion-vertical-gradient": true
       }
     },
     {
@@ -6046,14 +6792,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6083,9 +6827,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6191,14 +6935,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6228,9 +6970,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6335,14 +7077,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6372,9 +7112,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6455,14 +7195,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6492,9 +7230,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6601,14 +7339,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6638,9 +7374,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6720,14 +7456,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6757,9 +7491,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6869,14 +7603,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -6906,9 +7638,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -6988,14 +7720,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -7025,9 +7755,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -7108,14 +7838,12 @@
           [
             "zoom"
           ],
-          12,
-          0.76,
-          15,
-          0.9,
+          13,
+          0.73,
           18,
-          1.05
+          1.03
         ],
-        "icon-padding": 5,
+        "icon-padding": 7,
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "symbol-sort-key": [
@@ -7145,9 +7873,9 @@
         "text-max-width": 13
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 0.9
       }
     },
     {
@@ -7217,23 +7945,19 @@
           [
             "zoom"
           ],
-          2,
-          11,
-          7,
           13,
-          12,
-          16,
           17,
-          20
+          18,
+          22
         ],
-        "text-letter-spacing": 0.1,
+        "text-letter-spacing": 0.15,
         "text-max-width": 15,
         "text-padding": 14
       },
       "paint": {
-        "text-color": "#39281C",
-        "text-halo-color": "#F1DEB6",
-        "text-halo-width": 1.5
+        "text-color": "#423025",
+        "text-halo-color": "#e6d4ac",
+        "text-halo-width": 1
       }
     }
   ],

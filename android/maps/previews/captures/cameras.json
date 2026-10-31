@@ -1,0 +1,82 @@
+{
+  "pipboy": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Approved browser panel, real Goiânia crop"
+  },
+  "hollow": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Approved browser panel, real Goiânia crop"
+  },
+  "crossy": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 51.99999999999999,
+    "bearing": -25,
+    "source": "Approved browser panel, real Goiânia crop"
+  },
+  "gta": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Production offline style rendered in browser, real Goiânia crop"
+  },
+  "rosa": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Production offline style rendered in browser, real Goiânia crop"
+  },
+  "rdr2": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Production offline style rendered in browser, real Goiânia crop"
+  },
+  "smw": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Production offline style rendered in browser, real Goiânia crop"
+  },
+  "cyberpunk": {
+    "center": [
+      -49.2618,
+      -16.684
+    ],
+    "zoom": 16.4,
+    "pitch": 0,
+    "bearing": 0,
+    "source": "Production offline style rendered in browser, real Goiânia crop"
+  }
+}

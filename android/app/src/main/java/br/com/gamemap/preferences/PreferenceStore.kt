@@ -11,7 +11,7 @@ class PreferenceStore(context: Context) : AutoCloseable {
     private val main = Handler(Looper.getMainLooper())
     private val listeners = linkedSetOf<(MapPreferences) -> Unit>()
     private val changed = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key == THEME || key == CATEGORIES || key == BASE_MAP_MODE) onMain {
+        if (key == THEME || key == CATEGORIES || key == BASE_MAP_MODE || key == BROWSE_3D || key == NAVIGATION_3D) onMain {
             val state = snapshot()
             listeners.toList().forEach { it(state) }
         }
@@ -35,6 +35,8 @@ class PreferenceStore(context: Context) : AutoCloseable {
             MapTheme.fromId(storage.getString(THEME, null)),
             categories?.mapNotNull { PoiCategory.fromId(it) }?.toSet() ?: PoiCategory.entries.toSet(),
             MapBaseMode.fromId(storage.getString(BASE_MAP_MODE, null)),
+            browse3D = storage.getBoolean(BROWSE_3D, false),
+            navigation3D = storage.getBoolean(NAVIGATION_3D, true),
         )
     }
 
@@ -44,6 +46,11 @@ class PreferenceStore(context: Context) : AutoCloseable {
 
     fun setBaseMapMode(mode: MapBaseMode) {
         check(storage.edit().putString(BASE_MAP_MODE, mode.id).commit()) { "Não foi possível salvar a cobertura do mapa" }
+    }
+
+    fun setMap3D(navigationActive: Boolean, enabled: Boolean) {
+        val key = if (navigationActive) NAVIGATION_3D else BROWSE_3D
+        check(storage.edit().putBoolean(key, enabled).commit()) { "Não foi possível salvar a dimensão do mapa" }
     }
 
     fun setCategoryEnabled(category: PoiCategory, enabled: Boolean) {
@@ -74,5 +81,7 @@ class PreferenceStore(context: Context) : AutoCloseable {
         private const val CATEGORIES = "poi_categories"
         private const val CATEGORY_SCHEMA = "poi_categories_schema"
         private const val BASE_MAP_MODE = "base_map_mode"
+        private const val BROWSE_3D = "browse_3d"
+        private const val NAVIGATION_3D = "navigation_3d"
     }
 }

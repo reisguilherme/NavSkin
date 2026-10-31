@@ -1,0 +1,12 @@
+PARTIAL CHECK: map preview PNG existence is omitted pending native captures; committed test remains strict.
+✔ iOS bundle retains original geographic bytes and all local map variants (1482.0653ms)
+✔ iOS catalog choices all resolve to actual transparent artwork in every theme (443.2028ms)
+✔ checked-in Xcode project includes every app source and local resources (11.5199ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2100.503

@@ -21,5 +21,22 @@
       "sourceRole": "Original raster is the source for the runtime PNGs; the legacy SVG is an unused original NavSkin alternative.",
       "distribution": "Local private pack only. Original game artwork and its derivatives are excluded from CC0."
     }
+  ],
+  "authoredThemes": [
+    "smw",
+    "cyberpunk",
+    "pipboy",
+    "hollow",
+    "crossy"
+  ],
+  "authoredArtwork": "NavSkin-authored SVG adaptations; CC0-1.0 except character adaptations. Theme names indicate visual inspiration, not original game artwork.",
+  "characterAdaptations": [
+    {
+      "theme": "rosa",
+      "kind": "vehicles",
+      "id": "themed",
+      "source": "scripts/theme-art/pink-icons/vehicle.svg",
+      "license": "Original NavSkin vector drawing from user-provided toy reference. Hello Kitty character rights remain with Sanrio; excluded from CC0."
+    }
   ]
 }

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "technique": "Original low-poly triangle meshes, orthographic multi-angle renders; no original game model extraction.",
+  "sources": [
+    "scripts/navigation-3d/models.mjs",
+    "scripts/navigation-3d/geometry.mjs",
+    "scripts/navigation-3d/renderer.mjs"
+  ],
+  "coordinateSystem": {
+    "forward": "+Y (north)",
+    "up": "+Z",
+    "yaw": "clockwise heading minus camera bearing",
+    "pitch": "map tilt from top-down"
+  },
+  "groundAnchor": [
+    0.5,
+    0.7
+  ],
+  "themes": {
+    "gta": {
+      "label": "CJ • BMX",
+      "source": "scripts/navigation-3d/models/gta/model.obj",
+      "inspiration": "Grand Theft Auto: San Andreas — CJ and BMX",
+      "triangles": 4792
+    },
+    "rosa": {
+      "label": "Hello Kitty • Conversível",
+      "source": "scripts/navigation-3d/models/rosa/model.obj",
+      "inspiration": "Hello Kitty toy convertible, user reference photo and approved vehicle.svg",
+      "triangles": 5588
+    },
+    "rdr2": {
+      "label": "Arthur • Cavalo",
+      "source": "scripts/navigation-3d/models/rdr2/model.obj",
+      "inspiration": "Red Dead Redemption 2 — saddled horse with frontier tack",
+      "triangles": 4600
+    },
+    "smw": {
+      "label": "Yoshi",
+      "source": "scripts/navigation-3d/models/smw/model.obj",
+      "inspiration": "Super Mario World — Yoshi",
+      "triangles": 5476
+    },
+    "cyberpunk": {
+      "label": "Kusanagi • Moto",
+      "source": "scripts/navigation-3d/models/cyberpunk/model.obj",
+      "inspiration": "Cyberpunk 2077 — Yaiba Kusanagi motorcycle",
+      "triangles": 3240
+    },
+    "pipboy": {
+      "label": "Vault Boy",
+      "source": "scripts/navigation-3d/models/pipboy/model.obj",
+      "inspiration": "Fallout — Vault Boy",
+      "triangles": 4020
+    },
+    "hollow": {
+      "label": "O Cavaleiro",
+      "source": "scripts/navigation-3d/models/hollow/model.obj",
+      "inspiration": "Hollow Knight — the Knight",
+      "triangles": 1728
+    },
+    "crossy": {
+      "label": "Galinha • Crossy Road",
+      "source": "scripts/navigation-3d/models/crossy/model.obj",
+      "inspiration": "Crossy Road — voxel chicken",
+      "triangles": 384
+    }
+  },
+  "note": "Authored fan-inspired assets. Character and franchise names belong to their respective owners. These files are not official game assets."
+}

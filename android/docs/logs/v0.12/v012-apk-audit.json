@@ -1,0 +1,33 @@
+{
+  "version": "0.12.0-debug",
+  "versionCode": 12,
+  "bytes": 137199930,
+  "sha256": "2eb117c25e76462ab5ab2d7762dc0146f28fd7cf32da1ccddd39816af4cef5bc",
+  "assets": 2119,
+  "avatarFrames": 768,
+  "themes": [
+    "gta",
+    "rosa",
+    "rdr2",
+    "smw",
+    "cyberpunk",
+    "pipboy",
+    "hollow",
+    "crossy"
+  ],
+  "styles": 32,
+  "missing": [],
+  "extra": [],
+  "mismatches": [],
+  "androidJvm": {
+    "tests": 212,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "Error": 0,
+    "Fatal": 0,
+    "Warning": 48
+  }
+}

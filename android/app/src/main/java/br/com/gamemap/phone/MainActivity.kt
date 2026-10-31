@@ -42,15 +42,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var root: FrameLayout
     private lateinit var navigationUi: PhoneNavigationUi
     private val insetProtections = mutableListOf<View>()
-    private lateinit var topBar: LinearLayout
-    private lateinit var locationPill: LinearLayout
-    private lateinit var locationTitle: TextView
-    private lateinit var selection: TextView
-    private lateinit var logo: ImageView
-    private lateinit var info: PhoneAction
-    private lateinit var dock: LinearLayout
-    private lateinit var themesAction: PhoneAction
-    private lateinit var filtersAction: PhoneAction
     private lateinit var renderStatus: TextView
     private val themeCards = mutableMapOf<MapTheme, ThemeCard>()
     private val categorySwitches = mutableMapOf<PoiCategory, Switch>()
@@ -63,9 +54,9 @@ class MainActivity : ComponentActivity() {
     private var sheetMode = SheetMode.THEMES
     private var removeListener: (() -> Unit)? = null
     private var removeNetworkListener: (() -> Unit)? = null
-    private var removeTypography: (() -> Unit)? = null
     private var lastMapStatus = "Carregando mapa…"
     private var navigationGuidanceVisible = false
+    private var vibing = false
     private var bindingPreferences = false
     private var destroying = false
     private var bottomInset = 0
@@ -87,7 +78,7 @@ class MainActivity : ComponentActivity() {
         }
         sheetMode = savedInstanceState?.getString(SHEET_STATE)?.let {
             runCatching { SheetMode.valueOf(it) }.getOrNull()
-        } ?: if (app.navigation.snapshot().navigationActive || app.navigation.snapshot().resumeDestination != null) SheetMode.NONE else SheetMode.THEMES
+        } ?: SheetMode.NONE
         root = FrameLayout(this)
         mapView = NativeMapRenderer.createMapView(this).apply {
             contentDescription = "Mapa NavSkin. Carregando mapa"
@@ -104,7 +95,6 @@ class MainActivity : ComponentActivity() {
         }
         buildMapControls()
         setContentView(root)
-        removeTypography = GameTypography.observe(root) { app.preferences.snapshot().theme }
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             bottomInset = bars.bottom
@@ -114,8 +104,7 @@ class MainActivity : ComponentActivity() {
                     when (index) { 0 -> height = bars.top; 1 -> height = bars.bottom; 2 -> width = bars.left; 3 -> width = bars.right }
                 }
             }
-            position(topBar, Gravity.TOP, start = bars.left + dip(12), end = bars.right + dip(12), top = bars.top + dip(10))
-            position(renderStatus, Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = bars.top + dip(88))
+            position(renderStatus, Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = bars.top + dip(76))
             if (::navigationUi.isInitialized) navigationUi.insets(bars.left, bars.top, bars.right, bars.bottom)
             root.post(::openRestoredSheet)
             insets
@@ -125,66 +114,19 @@ class MainActivity : ComponentActivity() {
         navigationUi = PhoneNavigationUi(this, root, renderer, restoredState = savedInstanceState,
             closeAppearanceSheet = { sheetMode = SheetMode.NONE; sheet?.dismiss() },
             openMapSettings = { showSheet(SheetMode.THEMES) },
+            openMapFilters = { showSheet(SheetMode.FILTERS) },
             onGuidanceChanged = { visible ->
                 if (navigationGuidanceVisible != visible) {
                     navigationGuidanceVisible = visible
                     refreshMapStatus()
                 }
-            })
-        topBar.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, _ ->
-            navigationUi.headerBottom(bottom)
-            position(renderStatus, Gravity.TOP or Gravity.CENTER_HORIZONTAL, top = bottom + dip(12))
-        }
+            }, onVibingChanged = ::applyVibing)
         applyPreferences(app.preferences.snapshot())
         if (savedInstanceState == null) root.post { navigationUi.handleIntent(intent) }
         ViewCompat.requestApplyInsets(root)
     }
 
     private fun buildMapControls() {
-        topBar = LinearLayout(this).apply {
-            id = R.id.phone_header
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        root.addView(topBar, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.TOP))
-        locationPill = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dip(10), dip(10), dip(10), dip(10))
-            minimumHeight = dip(60)
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
-            descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
-        }
-        logo = phoneIcon(R.drawable.phone_map).apply { setPadding(dip(5), dip(5), dip(5), dip(5)) }
-        locationPill.addView(logo, LinearLayout.LayoutParams(dip(30), dip(30)))
-        locationTitle = phoneText("NavSkin", 16f, true).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; gravity = Gravity.CENTER }
-        selection = phoneText("Mundo · online", 10f).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; gravity = Gravity.CENTER }
-        val brand = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            addView(locationTitle)
-            addView(selection, LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(4) })
-            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-        }
-        locationPill.addView(brand, LinearLayout.LayoutParams(0, WRAP, 1f).apply { marginStart = dip(7) })
-        topBar.addView(locationPill, if (landscape) LinearLayout.LayoutParams(dip(214), WRAP)
-            else LinearLayout.LayoutParams(0, WRAP, 1f))
-        info = PhoneAction(this, R.drawable.phone_menu, "Menu NavSkin").apply {
-            id = R.id.phone_main_menu
-            setOnClickListener { navigationUi.showOptions() }
-        }
-        dock = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            minimumHeight = dip(60)
-            setPadding(dip(2), 0, dip(2), 0)
-        }
-        themesAction = PhoneAction(this, R.drawable.phone_layers, "Temas", true, stacked = true).apply { setOnClickListener { showSheet(SheetMode.THEMES) } }
-        filtersAction = PhoneAction(this, R.drawable.phone_filters, "Filtros", true, stacked = true).apply { setOnClickListener { showSheet(SheetMode.FILTERS) } }
-        dock.addView(themesAction, LinearLayout.LayoutParams(dip(52), WRAP))
-        dock.addView(filtersAction, LinearLayout.LayoutParams(dip(52), WRAP))
-        topBar.addView(dock, LinearLayout.LayoutParams(WRAP, WRAP).apply { marginStart = dip(8) })
-        if (landscape) topBar.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
-        topBar.addView(info, LinearLayout.LayoutParams(dip(48), dip(60)).apply { marginStart = dip(8) })
         renderStatus = phoneText("Carregando mapa…", 12f).apply {
             gravity = Gravity.CENTER
             setPadding(dip(12), dip(9), dip(12), dip(9))
@@ -207,7 +149,8 @@ class MainActivity : ComponentActivity() {
         val mode = app.preferences.snapshot().baseMapMode
         val onlineMap = mode == MapBaseMode.WORLD
         val accessibleStatus = status.substringAfter("MapLibre Native: ").substringBefore(" · estilo ")
-        mapView.contentDescription = "Mapa ${mode.label}. $accessibleStatus"
+        mapView.contentDescription = if (vibing) "Mapa Vibing 3D. Toque para sair ou recentralizar. $accessibleStatus"
+            else "Mapa ${mode.label}. $accessibleStatus"
         when {
             onlineMap && !app.mapConnectivity.isOnline -> {
                 renderStatus.text = "Mapa mundial sem internet. Toque para escolher Goiânia offline."
@@ -218,7 +161,8 @@ class MainActivity : ComponentActivity() {
                     else "Não foi possível abrir o mapa offline. Toque para escolher outro mapa."
                 renderStatus.visibility = View.VISIBLE
             }
-            !status.contains("recursos e renderização prontos") -> {
+            !status.contains("recursos e renderização prontos") &&
+                !status.contains("primeiro quadro completo renderizado") -> {
                 renderStatus.text = if (onlineMap) "Carregando mapa mundial…" else "Carregando mapa de Goiânia offline…"
                 renderStatus.visibility = View.VISIBLE
             }
@@ -227,29 +171,27 @@ class MainActivity : ComponentActivity() {
         if (::navigationUi.isInitialized) navigationUi.mapNotice(
             renderStatus.text.toString().takeIf { renderStatus.visibility == View.VISIBLE })
         // During guidance the same notice is carried by the trip summary and menu.
-        if (navigationGuidanceVisible) renderStatus.visibility = View.GONE
+        if (navigationGuidanceVisible || vibing) renderStatus.visibility = View.GONE
+    }
+
+    private fun applyVibing(enabled: Boolean) {
+        vibing = enabled
+        root.keepScreenOn = enabled
+        insetProtections.forEach { it.visibility = if (enabled) View.GONE else View.VISIBLE }
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            if (enabled) hide(WindowInsetsCompat.Type.systemBars()) else show(WindowInsetsCompat.Type.systemBars())
+        }
+        mapView.contentDescription = if (enabled) "Mapa Vibing 3D. Toque para sair ou recentralizar." else "Mapa NavSkin"
+        refreshMapStatus()
     }
 
     private fun applyPreferences(preferences: MapPreferences) {
-        GameTypography.apply(root, preferences.theme)
-        sheet?.window?.decorView?.let { GameTypography.apply(it, preferences.theme) }
+        renderer.applyMapPreferences(preferences)
         renderer.applyStyle(currentStyle(preferences))
         palette = PhonePalette.forTheme(preferences.theme)
         root.setBackgroundColor(palette.soft)
         insetProtections.forEach { it.setBackgroundColor(palette.surface) }
-        locationPill.surface(palette, 24)
-        locationPill.contentDescription = "NavSkin · ${preferences.baseMapMode.label} · ${preferences.theme.label} · ${preferences.enabledCategories.size}/${PoiCategory.entries.size} categorias ativas"
-        selection.text = "${if (preferences.baseMapMode == MapBaseMode.WORLD) "Mundo" else "Goiânia offline"} · ${preferences.theme.label}"
-        locationTitle.setTextColor(palette.text)
-        selection.setTextColor(palette.muted)
-        logo.background = rounded(palette.soft, 13)
-        logo.imageTintList = ColorStateList.valueOf(palette.accent)
-        info.bind(palette)
-        info.touchSurface(palette.surface, 18)
-        info.elevation = dip(6).toFloat()
-        dock.surface(palette, 24)
-        themesAction.bind(palette)
-        filtersAction.bind(palette)
         renderStatus.setTextColor(palette.text)
         renderStatus.surface(palette, 14)
         if (::navigationUi.isInitialized) navigationUi.themeChanged()
@@ -357,7 +299,6 @@ class MainActivity : ComponentActivity() {
         dialog.setContentView(panel, ViewGroup.LayoutParams(MATCH, height))
         dialog.setOnShowListener {
             ViewCompat.requestApplyInsets(panel)
-            dialog.window?.decorView?.let { GameTypography.observe(it) { app.preferences.snapshot().theme } }
             dialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let {
                 it.setBackgroundColor(Color.TRANSPARENT)
                 it.layoutParams.height = height
@@ -386,7 +327,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun buildThemes(content: LinearLayout) {
-        content.addView(sheetLabel("Três estilos para explorar o mundo.", 13f, muted = true),
+        content.addView(sheetLabel("${MapTheme.entries.size} estilos para explorar o mundo.", 13f, muted = true),
             LinearLayout.LayoutParams(MATCH, WRAP).apply { topMargin = dip(8); bottomMargin = dip(16) })
         val carousel = ThemeCarousel(this)
         val cards = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -495,13 +436,10 @@ class MainActivity : ComponentActivity() {
 
     private inner class ThemeCard(val theme: MapTheme) : LinearLayout(this@MainActivity) {
         private val title = phoneText(theme.label, 16f, true)
-        private val description = phoneText(when (theme.assetName) {
-            "rosa" -> "Cores doces, cidade viva"
-            "rdr2" -> "Papel, terra e horizonte"
-            else -> "O clássico das ruas"
-        }, 11f)
+        private val description = phoneText(themePreviewDescription(theme), 11f)
         private val selectedIcon = phoneIcon(R.drawable.phone_check)
         init {
+            GameTypography.apply(title, theme)
             orientation = VERTICAL
             setPadding(dip(2), dip(2), dip(2), dip(2))
             isClickable = true; isFocusable = true
@@ -514,7 +452,7 @@ class MainActivity : ComponentActivity() {
                 importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
                 runCatching { assets.open("maps/previews/${theme.assetName}.webp").use { BitmapFactory.decodeStream(it) } }
                     .getOrNull()?.let { setImageBitmap(it) }
-                setBackgroundColor(PhonePalette.forTheme(theme).soft)
+                setBackgroundColor(themePreviewBackground(theme))
             }
             preview.addView(image, FrameLayout.LayoutParams(MATCH, MATCH))
             selectedIcon.setPadding(dip(4), dip(4), dip(4), dip(4))
@@ -590,7 +528,6 @@ class MainActivity : ComponentActivity() {
     }
     override fun onLowMemory() { super.onLowMemory(); renderer.onLowMemory() }
     override fun onDestroy() {
-        removeTypography?.invoke(); removeTypography = null
         destroying = true
         sheet?.setOnDismissListener(null)
         sheet?.dismiss()

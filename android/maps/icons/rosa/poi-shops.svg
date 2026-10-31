@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Mercados e lojas de conveniência"><title>Mercados e lojas de conveniência</title><!-- GameMap original Rosa Pop artwork. CC0-1.0. --><rect x="1" y="1" width="30" height="30" rx="9" fill="#FFFBF8" stroke="#FFFFFF" stroke-width="2"/><g stroke-linecap="round" stroke-linejoin="round"><path d="M7 12h18l2 17H5Z" fill="#FFE9B8" stroke="#985573" stroke-width="2" stroke-linejoin="round"/><path d="M11 13V9c0-8 10-8 10 0v4" fill="none" stroke="#985573" stroke-width="2" stroke-linecap="round"/><path d="M16 17c-8-7-10 6 0 3 10 3 8-10 0-3Z" fill="#F49AC4" stroke="#A53D74" stroke-width="1.2"/><circle cx="16" cy="18.5" r="2" fill="#FFF4E0"/><path d="m15 20-3 5m5-5 3 5" stroke="#A53D74" stroke-width="1.5" stroke-linecap="round"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Boutique de presentes</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 25h42v30H11Z" fill="#FFF0DB"/>
+    <path d="M46 27h7v28h-7Z" fill="#F0AFC6" stroke="none"/>
+    <path d="M15 12h34l7 15H8Z" fill="#FF90BC"/>
+    <path d="m22 13-3 14m13-14v14m10-14 3 14" stroke="#FFF1F4" stroke-width="6"/>
+    <path d="M15 12h34l7 15H8Z"/>
+    <path d="M8 27v3a6 6 0 0 0 12 0 6 6 0 0 0 12 0 6 6 0 0 0 12 0 6 6 0 0 0 12 0v-3" fill="#FF90BC"/>
+    <path d="M23 40h18v15H23Z" fill="#BAEBD4"/>
+    <path d="M20 40h24v6H20Z" fill="#C7AAE9"/>
+    <path d="M32 39s-10 0-10-5c0-6 9-2 10 5Zm0 0s10 0 10-5c0-6-9-2-10 5Z" fill="#FFBCD8"/>
+    <path d="M32 40v15"/>
+    <path d="M8 55h48v5H8Z" fill="#D7B4EC"/>
+  </g>
+</svg>

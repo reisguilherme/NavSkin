@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Estacionamentos"><title>Estacionamentos</title><!-- GameMap original Rosa Pop artwork. CC0-1.0. --><rect x="1" y="1" width="30" height="30" rx="9" fill="#FFFBF8" stroke="#FFFFFF" stroke-width="2"/><g stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="24" height="25" rx="8" fill="#D9D0FF" stroke="#68518D" stroke-width="2"/><path d="M12 24V10h6c7 0 7 9 0 9h-6m0-5h6" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="m23 3 1.2 2.8L27 7l-2.8 1.2L23 11l-1.2-2.8L19 7l2.8-1.2Z" fill="#FFF0A4" stroke="#AD7E66" stroke-width=".7"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Garagem de carrinho</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 55V29a25 25 0 0 1 50 0v26h-9V29a16 16 0 0 0-32 0v26Z" fill="#C7ADE9"/>
+    <path d="M12 27a20 20 0 0 1 40 0" stroke="#F9E9FB" stroke-width="3"/>
+    <path d="M22 37 26 27h12l4 10" fill="#A7E8D1"/>
+    <path d="M25 29h12" stroke="#F4FFEE" stroke-width="2"/>
+    <path d="M18 37h28v16H18Z" fill="#FF96BF"/>
+    <path d="M18 44h28v9H18Z" fill="#F178A6" stroke="none"/>
+    <path d="M18 37h28v16H18Z"/>
+    <path d="M21 51v5m22-5v5" stroke-width="6"/>
+    <path d="M22 42h2m16 0h2" stroke="#FFF2D7" stroke-width="4"/>
+    <path d="M29 48h6"/>
+    <path d="M4 58h56" stroke="#653452" stroke-width="3.5"/>
+  </g>
+</svg>

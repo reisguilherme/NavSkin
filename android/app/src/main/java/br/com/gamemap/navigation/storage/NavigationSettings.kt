@@ -22,6 +22,7 @@ class NavigationSettings(
 
     fun snapshot() = NavigationPreferences(
         vehicleId = storage.getString(VEHICLE_ID, "arrow").orEmpty().ifBlank { "arrow" },
+        hasVehicleSelection = storage.contains(VEHICLE_ID),
         savedPlacesVisible = storage.getBoolean(SAVED_VISIBLE, true),
         orientation = MapOrientation.entries.firstOrNull { it.name == storage.getString(ORIENTATION, null) }
             ?: MapOrientation.MOVEMENT_UP,

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Bomba de combustível de brinquedo</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M42 25h5v20c0 7 10 7 10 0V29l-7-7" stroke-width="4"/>
+    <path d="m47 17 9 9-4 5-8-9Z" fill="#B7EBD0"/>
+    <path d="M12 12a5 5 0 0 1 5-5h21a5 5 0 0 1 5 5v43H12Z" fill="#FF9DC7"/>
+    <path d="M35 10h5v42h-5Z" fill="#E877AA" stroke="none"/>
+    <path d="M18 15h19v13H18Z" fill="#B8EED4"/>
+    <path d="m22 19 9 0" stroke="#F7FFEE"/>
+    <path d="M28 33c-2 4-7 8-7 12a7 7 0 0 0 14 0c0-4-5-8-7-12Z" fill="#FFF0D9"/>
+    <path d="M27 47c-2 0-3-1-3-3" stroke="#F3BDCB" stroke-width="2.5"/>
+    <path d="M9 54h38v6H9Z" fill="#C9A8E8"/>
+    <path d="M16 12h13" stroke="#FFDCEC"/>
+  </g>
+</svg>

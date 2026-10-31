@@ -1,6 +1,7 @@
 package br.com.gamemap.data
 
 import android.content.Context
+import br.com.gamemap.preferences.MapTheme
 import org.json.JSONObject
 
 /** References exact supplied font files; absent themes keep their existing system font. */
@@ -20,7 +21,7 @@ class GameAssetCatalog private constructor(val themes: Map<String, GameThemeAsse
             require(json.getInt("schemaVersion") == 1)
             val themes = json.getJSONObject("themes")
             return GameAssetCatalog(buildMap {
-                for (theme in listOf("gta", "rosa", "rdr2")) {
+                for (theme in MapTheme.entries.map { it.assetName }) {
                     val entry = themes.optJSONObject(theme) ?: continue
                     val ui = entry.optJSONObject("ui")?.let {
                         val file = it.getString("file")

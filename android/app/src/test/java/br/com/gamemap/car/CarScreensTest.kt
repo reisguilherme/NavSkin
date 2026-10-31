@@ -59,17 +59,37 @@ class CarScreensTest {
 
     @Test fun hostRadioSelectionPersistsTheThemeSharedWithPhone() {
         val screen = ThemeScreen(carContext, store)
-        val before = screen.onGetTemplate() as ListTemplate
-        assertEquals(listOf("GTA SA", "Rosa Pop", "RDR2"),
-            before.singleList!!.items.map { (it as Row).title.toString() })
-        assertEquals(0, before.singleList!!.selectedIndex)
-        listOf(MapTheme.GTA_SA, MapTheme.ROSA_POP, MapTheme.RDR2).forEachIndexed { index, theme ->
-            before.singleList!!.onSelectedDelegate!!.sendSelected(index, completed)
+        val visited = mutableListOf<String>()
+        while (true) {
+            val template = screen.onGetTemplate() as ListTemplate
+            val rows = template.singleList!!.items.map { it as Row }
+            assertTrue("The car host list capacity must be respected", rows.size <= hostListLimit(carContext))
+            for ((index, row) in rows.withIndex()) {
+                visited += row.title.toString()
+                val currentList = (screen.onGetTemplate() as ListTemplate).singleList!!
+                val selection = currentList.onSelectedDelegate
+                if (selection != null) selection.sendSelected(index, completed)
+                else (currentList.items[index] as Row).onClickDelegate!!.sendClick(completed)
+                shadowOf(Looper.getMainLooper()).idle()
+                assertEquals(row.title.toString(), store.snapshot().theme.label)
+                PreferenceStore(context).use { assertEquals(store.snapshot().theme, it.snapshot().theme) }
+                assertEquals(index, (screen.onGetTemplate() as ListTemplate).singleList!!.selectedIndex)
+            }
+            val next = template.header!!.endHeaderActions.firstOrNull { it.title?.toString() == "Próximas" } ?: break
+            next.onClickDelegate!!.sendClick(completed)
             shadowOf(Looper.getMainLooper()).idle()
-            assertEquals(theme, store.snapshot().theme)
-            PreferenceStore(context).use { assertEquals(theme, it.snapshot().theme) }
-            assertEquals(index, (screen.onGetTemplate() as ListTemplate).singleList!!.selectedIndex)
+            assertNull("Browsing another page must not falsely select its first theme",
+                (screen.onGetTemplate() as ListTemplate).singleList!!.onSelectedDelegate)
         }
+        assertEquals(listOf("GTA SA", "Rosa Pop", "RDR2", "Super Mario World", "Cyberpunk 2077", "Pip-Boy", "Hollow Knight", "Crossy Road"), visited)
+    }
+
+    @Test fun themeScreenOpensThePageContainingThePersistedSelection() {
+        store.setTheme(MapTheme.CROSSY_ROAD)
+        val template = ThemeScreen(carContext, store).onGetTemplate() as ListTemplate
+        val items = template.singleList!!
+        assertTrue(items.items.size <= hostListLimit(carContext))
+        assertEquals("Crossy Road", (items.items[items.selectedIndex] as Row).title.toString())
     }
 
     @Test fun allNineHostSwitchesRemainIndependentAcrossHostLimitedPages() {
@@ -108,6 +128,11 @@ class CarScreensTest {
             val returned = controller.templatesReturned.filterIsInstance<ListTemplate>()
             assertTrue("The active host screen did not refresh", returned.isNotEmpty())
             assertEquals(2, returned.last().singleList!!.selectedIndex)
+            controller.reset()
+            PreferenceStore(context).use { it.setTheme(MapTheme.CYBERPUNK_2077) }
+            shadowOf(Looper.getMainLooper()).idle()
+            val newPage = controller.templatesReturned.filterIsInstance<ListTemplate>().last().singleList!!
+            assertEquals("Cyberpunk 2077", (newPage.items[newPage.selectedIndex] as Row).title.toString())
         } finally {
             controller.moveToState(Lifecycle.State.DESTROYED)
         }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="meeting">
+  <title>hollow · saved · meeting</title>
+  <!-- NavSkin authored collection navigation adaptation, CC0-1.0.  Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><circle cx="22" cy="20" r="8" fill="#e5d9bb"/><circle cx="43" cy="22" r="7" fill="#2d2e31"/><path d="M7 52V43Q7 32 21 32Q35 32 35 43V52Z" fill="#e5d9bb" /><path d="M35 52V43Q35 35 43 34Q56 34 57 46V52Z" fill="#2d2e31" /><path d="M12 16L16 12H26L30 16Z" fill="#a4b0a4" /></g></defs>
+  <use href="#art" stroke="#9ba6a7" stroke-width="6.2"/>
+  <use href="#art" stroke="#adb1a0" stroke-width="3.2"/>
+</svg>

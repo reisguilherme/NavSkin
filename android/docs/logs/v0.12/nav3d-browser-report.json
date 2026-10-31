@@ -1,0 +1,165 @@
+{
+  "checks": [
+    {
+      "name": "eight-avatars-gallery",
+      "pass": true
+    },
+    {
+      "name": "gallery-rotation-changes-view",
+      "pass": true
+    },
+    {
+      "name": "gallery-topview",
+      "pass": true
+    },
+    {
+      "name": "gallery-orbit",
+      "pass": true
+    },
+    {
+      "name": "gallery-mobile-no-overflow",
+      "pass": true
+    },
+    {
+      "name": "native-asset-navigation-gta",
+      "pass": true,
+      "data": {
+        "path": "gta/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-rosa",
+      "pass": true,
+      "data": {
+        "path": "rosa/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-rdr2",
+      "pass": true,
+      "data": {
+        "path": "rdr2/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-smw",
+      "pass": true,
+      "data": {
+        "path": "smw/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-cyberpunk",
+      "pass": true,
+      "data": {
+        "path": "cyberpunk/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-pipboy",
+      "pass": true,
+      "data": {
+        "path": "pipboy/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-hollow",
+      "pass": true,
+      "data": {
+        "path": "hollow/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "native-asset-navigation-crossy",
+      "pass": true,
+      "data": {
+        "path": "crossy/p55/a00.png",
+        "width": 72,
+        "rotation": 0,
+        "alignment": "viewport",
+        "pitch": "viewport",
+        "offset": {
+          "x": 0,
+          "y": -14.399999999999997
+        }
+      }
+    },
+    {
+      "name": "manual-map-rotation-changes-view",
+      "pass": true,
+      "data": "crossy/p40/a24.png"
+    },
+    {
+      "name": "moving-route-keeps-avatar",
+      "pass": true
+    },
+    {
+      "name": "no-browser-errors",
+      "pass": true,
+      "data": []
+    },
+    {
+      "name": "no-resource-errors",
+      "pass": true,
+      "data": []
+    }
+  ],
+  "errors": [],
+  "resources": []
+}

@@ -27,12 +27,13 @@ internal class AdaptiveNavigationCamera {
         lastTarget = null
     }
 
-    fun update(state: NavigationSnapshot, orientation: MapOrientation, recenter: Boolean = false): FollowCameraTarget? {
+    fun update(state: NavigationSnapshot, orientation: MapOrientation, recenter: Boolean = false,
+               freeDrive: Boolean = false): FollowCameraTarget? {
         if (!state.hasCurrentFix()) return null
         val point = state.renderPosition() ?: return null
         val previous = lastTarget
         val bearing = state.followBearing(orientation, previous?.bearing ?: 0.0)
-        val input = Input(point, state.location.fix!!.elapsedRealtimeMs, bearing, adaptiveFollowZoom(state), orientation)
+        val input = Input(point, state.location.fix!!.elapsedRealtimeMs, bearing, adaptiveFollowZoom(state, freeDrive), orientation)
         val before = lastInput
         if (!recenter && input == before) return null
         val elapsed = before?.let { (input.fixTime - it.fixTime).coerceIn(0L, 5_000L) } ?: 1_000L
@@ -57,8 +58,8 @@ internal class AdaptiveNavigationCamera {
 }
 
 /** More street detail at urban speed; a twelve-second approach window opens before a turn. */
-internal fun adaptiveFollowZoom(state: NavigationSnapshot): Double {
-    if (!state.navigationActive) return 16.0
+internal fun adaptiveFollowZoom(state: NavigationSnapshot, freeDrive: Boolean = false): Double {
+    if (!state.navigationActive && !freeDrive) return 16.0
     val speed = state.location.speedKmh?.takeIf { it.isFinite() && it >= 0.0 } ?: 50.0
     val cruising = when {
         speed <= 20.0 -> 17.0

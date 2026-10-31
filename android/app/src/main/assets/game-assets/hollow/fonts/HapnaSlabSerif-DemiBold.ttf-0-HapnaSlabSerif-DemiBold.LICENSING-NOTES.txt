@@ -1,0 +1,8 @@
+Family: Hapna Slab Serif DemiBold
+Original copyright: Copyright (c) 2013 by Mariya Pigoulevskaya. All rights reserved.
+Public extraction/conversion attributed to Peter1501.
+No outside-game redistribution permission accompanies this copy.
+Not CC0, not covered by the license of any extraction code or game-map code.
+Keep original notices, bundled README, provenance, and generated derivatives local and Git-ignored.
+The OS/2 fsType field is zero; this does not establish license rights.
+Source: https://www.worldofmods.com/rdr-2/tools/56923-rdr-2-font-russian-cyrillic-latin.html

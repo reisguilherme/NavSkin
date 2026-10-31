@@ -4,6 +4,7 @@ import br.com.gamemap.navigation.model.Destination
 import br.com.gamemap.navigation.model.LocationState
 import br.com.gamemap.navigation.model.NavRoute
 import br.com.gamemap.navigation.model.RouteProgress
+import br.com.gamemap.preferences.MapTheme
 
 enum class NavigationPhase {
     IDLE, WAITING_FOR_LOCATION, CALCULATING, PREVIEW, NAVIGATING, RECALCULATING, REROUTE_FAILED,
@@ -20,7 +21,10 @@ data class NavigationPreferences(
     val vehicleId: String = "arrow",
     val savedPlacesVisible: Boolean = true,
     val orientation: MapOrientation = MapOrientation.MOVEMENT_UP,
-)
+    val hasVehicleSelection: Boolean = true,
+) {
+    fun vehicleIdFor(theme: MapTheme): String = if (!hasVehicleSelection && theme == MapTheme.ROSA_POP) "themed" else vehicleId
+}
 
 /** One session shared by phone, foreground location service and the car host. */
 data class NavigationSnapshot(
@@ -39,6 +43,10 @@ data class NavigationSnapshot(
     val simulation: Boolean = false,
     val sessionId: Long = 0L,
     val resumeDestination: Destination? = null,
+    val intermediateStops: List<Destination> = emptyList(),
+    /** Requested edit awaiting a route; committed stops continue to describe the current route. */
+    val pendingIntermediateStops: List<Destination>? = null,
+    val resumeIntermediateStops: List<Destination> = emptyList(),
 ) {
     val navigationActive: Boolean get() = phase in setOf(
         NavigationPhase.NAVIGATING, NavigationPhase.RECALCULATING, NavigationPhase.REROUTE_FAILED,

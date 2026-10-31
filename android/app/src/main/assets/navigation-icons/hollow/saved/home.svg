@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="home">
+  <title>hollow · saved · home</title>
+  <!-- NavSkin authored collection navigation adaptation, CC0-1.0.  Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M10 30L32 11L54 30L48 30V53H17V30Z" fill="#e5d9bb" /><path d="M9 30L32 10L55 30" fill="#2c2931" /><rect x="27" y="36" width="11" height="17" rx="1" fill="#a4b0a4"/><rect x="21" y="26" width="10" height="8" rx="0" fill="#91a1a5"/><path d="M42 34L42 46" fill="none"/></g></defs>
+  <use href="#art" stroke="#c9cbb6" stroke-width="6.2"/>
+  <use href="#art" stroke="#d0c8b3" stroke-width="3.2"/>
+</svg>

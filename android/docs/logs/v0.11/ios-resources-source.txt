@@ -1,0 +1,2 @@
+PASS: actual resource resolver, 16 worldwide + 16 offline styles, eight persisted themes and removed-theme fallback, hidden 3D layers, world default, mode cache, all catalog previews, OpenStep project references and XML property lists
+PASS: Swift syntax for app and Apple-platform tests (does not type-check Apple frameworks)

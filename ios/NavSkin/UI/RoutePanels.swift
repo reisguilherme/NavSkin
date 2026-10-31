@@ -5,7 +5,8 @@ import NavSkinCore
 struct CompactRouteSummary: View {
     @ObservedObject var store: AppStore
     let openDetails: () -> Void
-    private var palette: ThemePalette { store.theme.palette }
+    var embedded = false
+    private var palette: ThemePalette { store.theme.glassPalette }
     private var canResume: Bool {
         store.snapshot.phase == .resumeAvailable || (!store.snapshot.navigationActive &&
             store.snapshot.destination == nil && store.snapshot.resumeDestination != nil)
@@ -13,7 +14,7 @@ struct CompactRouteSummary: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            if [.waitingForLocation, .calculating, .recalculating].contains(store.snapshot.phase) {
+            if !embedded && [.waitingForLocation, .calculating, .recalculating].contains(store.snapshot.phase) {
                 ProgressView().accessibilityLabel("Aguardando rota")
             }
             Button(action: openDetails) {
@@ -25,7 +26,7 @@ struct CompactRouteSummary: View {
                             summaryMetric(metrics.arrival, label: "chegada")
                         }
                     } else {
-                        Text(summary).gameFont(.subheadline, weight: .bold).lineLimit(2).monospacedDigit()
+                        Text(summary).interfaceFont(.subheadline, weight: .bold).lineLimit(2).monospacedDigit()
                             .multilineTextAlignment(.center)
                     }
                 }
@@ -37,13 +38,14 @@ struct CompactRouteSummary: View {
             .accessibilityHint("Abrir detalhes e ações da rota")
             if store.snapshot.phase == .preview && store.snapshot.providerConfigured {
                 Button("Iniciar") { store.startNavigation() }
-                    .gameFont(.subheadline, weight: .bold)
+                    .interfaceFont(.subheadline, weight: .bold)
                     .buttonStyle(.borderedProminent).controlSize(.large)
             }
         }
         .foregroundStyle(palette.text).padding(.horizontal, 14).padding(.vertical, 6)
-        .background(palette.surface, in: RoundedRectangle(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(palette.border, lineWidth: 1))
+        .background {
+            if !embedded { Color.clear.glassSurface(radius: 24, palette: palette) }
+        }
     }
 
     private var metrics: (duration: String, distance: String, arrival: String)? {
@@ -56,15 +58,16 @@ struct CompactRouteSummary: View {
             let arrival = Int64((Date().timeIntervalSince1970 + route.durationSeconds) * 1_000)
             return (NavSkinFormat.duration(route.durationSeconds), NavSkinFormat.distance(route.distanceMeters), NavSkinFormat.arrival(arrival))
         }
+        if snapshot.navigationActive { return ("—", "—", "—") }
         return nil
     }
 
     private func summaryMetric(_ value: String, label: String, prominent: Bool = false) -> some View {
         VStack(spacing: 1) {
-            Text(value).gameFont(prominent ? .title3 : .subheadline, weight: .bold)
+            Text(value).interfaceFont(prominent ? .title3 : .subheadline, weight: .bold)
                 .foregroundStyle(prominent ? palette.accent : palette.text)
                 .lineLimit(1).minimumScaleFactor(0.75).monospacedDigit()
-            Text(label).gameFont(.caption2).foregroundStyle(palette.muted).lineLimit(1)
+            Text(label).interfaceFont(.caption2).foregroundStyle(palette.muted).lineLimit(1)
         }
         .frame(maxWidth: .infinity)
     }
@@ -98,7 +101,9 @@ struct CompactRouteSummary: View {
 @MainActor
 struct GuidanceCard: View {
     @ObservedObject var store: AppStore
-    private var palette: ThemePalette { store.theme.palette }
+    let toggleMenu: () -> Void
+    let menuExpanded: Bool
+    private var palette: ThemePalette { store.theme.glassPalette }
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
@@ -106,32 +111,36 @@ struct GuidanceCard: View {
                let route = store.snapshot.route, route.steps.indices.contains(progress.stepIndex) {
                 let step = route.steps[progress.stepIndex]
                 Image(systemName: NavSkinFormat.maneuverSymbol(step.kind))
-                    .font(.system(size: 38, weight: .bold)).frame(width: 62, height: 68)
+                    .font(.system(size: 36, weight: .bold)).frame(width: 44, height: 62)
                     .foregroundStyle(palette.accent)
-                    .background(palette.soft, in: RoundedRectangle(cornerRadius: 16))
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(NavSkinFormat.distance(progress.distanceToManeuverMeters))
-                        .gameFont(.largeTitle, weight: .bold).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
-                    Text(step.instruction).gameFont(.headline).lineLimit(2).fixedSize(horizontal: false, vertical: true)
-                    if !step.streetName.isEmpty { Text(step.streetName).gameFont(.subheadline).foregroundStyle(palette.muted).lineLimit(1) }
+                        .interfaceFont(.largeTitle, weight: .bold).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
+                    Text(step.instruction).interfaceFont(.headline).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                    if !step.streetName.isEmpty { Text(step.streetName).interfaceFont(.subheadline).foregroundStyle(palette.muted).lineLimit(1) }
                 }
             } else {
                 Image(systemName: store.snapshot.phase == .recalculating ? "arrow.triangle.2.circlepath" : "location.slash")
                     .font(.title2).frame(width: 44)
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(statusTitle).gameFont(.headline)
+                    Text(statusTitle).interfaceFont(.headline)
                     Text(store.snapshot.message ?? "Aguardando uma localização precisa para continuar as instruções.")
-                        .gameFont(.subheadline).foregroundStyle(palette.muted).fixedSize(horizontal: false, vertical: true)
+                        .interfaceFont(.subheadline).foregroundStyle(palette.muted).fixedSize(horizontal: false, vertical: true)
                 }
             }
             Spacer(minLength: 0)
+            Button(action: toggleMenu) {
+                Image(systemName: "ellipsis").font(.system(size: 22, weight: .bold))
+                    .frame(width: 44, height: 44)
+                    .background(.white.opacity(0.45), in: Circle())
+            }.buttonStyle(.plain)
+                .accessibilityLabel(menuExpanded ? "Fechar menu" : "Abrir menu")
+                .accessibilityValue(menuExpanded ? "Expandido" : "Recolhido")
         }
         .foregroundStyle(palette.text).padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(palette.surface, in: RoundedRectangle(cornerRadius: 22))
-        .overlay(RoundedRectangle(cornerRadius: 22).stroke(palette.border, lineWidth: 1))
-        .shadow(color: .black.opacity(0.14), radius: 12, y: 4)
+        .glassSurface(radius: 23, palette: palette)
     }
 
     private var statusTitle: String {
@@ -148,7 +157,7 @@ struct RoutePanel: View {
     @ObservedObject var store: AppStore
     let openSettings: () -> Void
     @State private var saving = false
-    private var palette: ThemePalette { store.theme.palette }
+    private var palette: ThemePalette { store.theme.glassPalette }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -158,20 +167,37 @@ struct RoutePanel: View {
                 arrivedPanel
             } else {
                 destinationHeading
+                if !store.snapshot.intermediateStops.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Paradas antes do destino").interfaceFont(.subheadline, weight: .semibold)
+                        ForEach(Array(store.snapshot.intermediateStops.enumerated()), id: \.element.id) { index, stop in
+                            HStack(spacing: 8) {
+                                Text("\(index + 1). \(stop.name)").interfaceFont(.subheadline)
+                                Spacer()
+                                Button { store.removeStop(id: stop.id) } label: {
+                                    Image(systemName: "xmark.circle").frame(width: 44, height: 44)
+                                }.accessibilityLabel("Remover parada \(stop.name)").disabled(store.snapshot.updatingStops)
+                            }
+                        }
+                    }
+                }
                 if store.snapshot.phase == .waitingForLocation {
-                    HStack { ProgressView(); Text("Aguardando GPS preciso…").gameFont(.subheadline) }
+                    HStack { ProgressView(); Text("Aguardando GPS preciso…").interfaceFont(.subheadline) }
                     Text("A rota será calculada automaticamente quando houver uma posição atual e precisa.")
-                        .gameFont(.caption).foregroundStyle(palette.muted)
+                        .interfaceFont(.caption).foregroundStyle(palette.muted)
                 } else if store.snapshot.phase == .calculating {
-                    HStack { ProgressView(); Text("Calculando rota…").gameFont(.subheadline) }
+                    HStack { ProgressView(); Text("Calculando rota…").interfaceFont(.subheadline) }
                 } else if store.snapshot.phase == .preview, let route = store.snapshot.route {
                     routeSummary(route)
                 } else if store.snapshot.guidanceAvailable, let progress = store.snapshot.progress {
                     navigationSummary(progress)
                 } else if store.snapshot.navigationActive {
-                    Text("Estimativas aguardam GPS válido e retorno à rota.").gameFont(.caption).foregroundStyle(palette.muted)
+                    Text("Estimativas aguardam GPS válido e retorno à rota.").interfaceFont(.caption).foregroundStyle(palette.muted)
                 }
-                if let message = store.snapshot.message { Text(message).gameFont(.footnote).foregroundStyle(palette.muted) }
+                if let message = store.snapshot.message { Text(message).interfaceFont(.footnote).foregroundStyle(palette.muted) }
+                if store.snapshot.pendingIntermediateStops != nil && !store.snapshot.updatingStops {
+                    Button("Tentar atualizar paradas novamente") { store.retryRoute() }.buttonStyle(.borderedProminent)
+                }
                 actionRow
             }
         }
@@ -189,9 +215,9 @@ struct RoutePanel: View {
     private var destinationHeading: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(store.snapshot.destination?.name ?? "Sua rota").gameFont(.headline).lineLimit(2)
+                Text(store.snapshot.destination?.name ?? "Sua rota").interfaceFont(.headline).lineLimit(2)
                 if let address = store.snapshot.destination?.address, !address.isEmpty {
-                    Text(address).gameFont(.caption).foregroundStyle(palette.muted).lineLimit(1)
+                    Text(address).interfaceFont(.caption).foregroundStyle(palette.muted).lineLimit(1)
                 }
             }
             Spacer(minLength: 6)
@@ -202,6 +228,10 @@ struct RoutePanel: View {
             if store.snapshot.destination != nil {
                 Button { saving = true } label: { Image(systemName: "bookmark").frame(width: 44, height: 44) }
                     .accessibilityLabel("Salvar destino")
+                if !store.snapshot.navigationActive && !store.snapshot.simulation {
+                    Button { store.clearDestination() } label: { Image(systemName: "xmark").frame(width: 44, height: 44) }
+                        .accessibilityLabel("Limpar destino e rota")
+                }
             }
         }
     }
@@ -211,25 +241,22 @@ struct RoutePanel: View {
             metric(NavSkinFormat.duration(route.durationSeconds), "tempo estimado")
             metric(NavSkinFormat.distance(route.distanceMeters), "distância")
             Spacer(minLength: 0)
-            Text("Sem trânsito\nao vivo").gameFont(.caption2).foregroundStyle(palette.muted)
+            Text("Sem trânsito\nao vivo").interfaceFont(.caption2).foregroundStyle(palette.muted)
         }
     }
 
     private func navigationSummary(_ progress: RouteProgress) -> some View {
         HStack(alignment: .top, spacing: 16) {
+            metric(NavSkinFormat.duration(progress.remainingSeconds), "restantes")
+            metric(NavSkinFormat.distance(progress.remainingDistanceMeters), "distância")
             metric(NavSkinFormat.arrival(progress.arrivalEpochMs), "chegada")
-            metric(NavSkinFormat.duration(progress.remainingSeconds), NavSkinFormat.distance(progress.remainingDistanceMeters))
-            Spacer(minLength: 0)
-            if let speed = store.snapshot.location.speedKmh, speed.isFinite {
-                metric("\(Int(speed.rounded()))", "km/h")
-            } else { metric("—", "km/h") }
         }
     }
 
     private func metric(_ value: String, _ label: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(value).gameFont(.title3, weight: .bold).monospacedDigit()
-            Text(label).gameFont(.caption).foregroundStyle(palette.muted)
+            Text(value).interfaceFont(.title3, weight: .bold).monospacedDigit()
+            Text(label).interfaceFont(.caption).foregroundStyle(palette.muted)
         }
     }
 
@@ -248,16 +275,19 @@ struct RoutePanel: View {
                 !(store.snapshot.phase == .waitingForLocation && store.snapshot.serviceRunning) {
                 Button("Ativar GPS") { store.activateGPS() }.buttonStyle(.bordered)
             }
-            Button(store.snapshot.navigationActive ? "Encerrar" : "Cancelar", role: .destructive) { store.stopNavigation() }
+            Button(store.snapshot.navigationActive ? "Parar" : "Cancelar", role: .destructive) { store.stopNavigation() }
                 .buttonStyle(.bordered).controlSize(.large)
         }
     }
 
     private var resumePanel: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("Retomar destino", systemImage: "arrow.clockwise").gameFont(.headline)
-            Text(store.snapshot.resumeDestination?.name ?? "Último destino").gameFont(.subheadline)
-            Text("Uma nova rota será calculada usando seu GPS atual.").gameFont(.caption).foregroundStyle(palette.muted)
+            Label("Retomar destino", systemImage: "arrow.clockwise").interfaceFont(.headline)
+            Text(store.snapshot.resumeDestination?.name ?? "Último destino").interfaceFont(.subheadline)
+            if !store.snapshot.resumeIntermediateStops.isEmpty {
+                Text("Paradas: " + store.snapshot.resumeIntermediateStops.map(\.name).joined(separator: " → ")).interfaceFont(.subheadline)
+            }
+            Text("Uma nova rota será calculada usando seu GPS atual.").interfaceFont(.caption).foregroundStyle(palette.muted)
             HStack {
                 Button("Recalcular") { store.resumeDestination() }.buttonStyle(.borderedProminent)
                 Button("Dispensar") { store.stopNavigation() }.buttonStyle(.bordered)
@@ -269,8 +299,8 @@ struct RoutePanel: View {
         HStack(spacing: 14) {
             Image(systemName: "flag.checkered.circle.fill").font(.largeTitle).foregroundStyle(palette.accent)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Você chegou!").gameFont(.title2, weight: .bold)
-                Text(store.snapshot.destination?.name ?? "Destino").gameFont(.subheadline)
+                Text("Você chegou!").interfaceFont(.title2, weight: .bold)
+                Text(store.snapshot.destination?.name ?? "Destino").interfaceFont(.subheadline)
             }
             Spacer()
             Button("Concluir") { store.stopNavigation() }.buttonStyle(.borderedProminent)

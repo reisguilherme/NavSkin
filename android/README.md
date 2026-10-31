@@ -1,12 +1,24 @@
 # NavSkin — Android
 
-A **0.8.0** libera girar o mapa, acompanha o rumo com transições e aproxima curvas/retornos e baixas velocidades. A instrução de manobra é maior e o ETA tem três campos. A camada opcional TomTom mostra fluxo e incidentes mediante chave própria. [Configuração, comportamento e limites](../docs/navigation-v0.8.md).
+A **0.12.0** inclui oito marcadores 3D que entram automaticamente ao navegar ou usar Vibing. O ângulo acompanha o movimento e a câmera, com carga de imagens fora da UI. O ícone escolhido nas opções retorna ao explorar. [Avatares e APK](../docs/navigation-avatars-v0.12.md) · [Validação](docs/VALIDATION-v0.12.md).
+
+A **0.11.0** reúne **oito temas**: GTA SA, Rosa Pop, RDR2, Super Mario World, Cyberpunk 2077, Pip-Boy, Hollow Knight e Crossy Road. São 32 estilos entre dia/noite e as duas coberturas, oito prévias e catálogos de locais/veículos. Inclui os redesenhos aprovados nos painéis, ícones Pink World e seu carrinho temático. [Recursos e procedência](../docs/eight-theme-assets.md).
+
+**Vibing** fica no menu ⋯ do telefone: mapa e veículo em 3D, GPS acompanhando o movimento, sem cards. Pode iniciar sem destino ou continuar uma rota. Um toque revela Sair e Recentralizar por cinco segundos; Voltar restaura os controles sem encerrar a viagem. [Uso e limites](../docs/vibing-v0.11.md).
+
+**Mapa 3D** fica no menu ⋯ do telefone e em Aparência no Android Auto. A escolha é persistida separadamente: exploração começa em 2D, navegação em 3D. A prévia/visão geral da rota permanece plana; recentralizar retoma a perspectiva escolhida. Todos os temas usam contornos reais dos prédios, com alturas ilustrativas quando faltam medições. Vibing força 3D temporariamente e preserva essas preferências.
+
+Minecraft e GTA V foram retirados desta entrega a pedido do usuário. Os SVGs e as paletas ficam como rascunhos, fora dos seletores e catálogos ativos.
+
+A **0.9.0** aplica a interface Vidro: menu **⋯** dentro do card de direção durante a viagem, controles circulares iguais e **Parar / Adicionar parada** no rodapé. Paradas reais são calculadas em ordem, mantendo o destino final e a rota confirmada em caso de falha. Temas, filtros, salvos e configurações ficam no menu. [Uso e limites](../docs/navigation-v0.9.md).
+
+A **0.8.0** liberou girar o mapa, acompanha o rumo com transições e aproxima curvas/retornos e baixas velocidades. A instrução de manobra é maior e o ETA tem três campos. A camada opcional TomTom mostra fluxo e incidentes mediante chave própria. [Configuração, comportamento e limites](../docs/navigation-v0.8.md).
 
 A 0.7.1 separa espera pelo GPS de erro de rota: o primeiro fix é aguardado com progresso e a prévia é calculada automaticamente. Internet/chave/quota continuam sendo falhas explicadas, com tentativa explícita. [Regressões e validação](docs/VALIDATION-v0.7.1.md).
 
 Aplicativo nativo em Kotlin com mapas mundiais, GPS do Android e navegação visual para automóvel no telefone e no Android Auto. A integração usa a categoria **Navegação** da Car App Library. MapLibre Native renderiza **Mundo online**, padrão, com mapas OpenFreeMap / OpenStreetMap por HTTPS, ou **Goiânia offline**, com o recorte cartográfico incluído no APK. Geoapify fornece busca e rotas pela internet com a chave do usuário.
 
-Versão do código: **0.8.0**, `versionCode 8`. Consulte [configuração e uso](docs/NAVIGATION.md) e [validação da v0.8.0](docs/VALIDATION-v0.8.md). O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.6](docs/VALIDATION-v0.6.md), [v0.5](docs/VALIDATION-v0.5.md), [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico.
+Versão do código: **0.12.0**, `versionCode 12`. Consulte [avatares 3D da versão atual](../docs/navigation-avatars-v0.12.md) e [validação da v0.12.0](docs/VALIDATION-v0.12.md). O identificador de instalação, a assinatura debug e os arquivos de preferências/dados mantêm os nomes anteriores para permitir atualização e conservar favoritos, destinos e configurações. Os registros da [v0.6](docs/VALIDATION-v0.6.md), [v0.5](docs/VALIDATION-v0.5.md), [v0.4.0](docs/VALIDATION-v0.4.md), [v0.3.0](docs/VALIDATION-v0.3.md), suas [capturas](screenshots/v0.3/README.md) e a [primeira entrega](docs/VALIDATION.md) permanecem como histórico.
 
 Na 0.7, Temas/Filtros sobem para o cabeçalho. O botão de menu abre salvos, GPS, configurações, orientação, zoom e créditos. Busca inferior, velocidade e recentralização circulares substituem os painéis ociosos e a faixa de atribuição. O card de ETA mostra somente tempo, distância e chegada, centralizados; rótulos GTA estão maiores. O marcador padrão GTA usa radar_centre original, com escala lógica corrigida em telas densas. Overture local também é renderizado no modo Mundo em Goiânia, sem duplicar os prédios mundiais; fora da cobertura continua OpenFreeMap.
 
@@ -14,19 +26,19 @@ Na 0.7, Temas/Filtros sobem para o cabeçalho. O botão de menu abre salvos, GPS
 
 Pricedown histórica é usada na UI e nos rótulos GTA; Hapna e RDR Lino no tema RDR2. Os sprites originais de POIs mantêm sua procedência, com adaptações próprias para categorias sem equivalente no jogo. Cores, contornos, nomes de ruas e sentidos foram calibrados pelos exemplos. São nove filtros, incluindo ensino, cultura e culto; os três novos grupos não estão no snapshot offline atual, mas aparecem no mundial. [Fontes, origem e importação](../docs/game-assets-provenance.md).
 
-O pacote original é local, separado do código versionado. O build verifica seus arquivos e informa se faltar algum; restaure os recursos da entrega completa antes de compilar um clone.
+Os recursos preparados e seus arquivos de origem estão versionados com os avisos dos titulares. O build verifica sua integridade; um clone atual dispensa pacote visual separado. A licença do código não se estende às fontes e à arte de terceiros.
 
 ## Funcionalidades implementadas
 
 - GPS do Android com precisão, direção de deslocamento, velocidade em km/h e estados de sinal indisponível, fraco e perdido. Leituras antigas não continuam sendo apresentadas como atuais.
 - Pesquisa de endereços e estabelecimentos; seleção por salvos, recentes ou ponto no mapa do telefone; prévia com destino, distância, duração e chegada antes de iniciar.
-- Rota de automóvel destacada, próximas manobras visuais, via seguinte quando disponível, distância/tempo restantes e horário estimado de chegada. Sem trânsito em tempo real e sem voz.
+- Rota de automóvel destacada, próximas manobras visuais, via seguinte quando disponível, distância/tempo restantes e horário estimado de chegada. ETA sem trânsito ao vivo; sem voz. Fluxo/incidentes TomTom opcionais aparecem em camada independente.
 - Progresso calculado ao longo da rota, confirmação de desvio por leituras sucessivas, recálculo com proteção contra respostas antigas e estado explícito quando falha.
 - Acompanhamento do veículo, exploração manual, recentralização, rota completa e orientação norte para cima ou direção do movimento.
 - Sessão única entre telefone e central, mantida por foreground service com notificação. Após encerramento do processo, o destino pode ser retomado com uma nova rota.
 - Mapa ocupando a tela, controles flutuantes e menus retráteis para cobertura, temas e filtros. **Mundo online** usa rede; **Goiânia offline** usa somente o recorte incluído. A escolha é compartilhada e persistida entre telefone e central.
-- Carrossel inicial com prévias reais e locais de **GTA SA**, **Rosa Pop** e **RDR2**. Cada tema tem variante noturna selecionada pelo modo do sistema no telefone e pelo host no carro.
-- Rosa Pop com interface clara, rosa vivo, menta e turquesa; RDR2 com papel sépia e tinta. GTA usa Pricedown, e RDR2 usa Hapna e RDR Lino nos dois modos de mapa. Noto complementa caracteres ausentes. Sprites originais e adaptações NavSkin têm sua procedência registrada separadamente.
+- Carrossel em **⋯ → Temas** com prévias reais e locais dos oito temas. Cada tema tem variante noturna selecionada pelo modo do sistema no telefone e pelo host no carro.
+- Rosa Pop com interface clara, rosa vivo, menta e turquesa; RDR2 com papel sépia e tinta. GTA SA usa Bank Gothic nas ruas/POIs e Pricedown nos nomes maiores; RDR2 usa Hapna e RDR Lino nos dois modos de mapa. Noto complementa caracteres ausentes. Sprites originais e adaptações NavSkin têm sua procedência registrada separadamente.
 - Nove filtros independentes: parques; combustível; alimentação; estacionamento; saúde; mercados e conveniências; ensino; cultura; locais de culto.
 - Locais salvos editáveis no telefone, atalhos Casa/Trabalho e destinos recentes, persistidos localmente. A visibilidade dos salvos é independente dos filtros de POI.
 - Catálogo próprio com 12 ícones de locais e seis marcadores de veículo por tema, prévias reais e IDs semânticos preservados ao trocar tema. O desenho de moto ou veículo temático é uma preferência visual; a rota continua sendo de automóvel.
@@ -37,9 +49,9 @@ O mapa mundial depende de internet e não exige chave cartográfica. Quando falt
 
 ## Começar a usar
 
-No telefone, escolha a cobertura em **Temas** ou **Filtros**; ela também está em **Menu → Cobertura do mapa**. No Android Auto, use **Aparência → Cobertura do mapa**. GTA SA, Rosa Pop, RDR2 e modo noturno estão disponíveis nos dois mapas. Os nove filtros aparecem no painel; ensino, cultura e culto dependem dos dados mundiais e ainda não estão no snapshot offline. As prévias do carrossel são capturas nativas de São Paulo no mapa mundial.
+No telefone, escolha a cobertura em **Temas** ou **Filtros**; ela também está em **⋯ → Configurações → Cobertura do mapa**. No Android Auto, use **Aparência → Cobertura do mapa**. Os oito temas e suas versões noturnas estão disponíveis nos dois mapas. Os nove filtros aparecem no painel; ensino, cultura e culto dependem dos dados mundiais e ainda não estão no snapshot offline. As cinco prévias anteriores são capturas nativas; as três novas mostram os recortes aprovados no painel, com procedência registrada.
 
-Para navegar, abra **Menu → Configurar chave Geoapify**, salve uma chave da sua conta e ative **GPS**. Autorize localização precisa durante o uso; a notificação mantém a sessão com a tela bloqueada. A chave é criptografada com Android KeyStore e não precisa ser inserida no código ou no build. Sem chave, o mapa, GPS e dados locais continuam disponíveis; o aplicativo informa a configuração pendente ao solicitar busca ou rota.
+Para navegar, abra **⋯ → Configurações → Configurar chave Geoapify**, salve uma chave da sua conta e ative **GPS**. Autorize localização precisa durante o uso; a notificação mantém a sessão com a tela bloqueada. A chave é criptografada com Android KeyStore e não precisa ser inserida no código ou no build. Sem chave, o mapa, GPS e dados locais continuam disponíveis; o aplicativo informa a configuração pendente ao solicitar busca ou rota.
 
 Pesquise um destino, escolha um local salvo/recente ou mantenha pressionado um ponto do mapa. Confira a prévia e toque em **Iniciar**. Arrastar o mapa suspende o acompanhamento; **Recentralizar** retoma. Edição detalhada de favoritos e catálogos ficam no celular. No Android Auto, o teclado depende de estacionamento e a entrada/seleção segue os templates do host. Se o Android impedir ativar o GPS apenas pela central, faça a ativação no telefone quando estacionado e depois use os destinos pela multimídia.
 
@@ -98,7 +110,7 @@ node scripts/prepare-navigation-icons.mjs
 node --test tests/android-pois.test.mjs tests/android-native-assets.test.mjs tests/navigation-icons.test.mjs
 ```
 
-Os cards não usam imagens ilustrativas: `maps/previews/*.webp` deriva das capturas reais dos três estilos na Surface nativa. Após mudar uma paleta, execute o cenário instrumentado `NativeMvpRenderingTest#completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges`, copie as três imagens `native-v3-{gta,rosa,rdr2}.png` de `Pictures/GameMapV3/` para `android/screenshots/v0.3/`, e rode `node scripts/prepare-android-previews.mjs` antes de recompilar. O índice das prévias registra os hashes dos estilos e das imagens de origem. Os WebPs preparados já acompanham o projeto.
+Os cards usam cinco capturas reais do renderizador nativo. Após mudar o estilo, atualize `android/screenshots/v0.10/world-sao-paulo-{gta,rosa,rdr2,smw,cyberpunk}.png` pelo cenário instrumentado `NativeWorldMapTest`, mantendo a câmera documentada no [índice de capturas](screenshots/v0.10/README.md), e rode `node scripts/prepare-android-previews.mjs` antes de recompilar. O preparador gera `maps/previews/*.webp` e registra os hashes dos estilos e das imagens de origem.
 
 Esses preparadores usam os arquivos salvos no projeto. Uma atualização voluntária da base POI é separada: `node scripts/android-pois.mjs --fetch` consulta Overpass; em seguida, rode novamente a preparação dos mapas. Sem `--fetch`, o adaptador POI reconstrói a partir do cache.
 
@@ -129,8 +141,8 @@ O recorte de **Goiânia offline** é `[-49.325, -16.755, -49.205, -16.640]`, em 
 | Onde editar | Finalidade |
 | --- | --- |
 | `android/maps/theme-tokens.json` | Paletas, limites de zoom e parâmetros cartográficos |
-| `android/maps/icons/{gta,rosa,rdr2}/` | Ícones SVG editáveis dos seis grupos |
-| `android/maps/catalogs/{gta,rosa,rdr2}/{saved,vehicles}/` | SVGs editáveis de locais salvos e veículos |
+| `android/maps/icons/{gta,rosa,rdr2,smw,cyberpunk}/` | Ícones SVG editáveis dos nove grupos e seus subtipos |
+| `android/maps/catalogs/{gta,rosa,rdr2,smw,cyberpunk}/{saved,vehicles}/` | SVGs editáveis de locais salvos e veículos dos oito temas ativos |
 | `android/maps/catalogs/catalog.json` | IDs semânticos, correspondências por tema e fallbacks |
 | `android/maps/previews/` | Prévias reais, convertidas para WebP e com procedência |
 | `android/maps/pois.geojson` e `pois-metadata.json` | Pacote POI Android e procedência |
@@ -144,4 +156,4 @@ Em **Goiânia offline**, rotas podem ultrapassar o recorte local; nesses trechos
 
 Consulte também [procedência e categorias POI](../docs/android-poi-categories.md), [decisão de navegação e custos](../docs/navigation-provider-decision.md), [requisitos de plataforma](../docs/android-navigation-platform.md), [viabilidade Android Auto anterior](../docs/android-auto-feasibility.md) e [ambiente emulado](../docs/emulator-status.md).
 
-O pacote local `NavSkin-game-assets-0.7.0.zip` contém a árvore de recursos preparada: extraia seu conteúdo na raiz do clone, mantendo as pastas `android` e `ios`. O ZIP iOS completo já está preparado para abrir no Mac e dispensa essa etapa. Os arquivos de assinatura pessoal continuam excluídos.
+O clone atual já contém os recursos preparados. O ZIP de assets 0.7.0 é histórico e não é necessário. Os arquivos de assinatura pessoal continuam excluídos.

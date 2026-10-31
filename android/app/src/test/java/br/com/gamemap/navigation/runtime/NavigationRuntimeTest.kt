@@ -68,6 +68,311 @@ class NavigationRuntimeTest {
             elapsed, 1_000_000L + elapsed))
     }
 
+    private fun stop(id: String, longitude: Double) = Destination(id, "Stop $id", GeoPoint(0.0, longitude))
+
+    private fun beginNavigation() {
+        runtime.onServiceStarted()
+        fix()
+        runtime.selectDestination(destination("B"))
+        executor.runAt(0)
+        runtime.startNavigation()
+    }
+
+    private fun waypoints(url: String = requests.last()): List<String> = URI(url).rawQuery.split("&")
+        .first { it.startsWith("waypoints=") }.substringAfter("=")
+        .let { URLDecoder.decode(it, "UTF-8").split("|") }
+
+    @Test fun orderedStopsCommitOnlyWithReplacementRouteAndKeepFinalDestination() {
+        beginNavigation()
+        val original = runtime.snapshot().route
+        val one = stop("one", 0.0005)
+        val two = stop("two", 0.001)
+        runtime.addStop(one)
+        assertEquals(original, runtime.snapshot().route)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertEquals(listOf(one), runtime.snapshot().pendingIntermediateStops)
+        executor.runAt(0)
+        runtime.addStop(two)
+        executor.runAt(0)
+        assertEquals(listOf("0.0,0.0", "0.0,5.0E-4", "0.0,0.001", "0.0,0.002"), waypoints())
+        assertEquals(listOf(one, two), runtime.snapshot().intermediateStops)
+        assertEquals(destination("B"), runtime.snapshot().destination)
+        assertEquals(destination("B"), runtime.snapshot().route!!.destination)
+        assertNull(runtime.snapshot().pendingIntermediateStops)
+        assertEquals(listOf(one, two), places.snapshot().resumeIntermediateStops)
+    }
+
+    @Test fun failedRemovalKeepsCommittedRouteAndStopsAndRetryCommitsRequestedItinerary() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        executor.runAt(0)
+        val oldRoute = runtime.snapshot().route
+        response = { HttpResponse(503, "") }
+        runtime.removeStop(one.id)
+        executor.runAt(0)
+        assertEquals(oldRoute, runtime.snapshot().route)
+        assertEquals(listOf(one), runtime.snapshot().intermediateStops)
+        assertEquals(emptyList<Destination>(), runtime.snapshot().pendingIntermediateStops)
+        assertEquals(listOf(one), places.snapshot().resumeIntermediateStops)
+        response = ::normalResponse
+        runtime.retryRoute()
+        executor.runAt(0)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertEquals(listOf("0.0,0.0", "0.0,0.002"), waypoints())
+        assertTrue(places.snapshot().resumeIntermediateStops.isEmpty())
+    }
+
+    @Test fun latestStopEditWinsEvenWhenEarlierHttpWorkIgnoresCancellation() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        val two = stop("two", 0.001)
+        runtime.addStop(one)
+        runtime.addStop(two)
+        executor.runAt(1)
+        val latest = runtime.snapshot().route
+        executor.runAt(0)
+        assertEquals(latest, runtime.snapshot().route)
+        assertEquals(listOf(one, two), runtime.snapshot().intermediateStops)
+        runtime.removeStop(one.id)
+        runtime.stopNavigation()
+        executor.runAt(0)
+        assertEquals(NavigationPhase.IDLE, runtime.snapshot().phase)
+        assertNull(runtime.snapshot().destination)
+        assertNull(runtime.snapshot().route)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertNull(runtime.snapshot().pendingIntermediateStops)
+        assertNull(places.snapshot().resumeDestination)
+    }
+
+    @Test fun weakGpsAndMissingKeyRetainOldItineraryUntilExplicitRetrySucceeds() {
+        beginNavigation()
+        val original = runtime.snapshot().route
+        val one = stop("one", 0.0005)
+        elapsed += 1_000
+        fix(accuracy = 100.0)
+        runtime.addStop(one)
+        assertTrue(executor.tasks.isEmpty())
+        assertEquals(original, runtime.snapshot().route)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertEquals(listOf(one), runtime.snapshot().pendingIntermediateStops)
+        elapsed += 1_000
+        fix()
+        settings.setApiKey("")
+        runtime.retryRoute()
+        assertTrue(executor.tasks.isEmpty())
+        assertEquals(original, runtime.snapshot().route)
+        settings.setApiKey("synthetic-test-key")
+        runtime.retryRoute()
+        executor.runAt(0)
+        assertEquals(listOf(one), runtime.snapshot().intermediateStops)
+    }
+
+    @Test fun invalidDuplicateAndFinalDestinationStopsDoNotDispatchNewRoutes() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        executor.runAt(0)
+        runtime.addStop(one)
+        runtime.addStop(one.copy(id = "alias"))
+        runtime.addStop(destination("B"))
+        runtime.addStop(stop("bad", Double.NaN))
+        runtime.addStop(stop("origin", 0.0))
+        assertTrue(executor.tasks.isEmpty())
+        assertEquals(listOf(one), runtime.snapshot().intermediateStops)
+        assertNull(runtime.snapshot().pendingIntermediateStops)
+    }
+
+    @Test fun passedStopIsRemovedFromResumeAndNeverReturnedToOnDeviationReroute() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        val two = stop("two", 0.0015)
+        runtime.addStop(one)
+        executor.runAt(0)
+        runtime.addStop(two)
+        executor.runAt(0)
+        elapsed += 1_000; fix(10.0)
+        elapsed += 4_000; fix(60.0)
+        assertEquals(listOf(two), runtime.snapshot().intermediateStops)
+        assertEquals(listOf(two), places.snapshot().resumeIntermediateStops)
+        repeat(3) { elapsed += 1_000; fix(70.0, 80.0) }
+        assertEquals(NavigationPhase.RECALCULATING, runtime.snapshot().phase)
+        executor.runAt(0)
+        assertEquals(3, waypoints().size)
+        assertEquals("0.0,0.0015", waypoints()[1])
+        assertEquals("0.0,0.002", waypoints().last())
+    }
+
+    @Test fun resumeAfterServiceDeathRecalculatesRemainingStopsBeforeTheFinalDestination() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        executor.runAt(0)
+        runtime.onServiceStopped()
+        assertEquals(listOf(one), runtime.snapshot().resumeIntermediateStops)
+        runtime.resumeDestination()
+        executor.runAt(0)
+        assertEquals(listOf(one), runtime.snapshot().intermediateStops)
+        assertEquals(destination("B"), runtime.snapshot().destination)
+        assertEquals(NavigationPhase.PREVIEW, runtime.snapshot().phase)
+        assertEquals(listOf("0.0,0.0", "0.0,5.0E-4", "0.0,0.002"), waypoints())
+    }
+
+    @Test fun passingACommittedStopDuringAnEditInvalidatesItsInflightResponse() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        val two = stop("two", 0.0015)
+        runtime.addStop(one)
+        executor.runAt(0)
+        elapsed += 1_000; fix(10.0)
+        runtime.addStop(two)
+        elapsed += 4_000; fix(60.0)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertEquals(listOf(two), runtime.snapshot().pendingIntermediateStops)
+        assertEquals(2, executor.tasks.size)
+        executor.runAt(1)
+        val replacement = runtime.snapshot().route
+        assertEquals(3, waypoints().size)
+        assertEquals("0.0,0.0015", waypoints()[1])
+        executor.runAt(0)
+        assertEquals(replacement, runtime.snapshot().route)
+        assertEquals(listOf(two), runtime.snapshot().intermediateStops)
+    }
+
+    @Test fun oldStopResponseCannotReplaceANewFinalDestination() {
+        beginNavigation()
+        runtime.addStop(stop("one", 0.0005))
+        runtime.selectDestination(destination("A"))
+        executor.runAt(1)
+        val latest = runtime.snapshot().route
+        executor.runAt(0)
+        assertEquals(latest, runtime.snapshot().route)
+        assertEquals(destination("A"), runtime.snapshot().destination)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+    }
+
+    @Test fun failedAddNeverClaimsTheStopOrOverwritesPersistedResume() {
+        beginNavigation()
+        val original = runtime.snapshot().route
+        val one = stop("one", 0.0005)
+        response = { HttpResponse(503, "") }
+        runtime.addStop(one)
+        executor.runAt(0)
+        assertEquals(original, runtime.snapshot().route)
+        assertEquals(destination("B"), runtime.snapshot().destination)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertEquals(listOf(one), runtime.snapshot().pendingIntermediateStops)
+        assertTrue(places.snapshot().resumeIntermediateStops.isEmpty())
+        assertEquals(destination("B"), places.snapshot().resumeDestination)
+    }
+
+    @Test fun intermediateStopDoesNotTriggerArrivalAndReplayCannotRequestRealStops() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        executor.runAt(0)
+        elapsed += 1_000; fix(10.0)
+        elapsed += 4_000; fix(56.0)
+        elapsed += 1_000; fix(57.0)
+        assertEquals(NavigationPhase.NAVIGATING, runtime.snapshot().phase)
+        assertEquals(destination("B"), places.snapshot().resumeDestination)
+        val detach = runtime.attachClient("test-phone")
+        runtime.startReplay(replayRoute(), listOf(replayFix()))
+        runtime.addStop(one)
+        assertTrue(runtime.snapshot().simulation)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertTrue(executor.tasks.isEmpty())
+        detach()
+    }
+
+    @Test fun reachingOldRouteEndWhileStopEditIsPendingCannotDiscardThePendingStop() {
+        beginNavigation()
+        elapsed += 1_000; fix(10.0)
+        val detour = stop("detour", 0.003)
+        runtime.addStop(detour)
+        elapsed += 5_000; fix(80.0)
+        elapsed += 5_000; fix(150.0)
+        elapsed += 5_000; fix(215.0)
+        elapsed += 1_000; fix(221.0)
+        assertEquals(NavigationPhase.RECALCULATING, runtime.snapshot().phase)
+        assertEquals(listOf(detour), runtime.snapshot().pendingIntermediateStops)
+        assertEquals(destination("B"), places.snapshot().resumeDestination)
+        executor.runAt(0)
+        assertEquals(NavigationPhase.NAVIGATING, runtime.snapshot().phase)
+        assertEquals(listOf(detour), runtime.snapshot().intermediateStops)
+        assertEquals(destination("B"), runtime.snapshot().destination)
+    }
+
+    @Test fun passingAStopAfterFailedEditRemovesItFromBothCommittedAndRetryItineraries() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        val two = stop("two", 0.0015)
+        runtime.addStop(one)
+        executor.runAt(0)
+        elapsed += 1_000; fix(10.0)
+        response = { HttpResponse(503, "") }
+        runtime.addStop(two)
+        executor.runAt(0)
+        elapsed += 4_000; fix(60.0)
+        assertEquals(NavigationPhase.NAVIGATING, runtime.snapshot().phase)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertEquals(listOf(two), runtime.snapshot().pendingIntermediateStops)
+        assertTrue(places.snapshot().resumeIntermediateStops.isEmpty())
+        response = ::normalResponse
+        runtime.retryRoute()
+        executor.runAt(0)
+        assertEquals(listOf(two), runtime.snapshot().intermediateStops)
+        assertEquals("0.0,0.0015", waypoints()[1])
+        assertEquals(3, waypoints().size)
+    }
+
+    @Test fun failedPreviewEditCannotStartNavigationOnTheUneditedRoute() {
+        runtime.onServiceStarted()
+        fix()
+        runtime.selectDestination(destination("B"))
+        executor.runAt(0)
+        val oldRoute = runtime.snapshot().route
+        response = { HttpResponse(503, "") }
+        runtime.addStop(stop("one", 0.0005))
+        executor.runAt(0)
+        runtime.startNavigation()
+        assertEquals(NavigationPhase.PREVIEW, runtime.snapshot().phase)
+        assertEquals(oldRoute, runtime.snapshot().route)
+        assertFalse(runtime.snapshot().navigationActive)
+        assertNull(places.snapshot().resumeDestination)
+    }
+
+    @Test fun failedStopEditKeepsSafeGuidanceOnTheUnchangedRouteWhileShowingPendingEdit() {
+        beginNavigation()
+        elapsed += 1_000; fix(10.0)
+        val original = runtime.snapshot().route
+        assertTrue(runtime.snapshot().guidanceAvailable)
+        response = { HttpResponse(503, "") }
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        executor.runAt(0)
+        assertEquals(original, runtime.snapshot().route)
+        assertEquals(NavigationPhase.NAVIGATING, runtime.snapshot().phase)
+        assertTrue(runtime.snapshot().guidanceAvailable)
+        assertEquals(listOf(one), runtime.snapshot().pendingIntermediateStops)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+        assertNotNull(runtime.snapshot().message)
+    }
+
+    @Test fun failedStopEditStillSuspendsGuidanceIfTheCarHasLeftTheCommittedRoute() {
+        beginNavigation()
+        elapsed += 1_000; fix(10.0)
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        repeat(3) { elapsed += 1_000; fix(20.0, 80.0) }
+        response = { HttpResponse(503, "") }
+        executor.runAt(0)
+        assertEquals(NavigationPhase.REROUTE_FAILED, runtime.snapshot().phase)
+        assertFalse(runtime.snapshot().guidanceAvailable)
+        assertEquals(listOf(one), runtime.snapshot().pendingIntermediateStops)
+        assertTrue(runtime.snapshot().intermediateStops.isEmpty())
+    }
+
     @Test fun firstCurrentGpsFixClearsOnlyTheLocationStartupNotice() {
         assertTrue(runtime.activateLocation())
         assertNotNull(runtime.snapshot().message)
@@ -330,6 +635,99 @@ class NavigationRuntimeTest {
         assertTrue(runtime.snapshot().searchResults.isEmpty())
     }
 
+    @Test fun cancellingPreviewAlsoClearsCompletedSearchResultsAndSearchError() {
+        runtime.onServiceStarted()
+        fix()
+        runtime.selectDestination(destination("B"))
+        executor.runAt(0)
+        runtime.search("synthetic")
+        executor.runAt(0)
+        assertFalse(runtime.snapshot().searchResults.isEmpty())
+        settings.setApiKey("")
+        runtime.search("blocked search")
+        assertNotNull(runtime.snapshot().searchError)
+
+        runtime.clearDestination()
+
+        assertEquals(NavigationPhase.IDLE, runtime.snapshot().phase)
+        assertNull(runtime.snapshot().destination)
+        assertNull(runtime.snapshot().route)
+        assertTrue(runtime.snapshot().searchResults.isEmpty())
+        assertNull(runtime.snapshot().searchError)
+        assertFalse(runtime.snapshot().searching)
+    }
+
+    @Test fun clearingPreviewDropsStopsAndIgnoresPendingRouteAndSearchResponses() {
+        runtime.onServiceStarted()
+        fix()
+        runtime.selectDestination(destination("B"))
+        executor.runAt(0)
+        runtime.addStop(stop("one", 0.0005))
+        executor.runAt(0)
+        runtime.addStop(stop("two", 0.0015))
+        runtime.search("synthetic")
+        assertEquals(1, runtime.snapshot().intermediateStops.size)
+        assertEquals(2, runtime.snapshot().pendingIntermediateStops!!.size)
+
+        runtime.clearDestination()
+        executor.runAt(0)
+        executor.runAt(0)
+
+        val cleared = runtime.snapshot()
+        assertEquals(NavigationPhase.IDLE, cleared.phase)
+        assertNull(cleared.destination)
+        assertNull(cleared.route)
+        assertNull(cleared.progress)
+        assertTrue(cleared.intermediateStops.isEmpty())
+        assertNull(cleared.pendingIntermediateStops)
+        assertNull(cleared.resumeDestination)
+        assertTrue(cleared.resumeIntermediateStops.isEmpty())
+        assertTrue(cleared.searchResults.isEmpty())
+        assertNull(cleared.searchError)
+        assertNull(cleared.message)
+        assertFalse(cleared.searching)
+        assertEquals(LocationQuality.GOOD, cleared.location.quality)
+    }
+
+    @Test fun clearingDestinationAlsoIgnoresLateProviderFailures() {
+        runtime.onServiceStarted()
+        fix()
+        runtime.selectDestination(destination("B"))
+        runtime.search("synthetic")
+        runtime.clearDestination()
+        response = { HttpResponse(503, "") }
+        executor.runAt(0)
+        executor.runAt(0)
+        assertEquals(NavigationPhase.IDLE, runtime.snapshot().phase)
+        assertNull(runtime.snapshot().message)
+        assertNull(runtime.snapshot().searchError)
+        assertFalse(runtime.snapshot().searching)
+    }
+
+    @Test fun clearingDestinationWhileWaitingForGpsDoesNotCalculateOnTheNextFix() {
+        runtime.selectDestination(destination("B"))
+        assertEquals(NavigationPhase.WAITING_FOR_LOCATION, runtime.snapshot().phase)
+        runtime.clearDestination()
+        runtime.onServiceStarted()
+        fix()
+        assertEquals(NavigationPhase.IDLE, runtime.snapshot().phase)
+        assertNull(runtime.snapshot().destination)
+        assertTrue(executor.tasks.isEmpty())
+    }
+
+    @Test fun clearDestinationCannotInterruptActiveNavigationOrItsStopEdit() {
+        beginNavigation()
+        val one = stop("one", 0.0005)
+        runtime.addStop(one)
+        val beforeClear = runtime.snapshot()
+        runtime.clearDestination()
+        assertEquals(beforeClear, runtime.snapshot())
+        executor.runAt(0)
+        assertEquals(NavigationPhase.NAVIGATING, runtime.snapshot().phase)
+        assertEquals(listOf(one), runtime.snapshot().intermediateStops)
+        assertEquals(destination("B"), places.snapshot().resumeDestination)
+    }
+
     @Test fun disablingLocationImmediatelyHidesGuidanceAndSpeed() {
         runtime.onServiceStarted()
         fix()
@@ -457,8 +855,12 @@ class NavigationRuntimeTest {
             val parts = it.split("=", limit = 2)
             parts[0] to URLDecoder.decode(parts[1], "UTF-8")
         }
-        val target = parameters.getValue("waypoints").substringAfter("|").split(",")
-        return HttpResponse(200, """{"type":"FeatureCollection","features":[{"geometry":{"type":"MultiLineString","coordinates":[[[0,0],[${target[1]},${target[0]}]]]},"properties":{"distance":222,"time":60,"legs":[{"distance":222,"time":60,"steps":[{"from_index":0,"to_index":1,"distance":222,"time":60,"instruction":{"type":"StartAt","text":"Depart"}}]}]}}]}""")
+        val points = parameters.getValue("waypoints").split("|").map { it.split(",") }
+        val coordinates = points.zipWithNext().joinToString(",") { (a, b) -> "[[${a[1]},${a[0]}],[${b[1]},${b[0]}]]" }
+        val legs = points.zipWithNext().joinToString(",") {
+            """{"distance":222,"time":60,"steps":[{"from_index":0,"to_index":1,"distance":222,"time":60,"instruction":{"type":"StartAt","text":"Depart"}}]}"""
+        }
+        return HttpResponse(200, """{"type":"FeatureCollection","features":[{"geometry":{"type":"MultiLineString","coordinates":[$coordinates]},"properties":{"distance":${222 * (points.size - 1)},"time":${60 * (points.size - 1)},"legs":[$legs]}}]}""")
     }
 }
 

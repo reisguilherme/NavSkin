@@ -59,7 +59,7 @@ class NativeWorldMapTest {
     private val idleStyle = AtomicReference<Style?>(null)
     private val saoPaulo = GeoPoint(-23.5505, -46.6333)
 
-    @Test fun saoPauloRendersThreeOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges() {
+    @Test fun saoPauloRendersEightOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges() {
         // A warmed SDK cache must not turn a disconnected run into an online pass.
         requireLiveProductionTileJson()
         val original = app.preferences.snapshot()
@@ -81,10 +81,10 @@ class NativeWorldMapTest {
             }
             val marker = checkNotNull(savedId)
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                // The initial theme sheet may be absent when a prior destination is resumable.
-                device.wait(Until.findObject(By.desc("Explorar mapa")), 3_000)?.click()
-                assertTrue("Theme sheet still covers the native map",
-                    device.wait(Until.gone(By.desc("Explorar mapa")), 5_000))
+                assertTrue("Map controls did not appear",
+                    device.wait(Until.hasObject(By.desc("Menu NavSkin")), 15_000))
+                assertFalse("An unopened theme sheet must not cover the native map",
+                    device.hasObject(By.desc("Explorar mapa")))
                 val obtainedMap = CountDownLatch(1)
                 scenario.onActivity { activity ->
                     val mapView = checkNotNull(findMap(activity.window.decorView))
@@ -120,7 +120,7 @@ class NativeWorldMapTest {
                 }
 
                 var previousStyle: Style? = null
-                for (theme in listOf(MapTheme.GTA_SA, MapTheme.ROSA_POP, MapTheme.RDR2)) {
+                for (theme in MapTheme.entries) {
                     if (theme != MapTheme.GTA_SA) scenario.onActivity {
                         forgetRenderedFrame()
                         app.preferences.setTheme(theme)
@@ -135,7 +135,7 @@ class NativeWorldMapTest {
                     forgetRenderedFrame()
                     PoiCategory.entries.forEach { app.preferences.setCategoryEnabled(it, false) }
                 }
-                val hiddenStyle = awaitWorldFrame(MapTheme.RDR2, marker, emptySet())
+                val hiddenStyle = awaitWorldFrame(MapTheme.CROSSY_ROAD, marker, emptySet())
                 assertSame("POI toggles should mutate the loaded style without reloading it", previousStyle, hiddenStyle)
                 scenario.onActivity { assertSameCamera(expectedCamera.get(), map.get().cameraPosition) }
 
@@ -173,9 +173,9 @@ class NativeWorldMapTest {
                     forgetRenderedFrame()
                     app.preferences.setBaseMapMode(MapBaseMode.WORLD)
                 }
-                awaitWorldFrame(MapTheme.RDR2, marker, emptySet(), offlineStyle.get())
+                awaitWorldFrame(MapTheme.CROSSY_ROAD, marker, emptySet(), offlineStyle.get())
                 scenario.onActivity { assertSameCamera(expectedCamera.get(), map.get().cameraPosition) }
-                saveNativeFrame("world-sao-paulo-rdr2-after-offline.png", MapTheme.RDR2)
+                saveNativeFrame("world-sao-paulo-crossy-after-offline.png", MapTheme.CROSSY_ROAD)
                 // Same real Goiânia square shown in the user's visual reference.
                 scenario.onActivity {
                     forgetRenderedFrame()
@@ -251,44 +251,91 @@ class NativeWorldMapTest {
 
     private fun awaitWorldFrame(theme: MapTheme, marker: String, enabled: Set<PoiCategory>, after: Style? = null): Style {
         val answer = AtomicReference<Style>()
-        awaitNative("${theme.label} online São Paulo geometry, labels, sprites and saved overlay") {
-            val native = map.get() ?: return@awaitNative false
-            val style = native.style ?: return@awaitNative false
-            if (style === after || !style.isFullyLoaded || !renderedFrameReady(style)) return@awaitNative false
-            val world = style.getSourceAs<VectorSource>("world") ?: return@awaitNative false
+        var probe = "map not evaluated"
+        fun pending(reason: String): Boolean {
+            if (probe != reason) Log.i("NativeWorldMapTest", "${theme.assetName}: $reason")
+            probe = reason
+            return false
+        }
+        try {
+        awaitNative("${theme.label} online São Paulo geometry, labels, sprites and saved overlay", { probe }) {
+            val native = map.get() ?: return@awaitNative pending("native map absent")
+            val style = native.style ?: return@awaitNative pending("native style absent")
+            if (style === after || !style.isFullyLoaded || !renderedFrameReady(style)) return@awaitNative pending(
+                "waiting replacement=${style === after}, loaded=${style.isFullyLoaded}, " +
+                    "fullFrame=${finishedFrameStyle.get() === style}, idle=${idleStyle.get() === style}")
+            val world = style.getSourceAs<VectorSource>("world") ?: return@awaitNative pending("world source absent")
             val metadata = JSONObject(style.json).optJSONObject("metadata")?.optJSONObject("navskin")
-            if (metadata?.optString("theme") != theme.assetName || !hasSavedMarker(style, marker)) return@awaitNative false
+            if (metadata?.optString("theme") != theme.assetName || !hasSavedMarker(style, marker)) return@awaitNative pending(
+                "styleTheme=${metadata?.optString("theme")}, savedSourceContainsMarker=${hasSavedMarker(style, marker)}")
             assertEquals("https://tiles.openfreemap.org/planet", world.url)
             val buildings = world.querySourceFeatures(arrayOf("building"), null)
             val pois = world.querySourceFeatures(arrayOf("poi"), null)
-            if (buildings.isEmpty() || pois.isEmpty()) return@awaitNative false
+            if (buildings.isEmpty() || pois.isEmpty()) return@awaitNative pending("source buildings=${buildings.size}, pois=${pois.size}")
             assertTrue("Decoded POIs must be in São Paulo, outside the offline package", pois.any { feature ->
                 val point = feature.geometry() as? Point
                 point != null && point.longitude() in -46.68..-46.58 && point.latitude() in -23.59..-23.51
             })
-            if (native.queryRenderedFeatures(viewport(), "building-footprints").isEmpty()) return@awaitNative false
+            val renderedBuildings = native.queryRenderedFeatures(viewport(), "building-footprints").size
+            if (renderedBuildings == 0) return@awaitNative pending("source buildings=${buildings.size}, rendered buildings=0")
             // Symbol placement only succeeds once the real glyph resources can be rendered.
-            if (native.queryRenderedFeatures(viewport(), "road-labels").none { feature ->
+            val renderedRoadLabels = native.queryRenderedFeatures(viewport(), "road-labels")
+            if (renderedRoadLabels.none { feature ->
                     feature.hasProperty("name") && feature.getStringProperty("name").isNotBlank()
-                }) return@awaitNative false
+                }) return@awaitNative pending("renderedBuildings=$renderedBuildings, sourceRoadNames=" +
+                    "${world.querySourceFeatures(arrayOf("transportation_name"), null).size}, " +
+                    "renderedRoadLabels=${renderedRoadLabels.size}, font=" +
+                    "${style.getLayerAs<SymbolLayer>("road-labels")?.textFont?.value?.toList()}")
             val roadLabels = checkNotNull(style.getLayerAs<SymbolLayer>("road-labels"))
             val directions = native.queryRenderedFeatures(viewport(), "road-oneway-directions")
-            if (directions.isEmpty()) return@awaitNative false
+            if (directions.isEmpty()) return@awaitNative pending("roadLabels=${renderedRoadLabels.size}, renderedDirections=0, " +
+                "onewaySprite=${style.getImage("road-oneway-forward") != null}")
             assertTrue("Direction markers must come from actual one-way roads", directions.all {
                 it.hasProperty("oneway") && kotlin.math.abs(it.getNumberProperty("oneway").toInt()) == 1
             })
-            assertArrayEquals(arrayOf(when(theme) { MapTheme.GTA_SA -> "NavSkinGtaRoad"; MapTheme.RDR2 -> "NavSkinRdrMap"; else -> "Noto Sans Bold" }), roadLabels.textFont.value)
+            assertArrayEquals(arrayOf(when(theme) {
+                MapTheme.GTA_SA -> "NavSkinGtaRoad"
+                MapTheme.ROSA_POP -> "Noto Sans Bold"
+                MapTheme.RDR2 -> "NavSkinRdrMap"
+                MapTheme.SUPER_MARIO_WORLD -> "NavSkinSmw"
+                MapTheme.CYBERPUNK_2077 -> "NavSkinCyberpunk"
+                MapTheme.PIP_BOY -> "NavSkinCyberpunk"
+                MapTheme.HOLLOW_KNIGHT -> "NavSkinRdrMap"
+                MapTheme.CROSSY_ROAD -> "GameMapSans"
+            }), roadLabels.textFont.value)
+            if (theme == MapTheme.GTA_SA) {
+                assertEquals("Street names must retain their mixed-case source text", "none", roadLabels.textTransform.value)
+                assertTrue("Street glyphs need a moderate halo", roadLabels.textHaloWidth.value!! in .7f..1.5f)
+                assertTrue("Street glyphs must not be spread apart", roadLabels.textLetterSpacing.value!! <= .05f)
+                val poiLabels = checkNotNull(style.getLayerAs<SymbolLayer>("poi-food"))
+                assertArrayEquals("POI captions should use the readable cartographic face",
+                    arrayOf("NavSkinGtaRoad"), poiLabels.textFont.value)
+            }
             for (category in PoiCategory.entries) {
                 val layer = checkNotNull(style.getLayer("poi-${category.id}"))
-                if (layer.visibility.value != if (category in enabled) "visible" else "none") return@awaitNative false
+                if (layer.visibility.value != if (category in enabled) "visible" else "none") return@awaitNative pending(
+                    "${category.id} visibility=${layer.visibility.value}, enabled=${category in enabled}")
                 if (category in enabled) assertNotNull("Missing actual native POI sprite ${category.id}", style.getImage("poi-${category.id}"))
             }
             val renderedPois = native.queryRenderedFeatures(viewport(), *PoiCategory.entries.map { "poi-${it.id}" }.toTypedArray())
-            if (enabled.isNotEmpty() && renderedPois.isEmpty()) return@awaitNative false
+            if (enabled.isNotEmpty() && renderedPois.isEmpty()) return@awaitNative pending(
+                "roadLabels=${renderedRoadLabels.size}, directions=${directions.size}, sourcePois=${pois.size}, renderedPois=0")
             if (enabled.isEmpty()) assertTrue("POIs still rendered after every category was hidden", renderedPois.isEmpty())
-            if (!savedOverlayRendered(marker)) return@awaitNative false
+            if (!savedOverlayRendered(marker)) return@awaitNative pending(
+                "roadLabels=${renderedRoadLabels.size}, directions=${directions.size}, renderedPois=${renderedPois.size}, savedOverlay=0")
             answer.set(style)
             true
+        }
+        } catch (failure: AssertionError) {
+            val captured = CountDownLatch(1)
+            instrumentation.runOnMainSync {
+                map.get()?.snapshot { image ->
+                    try { savePersistentImage("failed-world-${theme.assetName}.png", image) }
+                    finally { image.recycle(); captured.countDown() }
+                } ?: captured.countDown()
+            }
+            captured.await(10, TimeUnit.SECONDS)
+            throw failure
         }
         return checkNotNull(answer.get())
     }
@@ -329,11 +376,7 @@ class NativeWorldMapTest {
         val image = checkNotNull(bitmap.get())
         try {
             savePersistentImage(name, image)
-            val expectedBuilding = when (theme) {
-                MapTheme.GTA_SA -> 0xffe0e0dc.toInt()
-                MapTheme.ROSA_POP -> 0xfffff3fb.toInt()
-                MapTheme.RDR2 -> 0xffb6a17a.toInt()
-            }
+            val expectedBuilding = NativeMapPalette.forTheme(theme).building
             var footprintPixels = 0
             for (y in 0 until image.height step 2) for (x in 0 until image.width step 2) {
                 val pixel = image.getPixel(x, y)
@@ -346,7 +389,7 @@ class NativeWorldMapTest {
     }
 
     private fun savePersistentImage(name: String, bitmap: Bitmap) {
-        val directory = "Pictures/NavSkinWorld/v0.7/"
+        val directory = "Pictures/NavSkinWorld/v0.10/"
         val media = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         context.contentResolver.delete(media,
             "${MediaStore.Images.Media.DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.RELATIVE_PATH} = ?",

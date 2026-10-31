@@ -97,4 +97,18 @@ class AdaptiveNavigationCameraTest {
         camera.reset()
         assertEquals(270.0, camera.update(state(heading = 270.0), MapOrientation.MOVEMENT_UP)!!.bearing, 0.001)
     }
+
+    @Test fun vibingWithoutRouteUsesDrivingZoomAndRealHeadingWithoutCreatingNavigation() {
+        val freeDrive = state(speed = 15.0, heading = 120.0).copy(
+            phase = NavigationPhase.IDLE, route = null, progress = null, destination = null)
+        val camera = AdaptiveNavigationCamera()
+        val target = camera.update(freeDrive, MapOrientation.MOVEMENT_UP, freeDrive = true)!!
+        assertEquals(17.0, target.zoom, .001)
+        assertEquals(120.0, target.bearing, .001)
+        assertFalse(freeDrive.navigationActive)
+        assertNull(freeDrive.route)
+        assertEquals(15.5, adaptiveFollowZoom(freeDrive.copy(location = freeDrive.location.copy(speedKmh = 90.0)), true), .001)
+        assertNull(camera.update(freeDrive.copy(location = freeDrive.location.copy(ageMs = 9_000L)), MapOrientation.MOVEMENT_UP, freeDrive = true))
+        assertEquals(16.0, camera.update(freeDrive, MapOrientation.MOVEMENT_UP, recenter = true)!!.zoom, .001)
+    }
 }

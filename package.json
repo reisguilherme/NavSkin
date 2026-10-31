@@ -1,6 +1,6 @@
 {
   "name": "navskin",
-  "version": "0.8.0",
+  "version": "0.12.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +17,9 @@
     "buildings:validate-tiles": "node scripts/validate-building-tiles.mjs",
     "maps:world": "node scripts/prepare-world-maps.mjs",
     "ios:prepare": "node scripts/prepare-ios.mjs",
-    "assets:game": "node scripts/prepare-game-assets.mjs"
+    "assets:game": "node scripts/prepare-game-assets.mjs",
+    "assets:avatars": "node scripts/prepare-navigation-3d.mjs && node --input-type=module -e \"import('./scripts/prepare-ios.mjs').then(m => m.prepareAssets())\"",
+    "assets:collection": "node scripts/prepare-collection-assets.mjs && node scripts/prepare-android-maps.mjs && node scripts/prepare-navigation-icons.mjs && node scripts/prepare-navigation-3d.mjs && node scripts/prepare-android-previews.mjs && node --input-type=module -e \"import('./scripts/prepare-ios.mjs').then(m => m.prepareAssets())\""
   },
   "dependencies": {
     "maplibre-gl": "6.16.0"

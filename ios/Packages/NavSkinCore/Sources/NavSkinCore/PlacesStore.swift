@@ -31,12 +31,15 @@ public struct LocalPlacesState: Codable, Equatable, Sendable {
     public var homeId: String?
     public var workId: String?
     public var resumeDestination: Destination?
+    public var resumeIntermediateStops: [Destination]
     public var loadError: String?
     public init(savedPlaces: [SavedPlace] = [], recents: [RecentDestination] = [], homeId: String? = nil,
-                workId: String? = nil, resumeDestination: Destination? = nil, loadError: String? = nil) {
+                workId: String? = nil, resumeDestination: Destination? = nil, loadError: String? = nil,
+                resumeIntermediateStops: [Destination] = []) {
         self.savedPlaces = savedPlaces; self.recents = recents
         self.homeId = homeId; self.workId = workId
         self.resumeDestination = resumeDestination; self.loadError = loadError
+        self.resumeIntermediateStops = resumeIntermediateStops
     }
 }
 
@@ -120,11 +123,13 @@ public final class PlacesStore {
         try commit(candidate)
     }
 
-    public func setResumeDestination(_ destination: Destination?) throws {
+    public func setResumeDestination(_ destination: Destination?, intermediateStops: [Destination] = []) throws {
         if let destination { try Self.validateDestination(destination) }
+        try Self.validateItinerary(destination: destination, stops: intermediateStops)
         try ensureWritable()
         var candidate = snapshot
         candidate.resumeDestination = destination
+        candidate.resumeIntermediateStops = intermediateStops
         try commit(candidate)
     }
 
@@ -145,7 +150,8 @@ public final class PlacesStore {
             "recents": candidate.recents.map { ["destination": Self.destinationJSON($0.destination), "usedAtMs": $0.usedAtMs] as [String: Any] },
             "homeId": candidate.homeId.map { $0 as Any } ?? NSNull(),
             "workId": candidate.workId.map { $0 as Any } ?? NSNull(),
-            "resumeDestination": candidate.resumeDestination.map { Self.destinationJSON($0) as Any } ?? NSNull()
+            "resumeDestination": candidate.resumeDestination.map { Self.destinationJSON($0) as Any } ?? NSNull(),
+            "resumeIntermediateStops": candidate.resumeIntermediateStops.map(Self.destinationJSON)
         ]
         do {
             let data = try JSONSerialization.data(withJSONObject: source, options: [.sortedKeys])
@@ -204,7 +210,10 @@ public final class PlacesStore {
             let resume: Destination?
             if let raw = source["resumeDestination"], !(raw is NSNull) { resume = try parseDestination(raw) }
             else { resume = nil }
-            return LocalPlacesState(savedPlaces: places, recents: Array(recents.prefix(maxRecents)), homeId: homeId, workId: workId, resumeDestination: resume)
+            let stops = try source["resumeIntermediateStops"].map { try array($0).map(parseDestination) } ?? []
+            try validateItinerary(destination: resume, stops: stops)
+            return LocalPlacesState(savedPlaces: places, recents: Array(recents.prefix(maxRecents)), homeId: homeId, workId: workId, resumeDestination: resume,
+                resumeIntermediateStops: stops)
         } catch {
             return LocalPlacesState(loadError: "Não foi possível ler os locais salvos. O arquivo original foi preservado; alterações estão bloqueadas até sua recuperação.")
         }
@@ -226,6 +235,14 @@ public final class PlacesStore {
     private static func validateDestination(_ destination: Destination) throws {
         guard !trim(destination.id).isEmpty, !trim(destination.name).isEmpty else { throw LocalPlacesStorageException("Destino inválido") }
         try validatePoint(destination.point)
+    }
+    private static func validateItinerary(destination: Destination?, stops: [Destination]) throws {
+        guard stops.count <= 8, destination != nil || stops.isEmpty else { throw invalid() }
+        let all = stops + (destination.map { [$0] } ?? [])
+        for (index, stop) in all.enumerated() {
+            try validateDestination(stop)
+            guard !all.prefix(index).contains(where: { $0.id == stop.id || distanceMeters($0.point, stop.point) <= 10 }) else { throw invalid() }
+        }
     }
     private static func validatePoint(_ point: GeoPoint) throws {
         guard point.latitude.isFinite, point.longitude.isFinite,

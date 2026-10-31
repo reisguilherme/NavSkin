@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>NavSkin education: original adaptation for a category without an exact game counterpart</title><g stroke="#914D63" stroke-width="1.8" stroke-linejoin="round"><path d="m2 11 14-8 14 8-14 8ZM8 16v9c7 4 10 4 16 0v-9" fill="#AB85D4"/><path d="M27 13v13l-2 4h5l-2-4" fill="#F3CA42"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Escola de livro de histórias</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 28h42v25H11Z" fill="#FFF0D9"/>
+    <path d="M46 28h7v25h-7Z" fill="#F2A7C6" stroke="none"/>
+    <path d="m7 29 25-19 25 19Z" fill="#FF9EC6"/>
+    <path d="m16 25 16-12 16 12" stroke="#FFD5E6"/>
+    <path d="M32 10V3l12 4-12 4Z" fill="#B3EED1"/>
+    <path d="M26 40a6 6 0 0 1 12 0v13H26Z" fill="#C9ADEA"/>
+    <path d="M17 35v6m30-6v6" stroke="#86CFB4" stroke-width="5"/>
+    <path d="M10 48c8-2 15-1 22 4 7-5 14-6 22-4v11c-8-2-15-1-22 2-7-3-14-4-22-2Z" fill="#FFF7E8"/>
+    <path d="M32 52v9"/>
+    <path d="m15 53 11 2m12 0 11-2" stroke="#DEA0BD" stroke-width="2"/>
+    <path d="M29 27h6" stroke="#653452" stroke-width="3.5"/>
+  </g>
+</svg>

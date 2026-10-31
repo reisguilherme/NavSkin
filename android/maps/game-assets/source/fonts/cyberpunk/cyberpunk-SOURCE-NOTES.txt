@@ -1,0 +1,7 @@
+Source: https://www.cyberpunk.net/build/fonts/BlenderPro-Bold-c11a01ca.woff
+
+Blender Pro Bold served by the official Cyberpunk website. WOFF decompressed to sfnt, outlines and names preserved. Not a claim of extraction from game UI.
+
+Embedded copyright: Published by Die Gestalten Verlag GmbH & Co. KG, 2008Copyright © by Binnenland and re-p.org, 2008. All rights reserved. This software may not be reproduced, used, displayed, modified, disclosed or transferred without the express written approval of (Binnenland). 
+
+Public availability is not a redistribution grant. Retained as requested in the local game asset package, outside the code license.

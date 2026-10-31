@@ -1,0 +1,119 @@
+{
+  "uniqueScenarios": 16,
+  "latestFailures": 0,
+  "batches": [
+    {
+      "log": "native-first-pass.txt",
+      "tests": 16,
+      "failures": 6
+    },
+    {
+      "log": "native-second-pass.txt",
+      "tests": 9,
+      "failures": 1
+    },
+    {
+      "log": "native-exit-final.txt",
+      "tests": 1,
+      "failures": 0
+    }
+  ],
+  "latestResults": [
+    {
+      "class": "br.com.gamemap.render.NativeVibingTest",
+      "test": "activeRouteKeepsSessionAndRestoresItsFlatNavigationPreference",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeVibingTest",
+      "test": "phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi",
+      "passed": true,
+      "log": "native-exit-final.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeVibingTest",
+      "test": "freeDrivingForces3DHeadingAndRestoresFlatBrowsePreferences",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeCatalog3DTest",
+      "test": "allEightThemesDrawRealVolumesAndCanReturnToFlatFootprints",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeMvpRenderingTest",
+      "test": "phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeMvpRenderingTest",
+      "test": "phoneRosaNightKeepsLightChromeAndVibrantMap",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeMvpRenderingTest",
+      "test": "phoneThemeAndCategoryControlsPersistWithOptionalLocationPermission",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeMvpRenderingTest",
+      "test": "completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeAdaptiveCameraTest",
+      "test": "nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeAdaptiveCameraTest",
+      "test": "changedViewportAndStylePreserveTheAcceptedFollowTargetDuringAnEase",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeWorldMapTest",
+      "test": "saoPauloRendersEightOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeNavigationTest",
+      "test": "twoNewThemesKeepTheActiveRouteAndSemanticVehicleAndSavedIcons",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeNavigationTest",
+      "test": "deviceKeyStoreEncryptsAndRestoresProviderKeyWithoutPlaintextPreferences",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeNavigationTest",
+      "test": "addStopSearchKeepsFinalDestinationAndStopButtonEndsNavigation",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeNavigationTest",
+      "test": "simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation",
+      "passed": true,
+      "log": "native-second-pass.txt"
+    },
+    {
+      "class": "br.com.gamemap.render.NativeNavigationTest",
+      "test": "actualAndroidAtomicStorageReopensRepeatedEditsAndRemoval",
+      "passed": true,
+      "log": "native-first-pass.txt"
+    }
+  ]
+}

@@ -74,9 +74,8 @@ class NativeMvpRenderingTest {
         }
         try {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                waitForDescription(device, "Explorar mapa")
+                waitForDescription(device, "Menu NavSkin")
                 captureSheetSafeBottom(scenario, device)
-                collapsePanel(device)
                 assertTrue("Wait for real cartography before capturing phone chrome",
                     device.wait(Until.hasObject(By.descContains("recursos e renderização prontos")), 30_000))
                 device.waitForIdle()
@@ -84,7 +83,7 @@ class NativeMvpRenderingTest {
                     fun bounds(id: Int) = android.graphics.Rect().also {
                         assertTrue("Missing phone control $id", activity.findViewById<View>(id).getGlobalVisibleRect(it))
                     }
-                    val header = bounds(R.id.phone_header)
+                    assertNull("Map must not retain the old brand toolbar", activity.findViewById<View>(R.id.phone_header))
                     val search = bounds(R.id.phone_search)
                     val speed = bounds(R.id.phone_speed)
                     val recenter = bounds(R.id.phone_recenter)
@@ -97,36 +96,39 @@ class NativeMvpRenderingTest {
                     val center = (insets.left + width - insets.right) / 2
                     assertTrue("Search must be centered inside the safe map area", abs(search.centerX() - center) <= 2)
                     assertTrue("Search overlaps system navigation", search.bottom <= sheetSafeBottom)
-                    assertTrue("Menu moved away from the upper bar", header.contains(menu))
+                    assertTrue("Exploration menu should float at the upper right", menu.centerX() > width / 2 && menu.top < height / 3)
                     assertTrue("Speed must be on the left", speed.centerX() < width / 2)
                     assertTrue("Recenter must be on the right", recenter.centerX() > width / 2)
                     assertEquals("Speed must be circular", speed.width(), speed.height())
                     assertEquals("Recenter must be circular", recenter.width(), recenter.height())
-                    assertTrue("Speed overlaps search", speed.bottom < search.top)
-                    assertTrue("Recenter overlaps search", recenter.bottom < search.top)
+                    assertEquals("Speed and recenter must have the same diameter", speed.width(), recenter.width())
+                    assertFalse("Speed overlaps search", android.graphics.Rect.intersects(speed, search))
+                    assertFalse("Recenter overlaps search", android.graphics.Rect.intersects(recenter, search))
                     assertFalse("Idle GPS should not show a large route card", activity.findViewById<View>(R.id.phone_route_summary).isShown)
-                    assertFalse(android.graphics.Rect.intersects(header, search))
+                    assertFalse(android.graphics.Rect.intersects(menu, search))
                 }
                 checkChrome()
-                for (description in listOf("Temas", "Filtros")) {
-                    assertTrue("$description must be beside NavSkin at the top",
-                        waitForDescription(device, description).visibleBounds.bottom < device.displayHeight / 3)
+                assertFalse("Themes stay inside the contextual menu", device.hasObject(By.desc("Temas")))
+                waitForDescription(device, "Menu NavSkin").click()
+                for (description in listOf("Temas", "Filtros", "Seus lugares", "Configurações")) {
+                    assertNotNull(waitForDescription(device, description))
                 }
+                savePhoneScreenshot("phone-v09-glass-menu.png")
+                device.pressBack()
                 assertFalse(device.hasObject(By.text("N ↑")))
                 assertFalse(device.hasObject(By.text("Rumo ↑")))
                 assertFalse(device.hasObject(By.textContains("OpenFreeMap")))
                 assertFalse(device.hasObject(By.text("Seus lugares e opções")))
-                savePhoneScreenshot("phone-v07-rosa-clean.png")
+                savePhoneScreenshot("phone-v09-rosa-clean.png")
                 waitForDescription(device, "Para onde? Buscar destinos").click()
                 waitForDescription(device, "Painel Para onde?")
                 assertFalse("Configuration should live in its own menu", device.hasObject(By.desc("Marcador do veículo e orientação")))
                 device.pressBack()
-                waitForDescription(device, "Menu NavSkin").click()
-                waitForDescription(device, "Painel Seus lugares e opções")
+                openSettings(device)
                 assertNotNull(device.findObject(By.desc("Seus lugares · salvos e recentes")))
                 revealOptionsAction(device, "Sobre o NavSkin · fontes e licenças")
                 assertTrue("Map credits must remain available inside the menu", device.hasObject(By.textContains("Dados do mapa:")))
-                savePhoneScreenshot("phone-v07-options.png")
+                savePhoneScreenshot("phone-v09-options.png")
                 device.pressBack()
                 scenario.onActivity { it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
                 val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(8)
@@ -136,7 +138,7 @@ class NativeMvpRenderingTest {
                 device.waitForIdle()
                 captureSheetSafeBottom(scenario, device)
                 checkChrome()
-                savePhoneScreenshot("phone-v07-landscape-clean.png")
+                savePhoneScreenshot("phone-v09-landscape-clean.png")
             }
         } finally {
             instrumentation.runOnMainSync { application.preferences.setTheme(previousTheme) }
@@ -148,15 +150,15 @@ class NativeMvpRenderingTest {
         val capture = SurfaceCapture(context, 800, 480)
         var renderer: CarSurfaceRenderer? = null
         try {
-            capture.expect(Palette.GTA)
+            capture.expect(NativeMapPalette.forTheme(MapTheme.GTA_SA))
             instrumentation.runOnMainSync {
                 renderer = CarSurfaceRenderer(context, repository.styleFor(MapPreferences(baseMapMode = MapBaseMode.GOIANIA_OFFLINE)))
                 renderer!!.onSurfaceAvailable(SurfaceContainer(capture.reader.surface, 800, 480, 160))
             }
             var generation = 0
             var camera: CameraPosition? = null
-            for (theme in listOf(MapTheme.GTA_SA, MapTheme.ROSA_POP, MapTheme.RDR2)) {
-                capture.expect(Palette.forTheme(theme))
+            for (theme in MapTheme.entries) {
+                capture.expect(NativeMapPalette.forTheme(theme))
                 if (generation > 0) {
                     // Changing theme must preserve the existing all-disabled filter selection.
                     instrumentation.runOnMainSync {
@@ -183,7 +185,7 @@ class NativeMvpRenderingTest {
                     renderer!!.panBy(40f, -20f)
                 }
                 camera = awaitSurfaceCameraMovement(renderer!!, beforePan!!)
-                capture.expect(Palette.forTheme(theme, night = true))
+                capture.expect(NativeMapPalette.forTheme(theme, night = true))
                 instrumentation.runOnMainSync {
                     renderer!!.applyStyle(repository.styleFor(MapPreferences(theme, emptySet(), MapBaseMode.GOIANIA_OFFLINE), true))
                 }
@@ -268,7 +270,7 @@ class NativeMvpRenderingTest {
         val device = UiDevice.getInstance(instrumentation)
         try {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                waitForDescription(device, "Explorar mapa")
+                openAppearance(device, "Temas")
                 val safeBottom = captureSheetSafeBottom(scenario, device)
                 val footerDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
                 while (waitForDescription(device, "Explorar mapa").visibleBounds.bottom > safeBottom &&
@@ -286,7 +288,7 @@ class NativeMvpRenderingTest {
                     assertTrue("The collapsed phone UI should leave most of the screen to the map",
                         mapView.height >= activity.window.decorView.height * .85)
                 }
-                awaitPhonePixels(Palette.GTA).also { saveImage(context, "phone-gta.png", it); it.recycle() }
+                awaitPhonePixels(NativeMapPalette.forTheme(MapTheme.GTA_SA)).also { saveImage(context, "phone-gta.png", it); it.recycle() }
                 val beforeZoom = readPhoneCamera(scenario)
                 clickMapMenuAction(device, "Aumentar zoom")
                 val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10)
@@ -304,22 +306,22 @@ class NativeMvpRenderingTest {
                 awaitPhoneCamera(scenario, NativeMapRenderer.defaultCamera())
                 val camera = readPhoneCamera(scenario)
 
-                for (theme in listOf(MapTheme.ROSA_POP, MapTheme.RDR2)) {
-                    waitForDescription(device, "Temas").click()
+                for (theme in MapTheme.entries.drop(1)) {
+                    openAppearance(device, "Temas")
                     chooseTheme(device, theme)
-                    if (theme == MapTheme.RDR2) awaitFullThemeCard(device, theme, fullThemeCardWidth)
+                    if (theme == MapTheme.CROSSY_ROAD) awaitFullThemeCard(device, theme, fullThemeCardWidth)
                     assertEquals(theme, application.preferences.snapshot().theme)
                     assertNotNull("Selecting a card must keep the carousel open",
                         device.findObject(By.desc("Explorar mapa")))
                     savePhoneScreenshot("phone-${theme.assetName}-selected.png")
                     collapsePanel(device)
-                    awaitPhonePixels(Palette.forTheme(theme)).also {
+                    awaitPhonePixels(NativeMapPalette.forTheme(theme)).also {
                         saveImage(context, "phone-${theme.assetName}.png", it); it.recycle()
                     }
                     sameCamera(camera, readPhoneCamera(scenario))
                 }
 
-                waitForDescription(device, "Filtros").click()
+                openAppearance(device, "Filtros")
                 for (category in PoiCategory.entries) {
                     clickScrollableControl(device, "Filtro ${category.label}", "Categorias do mapa")
                     awaitPreferenceCategories(PoiCategory.entries.toSet() - category)
@@ -333,30 +335,30 @@ class NativeMvpRenderingTest {
                 awaitPhoneLayers(scenario, selected)
                 savePhoneScreenshot("phone-filters.png")
                 collapsePanel(device)
-                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 8/9 categorias ativas")
+                waitForDescription(device, "Menu NavSkin")
 
                 // A different theme must not reset the user's independent POI filters.
-                for (theme in listOf(MapTheme.ROSA_POP, MapTheme.RDR2)) {
-                    waitForDescription(device, "Temas").click()
+                for (theme in MapTheme.entries.drop(1)) {
+                    openAppearance(device, "Temas")
                     chooseTheme(device, theme)
-                    if (theme == MapTheme.RDR2) awaitFullThemeCard(device, theme, fullThemeCardWidth)
+                    if (theme == MapTheme.CROSSY_ROAD) awaitFullThemeCard(device, theme, fullThemeCardWidth)
                     collapsePanel(device)
-                    awaitPhonePixels(Palette.forTheme(theme)).also { it.recycle() }
+                    awaitPhonePixels(NativeMapPalette.forTheme(theme)).also { it.recycle() }
                     awaitPhoneLayers(scenario, selected)
                     assertEquals(selected, application.preferences.snapshot().enabledCategories)
                     sameCamera(camera, readPhoneCamera(scenario))
                 }
                 scenario.recreate()
-                waitForDescription(device, "NavSkin · Goiânia · offline · RDR2 · 8/9 categorias ativas")
+                waitForDescription(device, "Menu NavSkin")
                 assertFalse("A collapsed panel reopened after Activity recreation",
                     device.hasObject(By.desc("Explorar mapa")))
                 PreferenceStore(context).use { reopened ->
-                    assertEquals(MapTheme.RDR2, reopened.snapshot().theme)
+                    assertEquals(MapTheme.CROSSY_ROAD, reopened.snapshot().theme)
                     assertEquals(selected, reopened.snapshot().enabledCategories)
                 }
                 awaitPhoneLayers(scenario, selected)
-                awaitPhonePixels(Palette.RDR2).also {
-                    saveImage(context, "phone-rdr2-parks-hidden.png", it); it.recycle()
+                awaitPhonePixels(NativeMapPalette.forTheme(MapTheme.CROSSY_ROAD)).also {
+                    saveImage(context, "phone-crossy-parks-hidden.png", it); it.recycle()
                 }
             }
         } finally {
@@ -385,10 +387,9 @@ class NativeMvpRenderingTest {
         val device = UiDevice.getInstance(instrumentation)
         try {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                waitForDescription(device, "Explorar mapa")
+                waitForDescription(device, "Menu NavSkin")
                 captureSheetSafeBottom(scenario, device)
-                collapsePanel(device)
-                awaitPhonePixels(Palette.ROSA_NIGHT).also { bitmap ->
+                awaitPhonePixels(NativeMapPalette.forTheme(MapTheme.ROSA_POP, night = true)).also { bitmap ->
                     try {
                         saveImage(context, "phone-rosa-night.png", bitmap)
                         val pixel = bitmap.getPixel(bitmap.width / 2,
@@ -399,9 +400,10 @@ class NativeMvpRenderingTest {
                             android.graphics.Color.blue(pixel) > 230)
                     } finally { bitmap.recycle() }
                 }
-                waitForDescription(device, "NavSkin · Goiânia · offline · Rosa Pop · 9/9 categorias ativas")
+                waitForDescription(device, "Menu NavSkin").click()
                 waitForDescription(device, "Temas")
                 waitForDescription(device, "Filtros")
+                device.pressBack()
             }
         } finally {
             instrumentation.runOnMainSync {
@@ -461,9 +463,20 @@ class NativeMvpRenderingTest {
         waitForDescription(device, "Menu NavSkin")
     }
 
-    private fun clickMapMenuAction(device: UiDevice, description: String) {
+    private fun openAppearance(device: UiDevice, description: String) {
         waitForDescription(device, "Menu NavSkin").click()
+        waitForDescription(device, description).click()
+        waitForDescription(device, "Explorar mapa")
+    }
+
+    private fun openSettings(device: UiDevice) {
+        waitForDescription(device, "Menu NavSkin").click()
+        waitForDescription(device, "Configurações").click()
         waitForDescription(device, "Painel Seus lugares e opções")
+    }
+
+    private fun clickMapMenuAction(device: UiDevice, description: String) {
+        openSettings(device)
         revealOptionsAction(device, description).click()
         assertTrue("Options menu should retract after changing zoom",
             device.wait(Until.gone(By.desc("Painel Seus lugares e opções")), 5000))
@@ -541,7 +554,7 @@ class NativeMvpRenderingTest {
             val values = ContentValues().apply {
                 put(MediaStore.Downloads.DISPLAY_NAME, "$name.xml")
                 put(MediaStore.Downloads.MIME_TYPE, "application/xml")
-                put(MediaStore.Downloads.RELATIVE_PATH, "Download/GameMapV3/")
+                put(MediaStore.Downloads.RELATIVE_PATH, "Download/NavSkinWorld/v0.10/")
             }
             val uri = checkNotNull(context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values))
             checkNotNull(context.contentResolver.openOutputStream(uri)).use { device.dumpWindowHierarchy(it) }
@@ -638,18 +651,23 @@ class NativeMvpRenderingTest {
         return null
     }
 
-    private fun awaitPhonePixels(palette: Palette): Bitmap {
+    private fun awaitPhonePixels(palette: NativeMapPalette): Bitmap {
         val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(40)
         val device = UiDevice.getInstance(instrumentation)
+        var lastObservation = "no screenshot returned"
         while (System.nanoTime() < deadline) {
             val bitmap = instrumentation.uiAutomation.takeScreenshot()
-            if (bitmap != null && device.hasObject(By.descContains("recursos e renderização prontos")) &&
-                hasMapColors(bitmap, palette)) return bitmap
+            if (bitmap != null) {
+                val ready = device.hasObject(By.descContains("recursos e renderização prontos"))
+                val coverage = mapColorCoverage(bitmap, palette)
+                if (ready && coverage.complete) return bitmap
+                lastObservation = "resourcesReady=$ready, $coverage"
+            }
             bitmap?.recycle()
             Thread.sleep(200)
         }
         savePhoneScreenshot("failed-phone-${palette.name.lowercase()}.png")
-        throw AssertionError("The phone did not render complete ${palette.name} cartography")
+        throw AssertionError("The phone did not render complete ${palette.name} cartography: $lastObservation; expected=$palette")
     }
 
     private fun sameCamera(expected: CameraPosition, actual: CameraPosition) {
@@ -659,29 +677,11 @@ class NativeMvpRenderingTest {
         assertEquals(expected.bearing, actual.bearing, 0.000001)
     }
 
-    private enum class Palette(val park: Int, val road: Int, val water: Int, val building: Int) {
-        GTA(0xff28681c.toInt(),0xff000000.toInt(),0xff7088ab.toInt(),0xffe0e0dc.toInt()),
-        GTA_NIGHT(0xff53662d.toInt(),0xff060805.toInt(),0xff4b6e91.toInt(),0xffb2bbae.toInt()),
-        // Sample wide primary-road fills; thin casing colors are blended by antialiasing.
-        ROSA(0xff6fe3bd.toInt(),0xffffdf79.toInt(),0xff64d7eb.toInt(),0xfffff3fb.toInt()),
-        ROSA_NIGHT(0xff41ab99.toInt(),0xffefc46f.toInt(),0xff388ebc.toInt(),0xffb888bb.toInt()),
-        RDR2(0xffb5af88.toInt(),0xff5c4030.toInt(),0xffa8b9ad.toInt(),0xffb6a17a.toInt()),
-        RDR2_NIGHT(0xff777d5a.toInt(),0xff32271d.toInt(),0xff718f89.toInt(),0xffb19b75.toInt());
-
-        companion object {
-            fun forTheme(theme: MapTheme, night: Boolean = false): Palette = when (theme) {
-                MapTheme.GTA_SA -> if (night) GTA_NIGHT else GTA
-                MapTheme.ROSA_POP -> if (night) ROSA_NIGHT else ROSA
-                MapTheme.RDR2 -> if (night) RDR2_NIGHT else RDR2
-            }
-        }
-    }
-
     private class SurfaceCapture(private val context: Context, width: Int, height: Int) : AutoCloseable {
         val reader = ImageReader.newInstance(width,height,PixelFormat.RGBA_8888,3)
         private val worker = HandlerThread("MvpSurfaceCapture").apply { start() }
         private val handler = Handler(worker.looper)
-        private val wanted = AtomicReference(Palette.GTA)
+        private val wanted = AtomicReference(NativeMapPalette.forTheme(MapTheme.GTA_SA))
         private val frames = LinkedBlockingQueue<Bitmap>(1)
         private val latest = AtomicReference<Bitmap?>(null)
         init {
@@ -706,7 +706,7 @@ class NativeMvpRenderingTest {
                 }
             },handler)
         }
-        fun expect(palette: Palette) { wanted.set(palette); while(true)(frames.poll() ?: break).recycle() }
+        fun expect(palette: NativeMapPalette) { wanted.set(palette); while(true)(frames.poll() ?: break).recycle() }
         fun awaitAndSave(name: String) {
             val bitmap=frames.poll(40,TimeUnit.SECONDS) ?: run {
                 latest.getAndSet(null)?.let { diagnostic ->
@@ -728,11 +728,19 @@ class NativeMvpRenderingTest {
     }
 
     companion object {
-        private fun hasMapColors(bitmap: Bitmap, palette: Palette): Boolean {
+        private data class MapColorCoverage(val park: Int, val road: Int, val water: Int, val building: Int) {
+            val complete get() = park >= 6 && road >= 20 && water >= 3 && building >= 15
+        }
+        private fun hasMapColors(bitmap: Bitmap, palette: NativeMapPalette): Boolean =
+            mapColorCoverage(bitmap, palette).complete
+
+        private fun mapColorCoverage(bitmap: Bitmap, palette: NativeMapPalette): MapColorCoverage {
             val colors=listOf(palette.park,palette.road,palette.water,palette.building)
             val counts=IntArray(4)
-            for(y in bitmap.height/8 until bitmap.height*3/4 step 5)
-                for(x in bitmap.width/10 until bitmap.width*9/10 step 5) {
+            // Resolve the approved one-pixel Pip-Boy road strokes; a five-pixel
+            // grid can skip them even when the real geometry is fully rendered.
+            for(y in bitmap.height/8 until bitmap.height*3/4 step 2)
+                for(x in bitmap.width/10 until bitmap.width*9/10 step 2) {
                     val pixel=bitmap.getPixel(x,y)
                     colors.forEachIndexed { index, wanted ->
                         if(abs(android.graphics.Color.red(pixel)-android.graphics.Color.red(wanted))<=8 &&
@@ -740,10 +748,10 @@ class NativeMvpRenderingTest {
                             abs(android.graphics.Color.blue(pixel)-android.graphics.Color.blue(wanted))<=8)counts[index]++
                     }
                 }
-            return counts[0]>=6 && counts[1]>=20 && counts[2]>=3 && counts[3]>=15
+            return MapColorCoverage(counts[0], counts[1], counts[2], counts[3])
         }
         private fun saveImage(context: Context,name: String,bitmap: Bitmap) {
-            val directory = "Pictures/GameMapV3/"
+            val directory = "Pictures/NavSkinWorld/v0.10/"
             // Re-running instrumentation refreshes the same generated evidence and previews.
             context.contentResolver.delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 "${MediaStore.Images.Media.DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.RELATIVE_PATH} = ?",

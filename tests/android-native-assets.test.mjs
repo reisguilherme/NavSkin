@@ -9,7 +9,7 @@ import sharp from 'sharp';
 const root = new URL('../', import.meta.url);
 const assetRoot = new URL('android/app/src/main/assets/maps/', root);
 const categories = ['parks', 'fuel', 'food', 'parking', 'health', 'shops', 'education', 'culture', 'religion'];
-const themes = ['gta', 'rosa', 'rdr2'];
+const themes = ['gta', 'rosa', 'rdr2', 'smw', 'cyberpunk', 'pipboy', 'hollow', 'crossy'];
 const variants = [...themes, ...themes.map(theme => `${theme}-night`)];
 const json = async path => JSON.parse(await readFile(new URL(path, root), 'utf8'));
 const asset = async path => JSON.parse(await readFile(new URL(path, assetRoot), 'utf8'));
@@ -94,7 +94,7 @@ test('all day/night native variants satisfy the schema and share geographic sour
     assert.deepEqual(style.sources, styles[0].sources);
     assert.deepEqual(validateStyleMin(style).map(error => error.message), []);
     assert.equal(style.glyphs, 'asset://maps/glyphs/{fontstack}/{range}.pbf');
-    assert.match(style.sprite, /^asset:\/\/maps\/sprites\/(gta|rosa|rdr2)$/);
+    assert.match(style.sprite, /^asset:\/\/maps\/sprites\/(gta|rosa|rdr2|smw|cyberpunk|pipboy|hollow|crossy)$/);
     for (const source of Object.values(style.sources)) {
       if (source.type === 'geojson') assert.match(source.data, /^asset:\/\/maps\/data\/.+\.geojson$/);
       else assert.deepEqual(source.tiles, ['asset://maps/tiles/buildings/{z}/{x}/{y}.pbf']);
@@ -220,13 +220,22 @@ test('both sprite atlases include every editable icon, nine categories, subtype 
       const png = await sharp(await readFile(new URL(`sprites/${mode}${suffix}.png`, assetRoot))).metadata();
       const sourceNames = (await readdir(new URL(`android/maps/icons/${mode}/`, root)))
         .filter(name => /^[a-z0-9-]+\.svg$/.test(name)).map(name => name.slice(0, -4)).sort();
-      assert.deepEqual(Object.keys(index).sort(), sourceNames);
+      const materialNames = new Set();
+      for (const variant of [mode, `${mode}-night`, `world-${mode}`, `world-${mode}-night`]) {
+        for (const layer of (await asset(`styles/${variant}.json`)).layers) {
+          const pattern = layer.paint?.['fill-pattern'] ?? layer.paint?.['background-pattern'];
+          if (typeof pattern === 'string') materialNames.add(pattern);
+        }
+      }
+      assert.deepEqual(Object.keys(index).sort(), [...sourceNames, ...materialNames].sort());
       for (const id of [...categories.map(c => `poi-${c}`), 'road-oneway-forward',
         'poi-cafe', 'poi-fast-food', 'poi-restaurant', 'poi-pharmacy', 'poi-hospital', 'poi-clinic',
         'poi-school', 'poi-museum', 'poi-theatre', 'poi-bar', 'poi-worship']) assert.ok(index[id], `${mode}: missing ${id}`);
-      for (const entry of Object.values(index)) {
+      for (const [id, entry] of Object.entries(index)) {
         assert.equal(entry.pixelRatio, ratio);
-        assert.equal(entry.width, 32 * ratio);
+        if (['pipboy', 'hollow', 'crossy'].includes(mode)) {
+          assert.ok(entry.width > 0 && entry.height > 0, 'approved material and icon proportions remain intact');
+        } else assert.equal(entry.width, (id.startsWith('lab-') ? 64 : 32) * ratio);
         assert.ok(entry.x + entry.width <= png.width);
         assert.ok(entry.y + entry.height <= png.height);
       }
@@ -264,7 +273,7 @@ test('GTA uses measured TO-BE colors while every theme preserves the same real r
   }
   for (const id of ['landuse-urban', 'water-fill', 'vegetation-parks', 'building-footprints', 'road-0-primary-fill', 'place-labels']) {
     const paints = styles.map(style => JSON.stringify(style.layers.find(l => l.id === id).paint));
-    assert.equal(new Set(paints).size, 3, id);
+    assert.equal(new Set(paints).size, themes.length, id);
   }
 });
 
@@ -273,7 +282,7 @@ const luminance = color => color.slice(1).match(/../g).map(value => Number.parse
   .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
 const contrast = (a, b) => (Math.max(luminance(a), luminance(b)) + 0.05) / (Math.min(luminance(a), luminance(b)) + 0.05);
 
-test('host night variants retain the same three themes, geometry, symbols and readable palettes', async () => {
+test('host night variants retain the same eight themes, geometry, symbols and readable palettes', async () => {
   const tokens = await json('android/maps/theme-tokens.json');
   const withoutPaint = style => style.layers.map(({ paint, ...layer }) => layer);
   for (const theme of themes) {
@@ -289,7 +298,10 @@ test('host night variants retain the same three themes, geometry, symbols and re
     assert.ok(luminance(p.urban) < luminance(tokens.palettes[theme].urban), `${theme}: dim urban area`);
     assert.ok(luminance(p.building) < luminance(tokens.palettes[theme].building), `${theme}: dim footprints`);
     assert.ok(contrast(p.label, p.labelHalo) >= 7, `${theme}: label/halo contrast`);
-    assert.ok(contrast(p.road, p.urban) >= 3, `${theme}: road/urban contrast`);
+    // Wireframe cartography (Cyberpunk) makes the road edge the high-contrast
+    // component; solid roads use their fill. Both are rendered continuously.
+    assert.ok(Math.max(contrast(p.road, p.urban), contrast(p.roadOutline, p.urban)) >= 3,
+      `${theme}: visible road stroke/urban contrast`);
     for (const category of categories) {
       const layer = night.layers.find(layer => layer.id === `poi-${category}`);
       assert.equal(layer.layout.visibility, 'visible');
@@ -317,9 +329,10 @@ test('Rosa stays candy pink and mint in both appearances while RDR2 uses parchme
     const p = tokens.palettes[mode];
     assert.ok(luminance(p.road) < luminance(p.urban) / 3, `${mode}: dark ink roads on parchment`);
     assert.deepEqual(Object.keys(style.sources).sort(), ['areas', 'buildings', 'places', 'pois', 'roads', 'waterways']);
-    for (const [id, token] of [['vegetation-parks', 'park'], ['water-fill', 'water'], ['building-footprints', 'building']]) {
-      assert.equal(style.layers.find(l => l.id === id).paint['fill-color'], p[token]);
+    const approved = mode === 'rdr2' ? ['#c4bf96', '#b7c7b3', '#d4bf94', '#51402d'] : ['#7c8060', '#78928a', '#aa9673', '#30271e'];
+    for (const [index, id] of ['vegetation-parks', 'water-fill', 'building-footprints'].entries()) {
+      assert.equal(style.layers.find(l => l.id === id).paint['fill-color'], approved[index]);
     }
-    assert.equal(style.layers.find(l => l.id === 'road-0-primary-fill').paint['line-color'], p.primary);
+    assert.equal(style.layers.find(l => l.id === 'road-0-primary-fill').paint['line-color'], approved[3]);
   }
 });

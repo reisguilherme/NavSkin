@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="br.com.gamemap.render.NativeAdaptiveCameraTest" tests="14" failures="1" errors="0" skipped="0" time="238.026" timestamp="2026-10-29T17:14:38" hostname="localhost">
+  <properties>
+    <property name="device" value="GameMap_AOSP_API36(AVD) - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera" classname="br.com.gamemap.render.NativeAdaptiveCameraTest" time="5.196" />
+  <testcase name="changedViewportAndStylePreserveTheAcceptedFollowTargetDuringAnEase" classname="br.com.gamemap.render.NativeAdaptiveCameraTest" time="3.141" />
+  <testcase name="cameraMovedWhileThemeLoadsKeepsTheLatestNativePosition" classname="br.com.gamemap.render.NativeCameraRaceTest" time="17.302">
+    <failure>java.lang.IllegalStateException: Required value was null.
+at br.com.gamemap.render.NativeCameraRaceTest.cameraMovedWhileThemeLoadsKeepsTheLatestNativePosition(NativeCameraRaceTest.kt:42)
+</failure>
+  </testcase>
+  <testcase name="phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="29.849" />
+  <testcase name="phoneRosaNightKeepsLightChromeAndVibrantMap" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="9.247" />
+  <testcase name="phoneThemeAndCategoryControlsPersistWithOptionalLocationPermission" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="84.843" />
+  <testcase name="completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="27.931" />
+  <testcase name="deviceKeyStoreEncryptsAndRestoresProviderKeyWithoutPlaintextPreferences" classname="br.com.gamemap.render.NativeNavigationTest" time="0.156" />
+  <testcase name="addStopSearchKeepsFinalDestinationAndStopButtonEndsNavigation" classname="br.com.gamemap.render.NativeNavigationTest" time="7.324" />
+  <testcase name="simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation" classname="br.com.gamemap.render.NativeNavigationTest" time="15.103" />
+  <testcase name="actualAndroidAtomicStorageReopensRepeatedEditsAndRemoval" classname="br.com.gamemap.render.NativeNavigationTest" time="0.029" />
+  <testcase name="nativeMapProducesPixelsAndSurvivesResizeAndReconnect" classname="br.com.gamemap.render.NativeSurfaceProbeTest" time="4.892" />
+  <testcase name="saoPauloRendersThreeOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges" classname="br.com.gamemap.render.NativeWorldMapTest" time="30.034" />
+  <testcase name="installsRendersCleansUpAndRejectsLateIncidentCallbacks" classname="br.com.gamemap.traffic.NativeTrafficOverlayTest" time="1.687" />
+</testsuite>

@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="br.com.gamemap.render.NativeWorldMapTest" tests="10" failures="0" errors="0" skipped="0" time="309.513" timestamp="2026-10-29T19:14:30" hostname="localhost">
+  <properties>
+    <property name="device" value="GameMap_AOSP_API36(AVD) - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges" classname="br.com.gamemap.render.NativeWorldMapTest" time="37.636" />
+  <testcase name="twoNewThemesKeepTheActiveRouteAndSemanticVehicleAndSavedIcons" classname="br.com.gamemap.render.NativeNavigationTest" time="12.294" />
+  <testcase name="deviceKeyStoreEncryptsAndRestoresProviderKeyWithoutPlaintextPreferences" classname="br.com.gamemap.render.NativeNavigationTest" time="0.13" />
+  <testcase name="addStopSearchKeepsFinalDestinationAndStopButtonEndsNavigation" classname="br.com.gamemap.render.NativeNavigationTest" time="8.132" />
+  <testcase name="simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation" classname="br.com.gamemap.render.NativeNavigationTest" time="21.044" />
+  <testcase name="actualAndroidAtomicStorageReopensRepeatedEditsAndRemoval" classname="br.com.gamemap.render.NativeNavigationTest" time="0.029" />
+  <testcase name="phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="31.973" />
+  <testcase name="phoneRosaNightKeepsLightChromeAndVibrantMap" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="10.332" />
+  <testcase name="phoneThemeAndCategoryControlsPersistWithOptionalLocationPermission" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="136.725" />
+  <testcase name="completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges" classname="br.com.gamemap.render.NativeMvpRenderingTest" time="50.017" />
+</testsuite>

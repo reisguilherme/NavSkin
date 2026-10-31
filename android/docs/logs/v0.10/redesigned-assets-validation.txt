@@ -1,0 +1,27 @@
+✔ offline oneway symbols keep original OSM direction and never invent missing or two-way restrictions (228.51ms)
+✔ native subtype icons distinguish original OSM amenity while keeping category fallbacks (39.8251ms)
+✔ native filters cover every actual road grade and the real Praça Cívica park (5281.5081ms)
+✔ all day/night native variants satisfy the schema and share geographic sources (213.4657ms)
+✔ nine independent POI layers cover every available offline POI once and keep green areas separate (58.6212ms)
+✔ hiding all nine categories removes every POI while preserving traffic directions and geographic layers (36.2136ms)
+✔ source GeoJSON bytes and prepared building MVTs are copied without coordinate edits (528.1846ms)
+✔ local Noto glyph PBFs cover all label codepoints including uppercase and accents (93.2587ms)
+✔ both sprite atlases include every editable icon, nine categories, subtype aliases and the traffic arrow (143.9896ms)
+✔ GTA uses measured TO-BE colors while every theme preserves the same real road hierarchy (20.1316ms)
+✔ host night variants retain the same seven themes, geometry, symbols and readable palettes (52.1009ms)
+✔ Rosa stays candy pink and mint in both appearances while RDR2 uses parchment and dark ink (6.0285ms)
+✔ illustrated map materials resolve locally without adding geographic sources or markers (368.0048ms)
+✔ readable theme fonts retain POI caption zoom gates in both coverages (89.6614ms)
+✔ new offline styles retain the bundled sources, road topology and all semantic filters (218.4875ms)
+✔ all seven themes build day and night world maps with identical real geography and category semantics (53.7454ms)
+✔ new theme sprites cover every category, subtype and traffic direction with visible standalone authored artwork (201.7576ms)
+Prepared 126 navigation choices (1 original game raster) and 252 transparent PNGs across 7 themes.
+✔ navigation generator emits all seven skins while retaining saved and vehicle preference IDs (1176.3348ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6824.9777

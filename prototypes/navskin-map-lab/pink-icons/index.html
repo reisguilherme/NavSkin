@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pink World · Coleção de ícones</title>
+  <link rel="icon" type="image/svg+xml" href="./saved-heart.svg">
+  <link rel="stylesheet" href="./catalog.css">
+</head>
+<body>
+  <header class="topbar"><a href="../index.html" class="back">← Voltar ao mapa</a><a href="../novos-mapas.html" class="back">Novos mapas ↗</a><span>NAVSKIN / DESIGN LAB</span></header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">PINK WORLD / COLEÇÃO 01</p><h1>Pequenos lugares.<br>Um mundo doce.</h1><p class="lead">Uma família de ícones desenhada para a cidade: formas de brinquedo, acabamento de doce e detalhes que contam o que existe em cada lugar.</p></div>
+      <div class="intro-art" aria-hidden="true"><div class="orbit"></div><img class="hero-park" src="./parks.svg" alt=""><img class="hero-car" src="./vehicle.svg" alt=""><img class="hero-heart" src="./saved-heart.svg" alt=""><span class="mini-note">feito para o Pink World</span></div>
+    </section>
+    <section class="collection" aria-labelledby="collection-title">
+      <div class="collection-heading"><div><p class="eyebrow">13 ÍCONES / COLEÇÃO PINK WORLD</p><h2 id="collection-title">A cidade, em miniatura</h2></div><div class="surface-control" role="group" aria-label="Fundo das amostras"><button type="button" data-surface="day" aria-pressed="true">Dia</button><button type="button" data-surface="night" aria-pressed="false">Noite</button></div></div>
+      <div class="icon-grid" id="icon-grid"></div>
+      <p class="collection-note">Cada desenho aparece em 24, 32 e 48 px para conferir a leitura no mapa. Parques, lugares e favoritos têm silhuetas próprias.</p>
+    </section>
+    <footer><span>Contorno ameixa · rosa morango · menta · lilás</span><span id="load-status" role="status">Carregando a coleção…</span></footer>
+  </main>
+  <script type="module">
+    import { PINK_ICON_CATALOG, loadPinkIcons } from '../pink-icons.js';
+    const grid = document.getElementById('icon-grid');
+    for (const icon of PINK_ICON_CATALOG) {
+      const card = document.createElement('article');
+      card.className = 'icon-card';
+      card.id = icon.category;
+      card.style.setProperty('--icon-surface', icon.background);
+      card.innerHTML = `<div class="icon-stage"><span class="category">${icon.label}</span><img class="large-icon" src="${icon.src}" alt="${icon.title}" width="96" height="96"><div class="size-samples">${[24, 32, 48].map(size => `<div><img src="${icon.src}" alt="" width="${size}" height="${size}"><span>${size}</span></div>`).join('')}</div></div><div class="icon-caption"><h3>${icon.title}</h3><p>${icon.description}</p></div>`;
+      grid.append(card);
+      if (icon.role === 'vehicle') {
+        const link = document.createElement('a');
+        link.href = '../navegacao.html?tema=rosa';
+        link.textContent = 'Ver o carrinho na navegação ↗';
+        card.querySelector('.icon-caption').append(link);
+      }
+    }
+    for (const button of document.querySelectorAll('[data-surface]')) button.addEventListener('click', () => {
+      document.body.dataset.surface = button.dataset.surface;
+      document.querySelectorAll('[data-surface]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    });
+    try {
+      const pixels = await loadPinkIcons();
+      document.getElementById('load-status').textContent = `${Object.keys(pixels).length} ícones prontos para o mapa`;
+      document.documentElement.dataset.iconsReady = 'true';
+    } catch (error) {
+      document.getElementById('load-status').textContent = error.message;
+      document.documentElement.dataset.iconsReady = 'false';
+    }
+  </script>
+</body>
+</html>

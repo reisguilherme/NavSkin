@@ -39,9 +39,10 @@ class NativeCameraRaceTest {
         try {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 val device = UiDevice.getInstance(instrumentation)
-                checkNotNull(device.wait(Until.findObject(By.desc("Explorar mapa")), 15000)).click()
-                assertTrue("Initial theme carousel did not retract",
-                    device.wait(Until.gone(By.desc("Explorar mapa")), 5000))
+                assertTrue("Map controls did not appear",
+                    device.wait(Until.hasObject(By.desc("Menu NavSkin")), 15000))
+                assertFalse("An unopened theme sheet must not cover the native camera test",
+                    device.hasObject(By.desc("Explorar mapa")))
                 val map = AtomicReference<MapLibreMap>()
                 val mapView = AtomicReference<MapView>()
                 val originalStyle = AtomicReference<Style>()

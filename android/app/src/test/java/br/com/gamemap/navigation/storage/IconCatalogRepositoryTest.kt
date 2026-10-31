@@ -18,6 +18,10 @@ class IconCatalogRepositoryTest {
         val catalog = IconCatalogRepository(context)
         assertEquals(12, catalog.savedIcons().size)
         assertEquals(6, catalog.vehicleIcons().size)
+        val activeThemes = MapTheme.entries.map { it.assetName }.toSet()
+        for (item in catalog.savedIcons() + catalog.vehicleIcons()) {
+            assertEquals("Only active themes should ship representations for ${item.id}", activeThemes, item.themeAssets.keys)
+        }
         for (theme in MapTheme.entries) {
             for (item in catalog.savedIcons()) {
                 val asset = catalog.savedIcon(item.id, theme)

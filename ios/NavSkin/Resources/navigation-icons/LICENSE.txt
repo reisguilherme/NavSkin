@@ -1,7 +1,7 @@
 GameMap original navigation icon artwork
 
-All SVG geometry in this directory was created specifically for this project.
-It contains no copied game artwork, logos, sprites, emoji, fonts or external images.
+SVG geometry in this directory was created specifically for this project, with
+the separately attributed character adaptation and original GTA raster below.
 The theme names describe visual inspiration only. No affiliation or endorsement
 by the owners of any game franchise is claimed.
 
@@ -21,6 +21,11 @@ has been verified; keep these resources in the local private asset pack.
 Source, exact SHA-256 and the pixel-preserving transformation are recorded in
 catalog.json and the generated provenance.json. Other vehicle choices retain
 the original NavSkin geometry and their semantic IDs.
+
+Exception: rosa/vehicles/themed.svg and its PNGs are NavSkin's authored top-view
+adaptation of the Hello Kitty toy car reference supplied by the user. Hello Kitty
+character rights remain with Sanrio. This character adaptation is excluded from
+the CC0 dedication; it is not an original official game or manufacturer asset.
 
 No Maki geometry is included in this catalog. Existing POI icons elsewhere in
 the repository keep their own licenses and attribution.

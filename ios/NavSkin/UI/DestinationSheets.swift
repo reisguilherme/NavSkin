@@ -4,25 +4,31 @@ import NavSkinCore
 @MainActor
 struct DestinationSearchSheet: View {
     @ObservedObject var store: AppStore
+    var addingStop = false
     let select: (Destination) -> Void
     @State private var query = ""
     @State private var settings = false
     @FocusState private var focused: Bool
     @Environment(\.dismiss) private var dismiss
-    private var palette: ThemePalette { store.theme.palette }
+    private var palette: ThemePalette { store.theme.glassPalette }
+    private var clearsDestination: Bool {
+        !addingStop && !store.snapshot.navigationActive && !store.snapshot.simulation &&
+            (store.snapshot.destination != nil || store.snapshot.resumeDestination != nil)
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    SheetHeading(title: "Seu próximo destino", subtitle: "Busque um lugar, endereço ou cidade.", palette: palette)
+                    SheetHeading(title: addingStop ? "Adicionar parada" : "Seu próximo destino",
+                        subtitle: addingStop ? "A parada entra antes de \(store.snapshot.destination?.name ?? "seu destino final")." : "Busque um lugar, endereço ou cidade.", palette: palette)
                     searchField
                     if !store.snapshot.providerConfigured {
                         MessageCard(text: "Adicione sua chave Geoapify para buscar lugares e calcular rotas online.", symbol: "key", palette: palette)
                         Button("Configurar chave") { settings = true }.buttonStyle(.borderedProminent)
                     }
                     if store.snapshot.searching {
-                        HStack { ProgressView(); Text("Buscando lugares…").gameFont(.subheadline) }.padding(.vertical, 12)
+                        HStack { ProgressView(); Text("Buscando lugares…").interfaceFont(.subheadline) }.padding(.vertical, 12)
                     }
                     if let error = store.snapshot.searchError {
                         MessageCard(text: error, symbol: "exclamationmark.triangle", palette: palette)
@@ -30,14 +36,17 @@ struct DestinationSearchSheet: View {
                     results
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         quickDestinations
+                        if addingStop {
+                            Button("Escolher um ponto no mapa") { dismiss() }.buttonStyle(.bordered)
+                        }
                         Text("Dica: mantenha pressionado um ponto no mapa para escolher um destino pelas coordenadas.")
-                            .gameFont(.footnote).foregroundStyle(palette.muted)
+                            .interfaceFont(.footnote).foregroundStyle(palette.muted)
                     }
                 }.padding(20)
             }
             .background(palette.surface).foregroundStyle(palette.text)
-            .gameNavigationTitle("Buscar").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
+            .navigationTitle("Buscar").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.interfaceFont(.body) } }
             .sheet(isPresented: $settings) { APIKeySheet(store: store) }
         }
     }
@@ -49,12 +58,19 @@ struct DestinationSearchSheet: View {
                 .textInputAutocapitalization(.words).autocorrectionDisabled()
                 .submitLabel(.search).focused($focused)
                 .onSubmit { focused = false; store.search(query) }
-            if !query.isEmpty {
-                Button { query = ""; store.search("") } label: { Image(systemName: "xmark.circle.fill") }
-                    .accessibilityLabel("Limpar busca")
+            if !query.isEmpty || clearsDestination {
+                Button {
+                    query = ""
+                    if clearsDestination {
+                        focused = false
+                        store.clearDestination()
+                        dismiss()
+                    } else { store.search("") }
+                } label: { Image(systemName: "xmark.circle.fill").frame(width: 44, height: 44) }
+                    .accessibilityLabel(clearsDestination ? "Limpar busca e destino" : "Limpar busca")
             }
             Button("Buscar") { focused = false; store.search(query) }
-                .gameFont(.subheadline, weight: .bold).disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || store.snapshot.searching)
+                .interfaceFont(.subheadline, weight: .bold).disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || store.snapshot.searching)
         }
         .padding(14).background(palette.soft, in: RoundedRectangle(cornerRadius: 16))
     }
@@ -70,6 +86,12 @@ struct DestinationSearchSheet: View {
 
     private var quickDestinations: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if addingStop && !store.places.savedPlaces.isEmpty {
+                Text("SALVOS").interfaceFont(.caption, weight: .semibold).foregroundStyle(palette.muted)
+                ForEach(store.places.savedPlaces, id: \.id) { saved in
+                    DestinationRow(destination: saved.asDestination(), palette: palette, symbol: "bookmark") { select(saved.asDestination()) }
+                }
+            }
             if let home = store.places.savedPlaces.first(where: { $0.id == store.places.homeId }) {
                 DestinationRow(destination: home.asDestination(), palette: palette, symbol: "house.fill") { select(home.asDestination()) }
             }
@@ -77,7 +99,7 @@ struct DestinationSearchSheet: View {
                 DestinationRow(destination: work.asDestination(), palette: palette, symbol: "briefcase.fill") { select(work.asDestination()) }
             }
             if !store.places.recents.isEmpty {
-                Text("RECENTES").gameFont(.caption, weight: .bold).foregroundStyle(palette.muted)
+                Text("RECENTES").interfaceFont(.caption, weight: .bold).foregroundStyle(palette.muted)
                 ForEach(store.places.recents, id: \.destination.id) { recent in
                     DestinationRow(destination: recent.destination, palette: palette, symbol: "clock") { select(recent.destination) }
                 }
@@ -98,9 +120,9 @@ struct DestinationRow: View {
             HStack(spacing: 12) {
                 Image(systemName: symbol).font(.title2).foregroundStyle(palette.accent).frame(width: 32)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(destination.name).gameFont(.headline).foregroundStyle(palette.text).multilineTextAlignment(.leading)
+                    Text(destination.name).interfaceFont(.headline).foregroundStyle(palette.text).multilineTextAlignment(.leading)
                     Text(destination.address.isEmpty ? NavSkinFormat.coordinates(destination.point) : destination.address)
-                        .gameFont(.caption).foregroundStyle(palette.muted).lineLimit(2).multilineTextAlignment(.leading)
+                        .interfaceFont(.caption).foregroundStyle(palette.muted).lineLimit(2).multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 6)
                 Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(palette.muted)
@@ -114,27 +136,28 @@ struct DestinationRow: View {
 struct SelectedDestinationSheet: View {
     @ObservedObject var store: AppStore
     let destination: Destination
+    var addingStop = false
     let navigate: () -> Void
     @State private var saving = false
     @Environment(\.dismiss) private var dismiss
-    private var palette: ThemePalette { store.theme.palette }
+    private var palette: ThemePalette { store.theme.glassPalette }
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
                 SheetHeading(title: destination.name, subtitle: destination.address.isEmpty ? "Ponto selecionado no mapa" : destination.address, palette: palette)
                 Label(NavSkinFormat.coordinates(destination.point), systemImage: "mappin.and.ellipse")
-                    .gameFont(.subheadline).monospacedDigit().foregroundStyle(palette.muted)
-                Button(action: navigate) { Label("Calcular rota", systemImage: "arrow.triangle.turn.up.right.diamond.fill").frame(maxWidth: .infinity) }
+                    .interfaceFont(.subheadline).monospacedDigit().foregroundStyle(palette.muted)
+                Button(action: navigate) { Label(addingStop ? "Adicionar parada" : "Calcular rota", systemImage: addingStop ? "plus" : "arrow.triangle.turn.up.right.diamond.fill").frame(maxWidth: .infinity) }
                     .buttonStyle(.borderedProminent).controlSize(.large)
                 Button { saving = true } label: { Label("Salvar nos favoritos", systemImage: "bookmark").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered).controlSize(.large)
-                Text("A rota de carro pode terminar no acesso viário mais próximo do destino.").gameFont(.footnote).foregroundStyle(palette.muted)
+                Text("A rota de carro pode terminar no acesso viário mais próximo do destino.").interfaceFont(.footnote).foregroundStyle(palette.muted)
                 Spacer(minLength: 0)
             }
             .padding(20).background(palette.surface).foregroundStyle(palette.text)
-            .gameNavigationTitle("Local").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
+            .navigationTitle("Local").navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.interfaceFont(.body) } }
             .sheet(isPresented: $saving) { SavedPlaceEditor(store: store, destination: destination) }
         }
     }

@@ -21,6 +21,7 @@ public final class NavigationSession {
     private var searchEpoch: Int64 = 0
     private var replayEpoch: Int64 = 0
     private var routeInFlight: Int64?
+    private var stopDistances: [String: Double] = [:]
     private var pendingPreview = false
     private var rateLimitedUntilMs: Int64 = 0
     private var sourceAccess: LocationAccess = .notRequested
@@ -47,7 +48,7 @@ public final class NavigationSession {
         self.allowSimulatedLocations = allowSimulatedLocations
         snapshot = NavigationSnapshot(phase: places.snapshot.resumeDestination == nil ? .idle : .resumeAvailable,
             message: places.snapshot.loadError, providerConfigured: !apiKey().trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-            resumeDestination: places.snapshot.resumeDestination)
+            resumeDestination: places.snapshot.resumeDestination, resumeIntermediateStops: places.snapshot.resumeIntermediateStops)
     }
 
     deinit { routeTask?.cancel(); searchTask?.cancel(); replayTask?.cancel() }
@@ -95,21 +96,27 @@ public final class NavigationSession {
     }
 
     public func selectDestination(_ destination: Destination) {
+        selectDestination(destination, intermediateStops: [], resuming: false)
+    }
+
+    private func selectDestination(_ destination: Destination, intermediateStops: [Destination], resuming: Bool) {
         if snapshot.simulation { stopReplay() }
         cancelRouteRequest()
         engine.stop()
+        stopDistances = [:]
         pendingPreview = true
-        let storageError = saveResume(nil)
+        let storageError = resuming ? nil : saveResume(nil)
         change {
             $0.phase = .idle; $0.destination = destination; $0.route = nil; $0.progress = nil
             $0.message = storageError; $0.sessionId &+= 1
+            $0.intermediateStops = intermediateStops
         }
         if !snapshot.serviceRunning, !locationRequested { activateGPS() }
         requestRoute(recalculation: false)
     }
 
     public func startNavigation() {
-        guard snapshot.phase == .preview, let route = snapshot.route else { return }
+        guard snapshot.phase == .preview, !snapshot.updatingStops, let route = snapshot.route else { return }
         applyEngine(engine.onTick(nowElapsedMs: elapsedClock(), nowWallMs: wallClock()))
         guard snapshot.serviceRunning, snapshot.locationAccess == .available,
               snapshot.location.quality == .good, let fix = snapshot.location.fix,
@@ -124,11 +131,16 @@ public final class NavigationSession {
         }
         let update = engine.onFix(fix, nowElapsedMs: elapsedClock(), nowWallMs: wallClock())
         change { $0.phase = .navigating; $0.progress = update.progress; $0.message = nil }
-        if let message = saveResume(snapshot.destination) { change { $0.message = message } }
+        if let message = saveResume(snapshot.destination, stops: snapshot.intermediateStops) { change { $0.message = message } }
         if let destination = snapshot.destination {
             do { try places.rememberRecent(destination) }
             catch { change { $0.message = "Navegação ativa; não foi possível salvar o destino recente." } }
         }
+    }
+
+    public func clearDestination() {
+        guard !snapshot.navigationActive, !snapshot.simulation else { return }
+        stopNavigation()
     }
 
     public func stopNavigation() {
@@ -143,10 +155,12 @@ public final class NavigationSession {
         pendingPreview = false
         if wasSimulation { engine = NavigationEngine(); sourceAccess = .waiting; locationRequested = false }
         else { engine.stop() }
+        stopDistances = [:]
         let storageError = saveResume(nil)
         locationLifecycleMessage = nil
         change {
             $0.phase = .idle; $0.destination = nil; $0.route = nil; $0.progress = nil
+            $0.intermediateStops = []
             if wasSimulation { $0.location = LocationState(); $0.locationAccess = .waiting; $0.serviceRunning = false }
             $0.message = storageError; $0.searching = false; $0.searchResults = []; $0.searchError = nil
             $0.simulation = false; $0.sessionId &+= 1
@@ -156,13 +170,43 @@ public final class NavigationSession {
 
     public func retryRoute() {
         guard routeInFlight == nil, snapshot.destination != nil, !snapshot.simulation else { return }
+        if snapshot.pendingIntermediateStops != nil { requestRoute(recalculation: snapshot.navigationActive, editingStops: true); return }
         let recalculation = snapshot.navigationActive
         if !recalculation { pendingPreview = true }
         requestRoute(recalculation: recalculation)
     }
 
     public func resumeDestination() {
-        if let destination = places.snapshot.resumeDestination { selectDestination(destination) }
+        if let destination = places.snapshot.resumeDestination {
+            selectDestination(destination, intermediateStops: places.snapshot.resumeIntermediateStops, resuming: true)
+        }
+    }
+
+    public func addStop(_ destination: Destination) {
+        guard let final = snapshot.destination, snapshot.route != nil,
+              snapshot.navigationActive || snapshot.phase == .preview, !snapshot.simulation else { return }
+        let stops = snapshot.pendingIntermediateStops ?? snapshot.intermediateStops
+        guard GeoMath.isValid(destination.point), !destination.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !destination.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            change { $0.message = "Escolha uma parada com nome e coordenadas válidos." }; return
+        }
+        guard stops.count < 8, !(stops + [final]).contains(where: {
+            $0.id == destination.id || GeoMath.distanceMeters($0.point, destination.point) <= 10
+        }) else { change { $0.message = "Essa parada já está na rota ou o limite de oito paradas foi atingido." }; return }
+        editStops(stops + [destination])
+    }
+
+    public func removeStop(id: String) {
+        let stops = snapshot.pendingIntermediateStops ?? snapshot.intermediateStops
+        guard stops.contains(where: { $0.id == id }), snapshot.route != nil,
+              snapshot.navigationActive || snapshot.phase == .preview, !snapshot.simulation else { return }
+        editStops(stops.filter { $0.id != id })
+    }
+
+    private func editStops(_ stops: [Destination]) {
+        cancelRouteRequest()
+        change { $0.pendingIntermediateStops = stops }
+        requestRoute(recalculation: snapshot.navigationActive, editingStops: true)
     }
 
     public func activateGPS() {
@@ -222,6 +266,7 @@ public final class NavigationSession {
     public func keyChanged() {
         let wasCalculating = snapshot.phase == .calculating
         let wasRecalculating = snapshot.phase == .recalculating
+        let wasEditingStops = snapshot.pendingIntermediateStops != nil
         cancelRouteRequest()
         searchEpoch &+= 1
         searchTask?.cancel()
@@ -232,6 +277,7 @@ public final class NavigationSession {
             $0.searching = false; $0.searchResults = []; $0.searchError = nil
             if wasCalculating { $0.phase = .error; $0.progress = nil }
             if wasRecalculating { $0.phase = .rerouteFailed; $0.progress = nil }
+            if wasEditingStops { $0.message = "Atualização de paradas cancelada; rota atual mantida." }
         }
         if wasRecalculating { requestRoute(recalculation: true) }
         else if pendingPreview { requestRoute(recalculation: false) }
@@ -280,16 +326,22 @@ public final class NavigationSession {
         applyEngine(engine.onFix(fix, nowElapsedMs: elapsedClock(), nowWallMs: wallClock()))
     }
 
-    private func requestRoute(recalculation: Bool) {
+    private func requestRoute(recalculation: Bool, editingStops: Bool = false) {
         guard routeInFlight == nil, !snapshot.simulation, let destination = snapshot.destination else { return }
+        let stops = editingStops ? (snapshot.pendingIntermediateStops ?? snapshot.intermediateStops) : snapshot.intermediateStops
         if let block = requestBlockMessage() {
-            change { $0.phase = recalculation ? .rerouteFailed : .error; $0.progress = nil; $0.message = block }
+            if editingStops { change { $0.updatingStops = false; $0.message = block } }
+            else { change { $0.phase = recalculation ? .rerouteFailed : .error; $0.progress = nil; $0.message = block } }
             return
         }
         let fix = snapshot.location.fix
         let gpsReady = snapshot.location.quality == .good && fix.map(isFresh) == true &&
             sourceAccess != .denied && sourceAccess != .disabled && sourceAccess != .weak && sourceAccess != .notRequested
         guard gpsReady else {
+            if editingStops {
+                change { $0.updatingStops = false; $0.message = "Aguarde GPS preciso e tente atualizar as paradas novamente." }
+                return
+            }
             if !recalculation { pendingPreview = true }
             change {
                 $0.phase = recalculation ? .rerouteFailed : .waitingForLocation; $0.progress = nil
@@ -304,12 +356,15 @@ public final class NavigationSession {
         routeInFlight = generation
         let provider = providerFactory(apiKey())
         change {
-            $0.phase = recalculation ? .recalculating : .calculating; $0.progress = nil
-            $0.message = recalculation ? "Recalculando rota…" : "Calculando rota…"
+            if editingStops { $0.updatingStops = true; $0.message = "Atualizando paradas…" }
+            else {
+                $0.phase = recalculation ? .recalculating : .calculating; $0.progress = nil
+                $0.message = recalculation ? "Recalculando rota…" : "Calculando rota…"
+            }
         }
         routeTask = Task { [weak self] in
             let result: Result<NavRoute, Error>
-            do { result = .success(try await provider.route(origin: origin, destination: destination)) }
+            do { result = .success(try await provider.route(origin: origin, destination: destination, intermediateStops: stops)) }
             catch { result = .failure(error) }
             guard let self, generation == self.routeEpoch, self.snapshot.destination?.id == destination.id else { return }
             self.routeInFlight = nil
@@ -320,20 +375,42 @@ public final class NavigationSession {
                     // Validate both preview and replacement routes before exposing them.
                     let validator = NavigationEngine()
                     try validator.start(route)
-                    guard route.destination == destination else { throw NavigationEngineError.invalidDestination }
+                    guard route.destination == destination, route.intermediateStops == stops,
+                          route.intermediateStopIndices.count == stops.count,
+                          zip(route.intermediateStopIndices, route.intermediateStopIndices.dropFirst()).allSatisfy({ $0 < $1 }),
+                          route.intermediateStopIndices.allSatisfy({ $0 > 0 && $0 < route.geometry.count - 1 }) else {
+                        throw NavigationEngineError.invalidDestination
+                    }
+                    // Persist a committed edit before replacing the active route. A write failure keeps the old itinerary.
+                    if editingStops && recalculation {
+                        try self.places.setResumeDestination(destination, intermediateStops: stops)
+                    }
                     if recalculation { try self.engine.start(route) }
+                    let cumulative = RouteGeometry(route.geometry).cumulativeMeters
+                    self.stopDistances = Dictionary(uniqueKeysWithValues: zip(stops, route.intermediateStopIndices).map { ($0.id, cumulative[$1]) })
                     self.change {
                         $0.route = route; $0.progress = nil; $0.phase = recalculation ? .navigating : .preview
+                        $0.intermediateStops = stops; $0.pendingIntermediateStops = nil; $0.updatingStops = false
                         $0.message = "Estimativa sem trânsito em tempo real."
                     }
-                } catch { self.routeFailed(TypedProviderException(kind: .invalidResponse), recalculation: recalculation) }
-            case .failure(let error): self.routeFailed(error, recalculation: recalculation)
+                } catch {
+                    self.routeFailed(error is LocalPlacesStorageException ? error : TypedProviderException(kind: .invalidResponse),
+                        recalculation: recalculation, editingStops: editingStops)
+                }
+            case .failure(let error): self.routeFailed(error, recalculation: recalculation, editingStops: editingStops)
             }
         }
     }
 
-    private func routeFailed(_ error: Error, recalculation: Bool) {
+    private func routeFailed(_ error: Error, recalculation: Bool, editingStops: Bool = false) {
         recordRateLimit(error)
+        if editingStops {
+            change {
+                $0.updatingStops = false
+                $0.message = "Paradas não atualizadas. " + (error is LocalPlacesStorageException ? "Não foi possível salvar a rota neste dispositivo." : safeMessage(error))
+            }
+            return
+        }
         change {
             $0.phase = recalculation ? .rerouteFailed : .error
             if !recalculation { $0.route = nil }
@@ -360,9 +437,35 @@ public final class NavigationSession {
             if next.message == locationLifecycleMessage { next.message = nil }
             locationLifecycleMessage = nil
         }
-        if snapshot.navigationActive, update.arrived, location.quality == .good {
+        if snapshot.navigationActive, location.quality == .good, let progress = update.progress, progress.onRoute,
+           let route = snapshot.route, progress.routeId == route.id {
+            var consumed: [String] = []
+            for stop in next.intermediateStops {
+                guard let distance = stopDistances[stop.id], progress.alongRouteMeters >= distance - 15,
+                      progress.distanceFromRouteMeters <= 20 else { break }
+                consumed.append(stop.id)
+            }
+            if !consumed.isEmpty {
+                next.intermediateStops.removeAll { consumed.contains($0.id) }
+                // An in-flight edit starts at an older position and must never restore a passed stop.
+                if routeInFlight != nil {
+                    let pending = next.pendingIntermediateStops?.filter { !consumed.contains($0.id) }
+                    cancelRouteRequest()
+                    next.updatingStops = false; next.pendingIntermediateStops = pending
+                    next.phase = .navigating; next.progress = progress
+                    next.message = pending == nil ? "Parada alcançada." : "Parada alcançada. Tente atualizar as demais paradas novamente."
+                } else { next.pendingIntermediateStops = next.pendingIntermediateStops?.filter { !consumed.contains($0.id) } }
+                if let error = saveResume(next.destination, stops: next.intermediateStops) { next.message = error }
+            }
+        }
+        // The engine still follows the committed route while a stop edit is pending.
+        // Reaching that route's endpoint must not discard the user's uncommitted itinerary.
+        if next.navigationActive, update.arrived, location.quality == .good,
+           next.pendingIntermediateStops == nil, !next.updatingStops {
+            cancelRouteRequest()
             let storageError = saveResume(nil)
             next.phase = .arrived; next.progress = update.progress
+            next.intermediateStops = []; next.pendingIntermediateStops = nil; next.updatingStops = false
             next.message = storageError ?? "Você chegou ao destino."
             engine.stop()
         }
@@ -371,7 +474,11 @@ public final class NavigationSession {
         if update.shouldRecalculate, [.navigating, .rerouteFailed].contains(snapshot.phase) {
             if snapshot.simulation {
                 change { $0.phase = .rerouteFailed; $0.progress = nil; $0.message = "SIMULAÇÃO GPS: desvio confirmado; cálculo pela internet desativado nesta reprodução." }
-            } else { requestRoute(recalculation: true) }
+            } else {
+                let editingStops = snapshot.pendingIntermediateStops != nil
+                if snapshot.updatingStops { cancelRouteRequest(preservePendingStops: true) }
+                requestRoute(recalculation: true, editingStops: editingStops)
+            }
         }
     }
 
@@ -410,12 +517,16 @@ public final class NavigationSession {
         (error as? TypedProviderException)?.description ?? "Não foi possível concluir a consulta. Tente novamente."
     }
     private func locationNotice(_ message: String) -> String { locationLifecycleMessage = message; return message }
-    private func cancelRouteRequest() {
+    private func cancelRouteRequest(preservePendingStops: Bool = false) {
         routeEpoch &+= 1
         routeTask?.cancel(); routeTask = nil; routeInFlight = nil
+        change {
+            if !preservePendingStops { $0.pendingIntermediateStops = nil }
+            $0.updatingStops = false
+        }
     }
-    private func saveResume(_ destination: Destination?) -> String? {
-        do { try places.setResumeDestination(destination); return nil }
+    private func saveResume(_ destination: Destination?, stops: [Destination] = []) -> String? {
+        do { try places.setResumeDestination(destination, intermediateStops: stops); return nil }
         catch { return "Não foi possível salvar o destino para retomada." }
     }
     private func change(_ mutation: (inout NavigationSnapshot) -> Void) {
@@ -426,6 +537,7 @@ public final class NavigationSession {
     private func publish(_ value: NavigationSnapshot) {
         var next = value
         next.resumeDestination = places.snapshot.resumeDestination
+        next.resumeIntermediateStops = places.snapshot.resumeIntermediateStops
         guard next != snapshot else { return }
         snapshot = next
         onChange?(next)

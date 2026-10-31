@@ -1,6 +1,7 @@
 package br.com.gamemap.navigation.provider
 
 import br.com.gamemap.navigation.model.*
+import br.com.gamemap.navigation.core.GeoMath
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.URLEncoder
@@ -38,16 +39,22 @@ class GeoapifyProvider(
         }
     }
 
-    fun route(origin: GeoPoint, destination: Destination): NavRoute {
+    fun route(origin: GeoPoint, destination: Destination, intermediateStops: List<Destination> = emptyList()): NavRoute {
         val key = key()
         validatePoint(origin)
         validatePoint(destination.point)
+        intermediateStops.forEach { validatePoint(it.point) }
+        val waypoints = listOf(origin) + intermediateStops.map { it.point } + destination.point
+        if (intermediateStops.map { it.id }.distinct().size != intermediateStops.size ||
+            intermediateStops.any { it.id == destination.id || samePoint(it.point, destination.point) } ||
+            waypoints.zipWithNext().any { (a, b) -> samePoint(a, b) }) invalid()
         val json = request("/v1/routing", linkedMapOf(
-            "waypoints" to "${origin.latitude},${origin.longitude}|${destination.point.latitude},${destination.point.longitude}",
+            "waypoints" to waypoints.joinToString("|") { "${it.latitude},${it.longitude}" },
+            "intermediate_waypoint_mode" to "stopover", "optimize_stops" to "false",
             "mode" to "drive", "units" to "metric", "lang" to "pt-BR",
             "details" to "instruction_details", "traffic" to "approximated", "format" to "geojson",
         ), key, routing = true)
-        return parseRoute(json, destination)
+        return parseRoute(json, destination, intermediateStops)
     }
 
     fun reverse(point: GeoPoint): String? {
@@ -129,7 +136,7 @@ class GeoapifyProvider(
         }
     }
 
-    private fun parseRoute(json: JSONObject, destination: Destination): NavRoute = parseSafely {
+    private fun parseRoute(json: JSONObject, destination: Destination, intermediateStops: List<Destination>): NavRoute = parseSafely {
         val features = json.getJSONArray("features")
         if (features.length() == 0) throw TypedProviderException(ProviderErrorKind.NO_ROUTE)
         val feature = features.getJSONObject(0)
@@ -139,11 +146,14 @@ class GeoapifyProvider(
         val properties = feature.getJSONObject("properties")
         val legs = properties.getJSONArray("legs")
         if (legs.length() == 0 || coordinates.length() != legs.length()) invalid()
+        if (intermediateStops.isNotEmpty() && legs.length() != intermediateStops.size + 1) invalid()
         val totalDistance = properties.nonnegative("distance")
         val totalTime = properties.nonnegative("time")
         if (totalDistance <= 0 || totalTime <= 0) invalid()
         val points = mutableListOf<GeoPoint>()
         val steps = mutableListOf<RouteStep>()
+        val boundaries = mutableListOf<RouteStop>()
+        var alongMeters = 0.0
         for (legIndex in 0 until legs.length()) {
             val legCoordinates = coordinates.getJSONArray(legIndex)
             if (legCoordinates.length() < 2) invalid()
@@ -151,8 +161,14 @@ class GeoapifyProvider(
             for (index in 0 until legCoordinates.length()) {
                 val p = point(legCoordinates.getJSONArray(index))
                 if (index == 0 && legIndex > 0 && !samePoint(points.last(), p)) invalid()
-                if (points.lastOrNull()?.let { samePoint(it, p) } != true) points += p
+                if (points.lastOrNull()?.let { samePoint(it, p) } != true) {
+                    points.lastOrNull()?.let { alongMeters += GeoMath.distanceMeters(it, p) }
+                    points += p
+                }
                 indexMap[index] = points.lastIndex
+            }
+            intermediateStops.getOrNull(legIndex)?.let {
+                boundaries += RouteStop(it, points.lastIndex, alongMeters)
             }
             val leg = legs.getJSONObject(legIndex)
             leg.nonnegative("distance")
@@ -191,7 +207,7 @@ class GeoapifyProvider(
             steps += RouteStep(steps.size, "Você chegou ao destino.", "", ManeuverKind.ARRIVE,
                 points.lastIndex, points.lastIndex, 0.0, 0.0)
         }
-        NavRoute("geoapify:${UUID.randomUUID()}", points, steps, totalDistance, totalTime, destination, clock())
+        NavRoute("geoapify:${UUID.randomUUID()}", points, steps, totalDistance, totalTime, destination, clock(), boundaries)
     }
 
     private fun maneuver(type: String): ManeuverKind = when (type) {

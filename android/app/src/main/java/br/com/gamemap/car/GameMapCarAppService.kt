@@ -63,6 +63,7 @@ private class GameMapSession : Session(), DefaultLifecycleObserver {
                 CarToast.makeText(carContext, "SIMULAÇÃO GPS: inicie a prévia para reproduzir a rota.", CarToast.LENGTH_LONG).show()
             } })
         unsubscribes = listOf(preferences.addListener { state ->
+            surface.applyMapPreferences(state)
             surface.applyStyle(maps.styleFor(state, carContext.isDarkMode))
             refreshNavigation()
             screen.invalidate()

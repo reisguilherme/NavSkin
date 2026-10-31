@@ -25,6 +25,7 @@ import br.com.gamemap.navigation.NavigationPreferences
 import br.com.gamemap.navigation.NavigationSnapshot
 import br.com.gamemap.navigation.storage.SavedPlace
 import br.com.gamemap.preferences.MapTheme
+import br.com.gamemap.preferences.MapPreferences
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.Style
@@ -38,6 +39,7 @@ class CarSurfaceRenderer(
     private val mainHandler = Handler(Looper.getMainLooper())
     private val displayManager = carContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
     private var style = styleJson
+    private var mapPreferences = MapPreferences()
     private var closed = false
     private var active = true
     private var surface: Surface? = null
@@ -50,6 +52,7 @@ class CarSurfaceRenderer(
     private var savedCamera = NativeMapRenderer.defaultCamera()
     private var savedCameraMode = NavigationCameraMode.FOLLOW
     private var savedSessionId: Long? = null
+    private var savedFlatOverview = false
     private var pendingNavigation: PendingNavigation? = null
     private var cameraModeListener: ((Boolean) -> Unit)? = null
     private var overviewRequested = false
@@ -164,6 +167,15 @@ class CarSurfaceRenderer(
         }
     }
 
+    fun applyMapPreferences(preferences: MapPreferences) = onMain {
+        if (!closed) {
+            if (mapPreferences.browse3D != preferences.browse3D || mapPreferences.navigation3D != preferences.navigation3D)
+                savedFlatOverview = savedCameraMode == NavigationCameraMode.OVERVIEW
+            mapPreferences = preferences
+            presentation?.renderer?.applyMapPreferences(preferences)
+        }
+    }
+
     fun zoomBy(amount: Double) = onMain { presentation?.renderer?.zoomBy(amount) }
 
     fun panBy(distanceX: Float, distanceY: Float) = onMain {
@@ -172,6 +184,7 @@ class CarSurfaceRenderer(
 
     fun reset() = onMain {
         savedCameraMode = NavigationCameraMode.MANUAL
+        savedFlatOverview = false
         overviewRequested = false
         recenterRequested = false
         savedCamera = NativeMapRenderer.defaultCamera()
@@ -181,6 +194,7 @@ class CarSurfaceRenderer(
     fun focusOn(latitude: Double, longitude: Double) = onMain {
         if (!closed && latitude.isFinite() && longitude.isFinite()) {
             savedCameraMode = NavigationCameraMode.MANUAL
+            savedFlatOverview = false
             overviewRequested = false
             recenterRequested = false
             savedCamera = CameraPosition.Builder(cameraState)
@@ -206,6 +220,7 @@ class CarSurfaceRenderer(
             val current = presentation
             if (current == null && state.navigationActive && state.sessionId != savedSessionId) {
                 savedCameraMode = NavigationCameraMode.FOLLOW
+                savedFlatOverview = false
                 overviewRequested = false
             }
             current?.renderer?.updateNavigation(state, prefs, saved, theme)
@@ -217,6 +232,7 @@ class CarSurfaceRenderer(
     fun recenter() = onMain {
         if (!closed) {
             savedCameraMode = NavigationCameraMode.FOLLOW
+            savedFlatOverview = false
             overviewRequested = false
             recenterRequested = presentation?.renderer == null
             presentation?.renderer?.recenter()
@@ -227,6 +243,7 @@ class CarSurfaceRenderer(
     fun showRouteOverview() = onMain {
         if (!closed) {
             savedCameraMode = NavigationCameraMode.OVERVIEW
+            savedFlatOverview = true
             overviewRequested = presentation?.renderer == null
             recenterRequested = false
             presentation?.renderer?.showRouteOverview()
@@ -259,6 +276,7 @@ class CarSurfaceRenderer(
             it.renderer?.let { renderer ->
                 savedCameraMode = renderer.navigationCameraMode
                 savedSessionId = renderer.navigationSessionId
+                savedFlatOverview = renderer.isFlatOverview
             }
             // Insets belong to the old host viewport and may exceed a smaller replacement.
             savedCamera = CameraPosition.Builder(it.renderer?.cameraState ?: savedCamera)
@@ -343,7 +361,8 @@ class CarSurfaceRenderer(
             renderer = NativeMapRenderer(
                 presentationContext, mapView, style, ::report, initialCamera = savedCamera,
             )
-            renderer?.restoreNavigationCamera(savedCameraMode, savedSessionId)
+            renderer?.applyMapPreferences(mapPreferences)
+            renderer?.restoreNavigationCamera(savedCameraMode, savedSessionId, savedFlatOverview)
             renderer?.setOnCameraModeChangedListener { following -> cameraModeListener?.invoke(following) }
             pendingNavigation?.let { pending ->
                 renderer?.updateNavigation(pending.snapshot, pending.preferences, pending.saved, pending.theme)

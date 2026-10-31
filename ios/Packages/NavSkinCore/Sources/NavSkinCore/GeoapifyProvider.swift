@@ -49,6 +49,14 @@ public protocol HTTPTransport: Sendable {
 public protocol NavigationProviding: Sendable {
     func search(query: String, bias: GeoPoint?) async throws -> [Destination]
     func route(origin: GeoPoint, destination: Destination) async throws -> NavRoute
+    func route(origin: GeoPoint, destination: Destination, intermediateStops: [Destination]) async throws -> NavRoute
+}
+
+public extension NavigationProviding {
+    func route(origin: GeoPoint, destination: Destination, intermediateStops: [Destination]) async throws -> NavRoute {
+        guard intermediateStops.isEmpty else { throw TypedProviderException(kind: .invalidResponse) }
+        return try await route(origin: origin, destination: destination)
+    }
 }
 
 /// Each request has an ephemeral session, a bounded streaming buffer, and no redirect or disk cache.
@@ -223,14 +231,27 @@ public struct GeoapifyProvider: NavigationProviding {
     }
 
     public func route(origin: GeoPoint, destination: Destination) async throws -> NavRoute {
+        try await route(origin: origin, destination: destination, intermediateStops: [])
+    }
+
+    public func route(origin: GeoPoint, destination: Destination, intermediateStops: [Destination]) async throws -> NavRoute {
         let key = try validatedKey()
         try validatePoint(origin)
         try validatePoint(destination.point)
+        guard intermediateStops.count <= 8 else { throw invalid() }
+        let destinations = intermediateStops + [destination]
+        for (index, stop) in destinations.enumerated() {
+            try validatePoint(stop.point)
+            guard !stop.id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  !stop.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  !destinations.prefix(index).contains(where: { $0.id == stop.id || GeoMath.distanceMeters($0.point, stop.point) <= 10 }) else { throw invalid() }
+        }
+        let waypoints = ([origin] + destinations.map(\.point)).map { "\($0.latitude),\($0.longitude)" }.joined(separator: "|")
         let json = try await request(path: "/v1/routing", params: [
-            ("waypoints", "\(origin.latitude),\(origin.longitude)|\(destination.point.latitude),\(destination.point.longitude)"),
+            ("waypoints", waypoints), ("intermediate_waypoint_mode", "stopover"), ("optimize_stops", "false"),
             ("mode", "drive"), ("units", "metric"), ("lang", "pt-BR"),
             ("details", "instruction_details"), ("traffic", "approximated"), ("format", "geojson")], key: key, routing: true)
-        return try parseRoute(json, destination: destination)
+        return try parseRoute(json, destination: destination, intermediateStops: intermediateStops)
     }
 
     public func reverse(point: GeoPoint) async throws -> String? {
@@ -318,7 +339,7 @@ public struct GeoapifyProvider: NavigationProviding {
         }
     }
 
-    private func parseRoute(_ json: [String: Any], destination: Destination) throws -> NavRoute {
+    private func parseRoute(_ json: [String: Any], destination: Destination, intermediateStops: [Destination]) throws -> NavRoute {
         let features = try array(json["features"])
         guard let first = features.first else { throw TypedProviderException(kind: .noRoute) }
         let feature = try object(first)
@@ -328,11 +349,13 @@ public struct GeoapifyProvider: NavigationProviding {
         let properties = try object(feature["properties"])
         let legs = try array(properties["legs"])
         guard !legs.isEmpty, legs.count == coordinates.count else { throw invalid() }
+        if !intermediateStops.isEmpty, legs.count != intermediateStops.count + 1 { throw invalid() }
         let totalDistance = try nonnegative(properties["distance"])
         let totalTime = try nonnegative(properties["time"])
         guard totalDistance > 0, totalTime > 0 else { throw invalid() }
         var points: [GeoPoint] = []
         var steps: [RouteStep] = []
+        var stopIndices: [Int] = []
         for legIndex in legs.indices {
             let legCoordinates = try array(coordinates[legIndex])
             guard legCoordinates.count >= 2 else { throw invalid() }
@@ -373,6 +396,7 @@ public struct GeoapifyProvider: NavigationProviding {
                     startIndex: indexMap[from], endIndex: indexMap[to], distanceMeters: distance, durationSeconds: duration, exitNumber: exitNumber))
             }
             guard previousEnd == legCoordinates.count - 1 else { throw invalid() }
+            if legIndex < intermediateStops.count { stopIndices.append(points.count - 1) }
         }
         guard points.count >= 2, !steps.isEmpty else { throw invalid() }
         guard abs(steps.reduce(0) { $0 + $1.durationSeconds } - totalTime) <= max(1, totalTime * 0.05),
@@ -382,7 +406,8 @@ public struct GeoapifyProvider: NavigationProviding {
                 startIndex: points.count - 1, endIndex: points.count - 1, distanceMeters: 0, durationSeconds: 0, exitNumber: nil))
         }
         return NavRoute(id: "geoapify:\(UUID().uuidString)", geometry: points, steps: steps, distanceMeters: totalDistance,
-            durationSeconds: totalTime, destination: destination, calculatedAtMs: clock())
+            durationSeconds: totalTime, destination: destination, calculatedAtMs: clock(),
+            intermediateStops: intermediateStops, intermediateStopIndices: stopIndices)
     }
 
     private func maneuver(_ type: String) -> ManeuverKind {

@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
+import { MAP_THEMES } from './prepare-world-maps.mjs';
 
 const projectRoot = path.resolve(import.meta.dirname, '..');
 const ios = path.join(projectRoot, 'ios');
@@ -16,10 +17,10 @@ async function walk(directory) {
 
 export async function prepareAssets() {
   await fs.mkdir(resources, { recursive: true });
-  for (const directory of ['maps', 'navigation-icons', 'game-assets']) {
+  for (const directory of ['maps', 'navigation-icons', 'navigation-3d', 'game-assets']) {
     await fs.cp(path.join(androidAssets, directory), path.join(resources, directory), { recursive: true });
   }
-  for (const theme of ['gta', 'rosa', 'rdr2']) {
+  for (const theme of Object.keys(MAP_THEMES)) {
     await sharp(path.join(resources, `maps/previews/${theme}.webp`)).png()
       .toFile(path.join(resources, `maps/previews/${theme}.png`));
   }
@@ -37,7 +38,7 @@ export async function prepareAssets() {
       sha256: createHash('sha256').update(bytes).digest('hex') });
   }
   await fs.writeFile(path.join(resources, 'bundle-manifest.json'), JSON.stringify({ schemaVersion: 1,
-    origin: 'Shared NavSkin world styles, Goiânia offline cartography and original navigation artwork.', files }, null, 2));
+    origin: 'Shared NavSkin world styles, GoiÃ¢nia offline cartography and original navigation artwork.', files }, null, 2));
   return files.length;
 }
 
@@ -90,7 +91,7 @@ export async function generateProject() {
     return add(`${name}:configList`, `isa = XCConfigurationList; buildConfigurations = (${configs.join(',')}); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;`);
   }
   const projectConfigurations = configurationList('Project', { CLANG_ENABLE_MODULES: 'YES', SDKROOT: 'iphoneos', IPHONEOS_DEPLOYMENT_TARGET: '17.0', SWIFT_VERSION: '5.0', SWIFT_STRICT_CONCURRENCY: 'minimal' });
-  const appConfigurations = configurationList('Application', { PRODUCT_NAME: 'NavSkin', PRODUCT_MODULE_NAME: 'NavSkin', MARKETING_VERSION: '0.8.0', CURRENT_PROJECT_VERSION: '1', INFOPLIST_FILE: 'NavSkin/Info.plist', GENERATE_INFOPLIST_FILE: 'NO', ASSETCATALOG_COMPILER_APPICON_NAME: 'AppIcon', CODE_SIGN_STYLE: 'Automatic', TARGETED_DEVICE_FAMILY: '1,2', SUPPORTED_PLATFORMS: 'iphoneos iphonesimulator', SUPPORTS_MACCATALYST: 'NO', LD_RUNPATH_SEARCH_PATHS: ['$(inherited)', '@executable_path/Frameworks'] }, true);
+  const appConfigurations = configurationList('Application', { PRODUCT_NAME: 'NavSkin', PRODUCT_MODULE_NAME: 'NavSkin', MARKETING_VERSION: '0.12.0', CURRENT_PROJECT_VERSION: '12', INFOPLIST_FILE: 'NavSkin/Info.plist', GENERATE_INFOPLIST_FILE: 'NO', ASSETCATALOG_COMPILER_APPICON_NAME: 'AppIcon', CODE_SIGN_STYLE: 'Automatic', TARGETED_DEVICE_FAMILY: '1,2', SUPPORTED_PLATFORMS: 'iphoneos iphonesimulator', SUPPORTS_MACCATALYST: 'NO', LD_RUNPATH_SEARCH_PATHS: ['$(inherited)', '@executable_path/Frameworks'] }, true);
   const testConfigurations = configurationList('Tests', { PRODUCT_NAME: 'NavSkinTests', PRODUCT_BUNDLE_IDENTIFIER: 'br.com.navskin.ios.tests', GENERATE_INFOPLIST_FILE: 'YES', CODE_SIGN_STYLE: 'Automatic', TARGETED_DEVICE_FAMILY: '1,2', TEST_HOST: '$(BUILT_PRODUCTS_DIR)/NavSkin.app/NavSkin', BUNDLE_LOADER: '$(TEST_HOST)', LD_RUNPATH_SEARCH_PATHS: ['$(inherited)', '@executable_path/Frameworks', '@loader_path/Frameworks'] }, true);
   const proxy = add('TestProxy', `isa = PBXContainerItemProxy; containerPortal = ${id('Project')}; proxyType = 1; remoteGlobalIDString = ${id('Application')}; remoteInfo = NavSkin;`);
   const targetDependency = add('TestDependency', `isa = PBXTargetDependency; target = ${id('Application')}; targetProxy = ${proxy};`);

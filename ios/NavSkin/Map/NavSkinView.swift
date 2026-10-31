@@ -24,6 +24,7 @@ struct NavSkinView: UIViewRepresentable {
         map.delegate = context.coordinator
         map.showsUserLocation = false
         map.isRotateEnabled = true
+        map.isPitchEnabled = false
         let offline = store.baseMapMode == .goianiaOffline
         map.setCenter(CLLocationCoordinate2D(latitude: offline ? -16.6869 : -23.5505, longitude: offline ? -49.2648 : -46.6333), zoomLevel: offline ? 13 : 12, direction: 0, animated: false)
         map.compassView.isHidden = true
@@ -32,6 +33,14 @@ struct NavSkinView: UIViewRepresentable {
         longPress.minimumPressDuration = 0.65
         longPress.delegate = context.coordinator
         map.addGestureRecognizer(longPress)
+        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.revealVibingExit(_:)))
+        tap.cancelsTouchesInView = false
+        tap.delegate = context.coordinator
+        // Leave MapLibre's double-tap zoom intact.
+        for existing in map.gestureRecognizers ?? [] {
+            if let other = existing as? UITapGestureRecognizer, other.numberOfTapsRequired > 1 { tap.require(toFail: other) }
+        }
+        map.addGestureRecognizer(tap)
         context.coordinator.map = map
         context.coordinator.loadedTheme = store.theme
         context.coordinator.loadedBaseMapMode = store.baseMapMode
@@ -66,6 +75,8 @@ struct NavSkinView: UIViewRepresentable {
         private var previewRouteID: String?
         private var commandID: UUID?
         private var renderedCategories: Set<String>?
+        private var rendered3D: Bool?
+        private var renderedVibing: Bool?
         private var pendingCamera: MLNMapCamera?
         private var pendingZoom: Double?
         private var cameraPolicy = NavigationCameraPolicy()
@@ -84,6 +95,16 @@ struct NavSkinView: UIViewRepresentable {
         func update(store: AppStore, dark: Bool) {
             self.store = store
             guard let map else { return }
+            if renderedVibing != store.vibing {
+                map.logoView.isHidden = store.vibing
+                map.attributionButton.isHidden = store.vibing
+                map.accessibilityLabel = store.vibing
+                    ? "Mapa Vibing. Toque para mostrar a saída e voltar a acompanhar o GPS."
+                    : "Mapa NavSkin. Mantenha pressionado para selecionar um destino."
+                map.accessibilityCustomActions = store.vibing ? [UIAccessibilityCustomAction(
+                    name: "Sair do Vibing", target: self, selector: #selector(exitVibingAccessibility))] : nil
+                renderedVibing = store.vibing
+            }
             if loadedTheme != store.theme || loadedDark != dark || loadedBaseMapMode != store.baseMapMode {
                 do {
                     let json = try store.mapRepository.styleJSON(theme: store.theme, night: dark, baseMapMode: store.baseMapMode)
@@ -97,6 +118,7 @@ struct NavSkinView: UIViewRepresentable {
                     loadedBaseMapMode = store.baseMapMode
                     loadedDark = dark
                     renderedCategories = nil
+                    rendered3D = nil
                     map.styleJSON = json
                 } catch { styleFailure = error.localizedDescription; reportStatus(styleFailure) }
                 return
@@ -108,6 +130,7 @@ struct NavSkinView: UIViewRepresentable {
                 }
                 renderedCategories = store.enabledCategories
             }
+            overlay.updateCamera(bearing: map.direction, pitch: Double(map.camera.pitch))
             overlay.update(store: store)
             trafficOverlay.update(store.traffic)
             if let error = overlay.resourceError { reportStatus(error) }
@@ -131,7 +154,12 @@ struct NavSkinView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MLNMapView, regionDidChangeAnimated animated: Bool) {
+            overlay.updateCamera(bearing: mapView.direction, pitch: Double(mapView.camera.pitch))
             updateTrafficViewport(mapView)
+        }
+
+        func mapViewRegionIsChanging(_ mapView: MLNMapView) {
+            overlay.updateCamera(bearing: mapView.direction, pitch: Double(mapView.camera.pitch))
         }
 
         private func updateTrafficViewport(_ map: MLNMapView) {
@@ -163,9 +191,22 @@ struct NavSkinView: UIViewRepresentable {
         }
 
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool { true }
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            if gestureRecognizer is UITapGestureRecognizer { return store.vibing }
+            return !store.vibing
+        }
+
+        @objc func revealVibingExit(_ gesture: UITapGestureRecognizer) {
+            if gesture.state == .ended { store.revealVibingExit() }
+        }
+
+        @objc func exitVibingAccessibility() -> Bool {
+            store.exitVibing()
+            return true
+        }
 
         @objc func selectPoint(_ gesture: UILongPressGestureRecognizer) {
-            guard gesture.state == .began, let map else { return }
+            guard !store.vibing, gesture.state == .began, let map else { return }
             mode = .manual
             needsOverview = false
             reportFollowing(false)
@@ -205,6 +246,7 @@ struct NavSkinView: UIViewRepresentable {
                     needsOverview = false
                     previewRouteID = snapshot.route?.id
                     reportFollowing(false)
+                    updateDimension(map, enabled: store.map3D && snapshot.phase != .preview)
                     map.setCenter(CLLocationCoordinate2D(latitude: -16.6869, longitude: -49.2648), zoomLevel: 13, direction: 0, animated: true)
                     return
                 case .zoom(let delta):
@@ -215,29 +257,47 @@ struct NavSkinView: UIViewRepresentable {
                 }
             }
             if mode != .follow {
-                if let lastOrientation, lastOrientation != store.navigationPreferences.orientation {
+                if let lastOrientation, lastOrientation != store.mapOrientation {
                     let camera = map.camera
-                    camera.heading = snapshot.mapFollowBearing(store.navigationPreferences.orientation)
+                    camera.heading = snapshot.mapFollowBearing(store.mapOrientation)
                     map.setCamera(camera, animated: false)
                 }
-                lastOrientation = store.navigationPreferences.orientation
+                lastOrientation = store.mapOrientation
             }
-            if snapshot.phase == .preview, let route = snapshot.route, route.id != previewRouteID {
+            if !store.vibing, snapshot.phase == .preview, let route = snapshot.route, route.id != previewRouteID {
                 mode = .overview
                 reportFollowing(false)
                 if fitRoute(map) { previewRouteID = route.id }
             }
             if needsOverview, fitRoute(map) { needsOverview = false }
+            if mode == .overview && snapshot.route == nil { mode = .manual }
+            let map3D = store.vibing || (store.map3D && snapshot.phase != .preview)
+            updateDimension(map, enabled: map3D)
             guard mode == .follow,
-                  let target = cameraPolicy.update(snapshot, orientation: store.navigationPreferences.orientation,
-                                                   fallbackBearing: map.direction),
+                  let target = cameraPolicy.update(snapshot, orientation: store.mapOrientation,
+                                                   fallbackBearing: map.direction, map3D: map3D, vibing: store.vibing),
                   target != renderedCamera || !hasCenteredGPS else { return }
             map.setCenter(target.point.coordinate, zoomLevel: target.zoom, direction: target.bearing,
                           animated: hasCenteredGPS && !UIAccessibility.isReduceMotionEnabled)
             renderedCamera = target
-            lastOrientation = store.navigationPreferences.orientation
+            lastOrientation = store.mapOrientation
             hasCenteredGPS = true
             reportFollowing(true)
+        }
+
+        private func updateDimension(_ map: MLNMapView, enabled: Bool) {
+            guard rendered3D != enabled, let style = map.style else { return }
+            for layer in style.layers where layer.identifier.hasPrefix("navskin-3d-") {
+                layer.isVisible = enabled
+            }
+            // Apply pitch once per dimension/context change, before any follow animation.
+            // Keep the viewport in manual mode; toggling dimension must not recenter it.
+            let zoom = map.zoomLevel
+            let camera = map.camera
+            camera.pitch = CGFloat(NavigationCameraPolicy.targetPitch(map3D: enabled))
+            map.setCamera(camera, animated: false)
+            map.setZoomLevel(zoom, animated: false)
+            rendered3D = enabled
         }
 
         @discardableResult
@@ -245,6 +305,7 @@ struct NavSkinView: UIViewRepresentable {
             guard let route = store.snapshot.route, map.bounds.width > 0, map.bounds.height > 0 else { return false }
             var coordinates = route.geometry.filter(\.isValidMapPoint).map(\.coordinate)
             guard coordinates.count >= 2 else { return false }
+            updateDimension(map, enabled: store.map3D && store.snapshot.phase != .preview)
             let landscape = map.bounds.width > map.bounds.height
             let insets = landscape ? UIEdgeInsets(top: min(80, map.bounds.height * 0.2), left: min(400, map.bounds.width * 0.46), bottom: 30, right: min(120, map.bounds.width * 0.15)) :
                 UIEdgeInsets(top: min(160, map.bounds.height * 0.23), left: 30, bottom: min(260, map.bounds.height * 0.37), right: min(112, map.bounds.width * 0.23))

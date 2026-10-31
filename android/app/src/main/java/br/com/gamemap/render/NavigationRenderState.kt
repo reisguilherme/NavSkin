@@ -12,22 +12,29 @@ internal enum class NavigationCameraMode { FOLLOW, MANUAL, OVERVIEW }
 internal class NavigationCameraState(
     initialMode: NavigationCameraMode = NavigationCameraMode.FOLLOW,
     initialSessionId: Long? = null,
+    initialFlatOverview: Boolean = initialMode == NavigationCameraMode.OVERVIEW,
 ) {
     var mode = initialMode
         private set
     var sessionId = initialSessionId
         private set
+    var flatOverview = initialFlatOverview
+        private set
+    val dimensionMode: NavigationCameraMode get() = if (flatOverview) NavigationCameraMode.OVERVIEW else mode
 
     fun observe(snapshot: NavigationSnapshot) {
         if (snapshot.navigationActive && snapshot.sessionId != sessionId) {
             sessionId = snapshot.sessionId
             mode = NavigationCameraMode.FOLLOW
+            flatOverview = false
         }
     }
 
-    fun follow() { mode = NavigationCameraMode.FOLLOW }
+    fun follow() { mode = NavigationCameraMode.FOLLOW; flatOverview = false }
     fun manual() { mode = NavigationCameraMode.MANUAL }
-    fun overview() { mode = NavigationCameraMode.OVERVIEW }
+    fun overview() { mode = NavigationCameraMode.OVERVIEW; flatOverview = true }
+    fun usePreferredDimension() { flatOverview = mode == NavigationCameraMode.OVERVIEW }
+    fun restoreFlatOverview(flat: Boolean) { flatOverview = flat }
     fun restoreSession(id: Long) { sessionId = id }
 }
 

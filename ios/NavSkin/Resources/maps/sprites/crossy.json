@@ -1,0 +1,205 @@
+{
+  "crossy-lawn-day": {
+    "width": 64,
+    "height": 64,
+    "x": 2,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-grove-day": {
+    "width": 64,
+    "height": 64,
+    "x": 70,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-water-day": {
+    "width": 64,
+    "height": 64,
+    "x": 138,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-paving-day": {
+    "width": 64,
+    "height": 64,
+    "x": 206,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-lawn-night": {
+    "width": 64,
+    "height": 64,
+    "x": 274,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-grove-night": {
+    "width": 64,
+    "height": 64,
+    "x": 342,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-water-night": {
+    "width": 64,
+    "height": 64,
+    "x": 410,
+    "y": 2,
+    "pixelRatio": 1
+  },
+  "crossy-paving-night": {
+    "width": 64,
+    "height": 64,
+    "x": 2,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-parks": {
+    "width": 48,
+    "height": 48,
+    "x": 70,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-health": {
+    "width": 48,
+    "height": 48,
+    "x": 122,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-food": {
+    "width": 48,
+    "height": 48,
+    "x": 174,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-shops": {
+    "width": 48,
+    "height": 48,
+    "x": 226,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-parking": {
+    "width": 48,
+    "height": 48,
+    "x": 278,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-fuel": {
+    "width": 48,
+    "height": 48,
+    "x": 330,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-education": {
+    "width": 48,
+    "height": 48,
+    "x": 382,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-culture": {
+    "width": 48,
+    "height": 48,
+    "x": 434,
+    "y": 70,
+    "pixelRatio": 1
+  },
+  "poi-religion": {
+    "width": 48,
+    "height": 48,
+    "x": 2,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "road-oneway-forward": {
+    "width": 32,
+    "height": 32,
+    "x": 54,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-cafe": {
+    "width": 48,
+    "height": 48,
+    "x": 90,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-fast-food": {
+    "width": 48,
+    "height": 48,
+    "x": 142,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-restaurant": {
+    "width": 48,
+    "height": 48,
+    "x": 194,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-bar": {
+    "width": 48,
+    "height": 48,
+    "x": 246,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-pharmacy": {
+    "width": 48,
+    "height": 48,
+    "x": 298,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-hospital": {
+    "width": 48,
+    "height": 48,
+    "x": 350,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-clinic": {
+    "width": 48,
+    "height": 48,
+    "x": 402,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-school": {
+    "width": 48,
+    "height": 48,
+    "x": 454,
+    "y": 138,
+    "pixelRatio": 1
+  },
+  "poi-museum": {
+    "width": 48,
+    "height": 48,
+    "x": 2,
+    "y": 190,
+    "pixelRatio": 1
+  },
+  "poi-theatre": {
+    "width": 48,
+    "height": 48,
+    "x": 54,
+    "y": 190,
+    "pixelRatio": 1
+  },
+  "poi-worship": {
+    "width": 48,
+    "height": 48,
+    "x": 106,
+    "y": 190,
+    "pixelRatio": 1
+  }
+}

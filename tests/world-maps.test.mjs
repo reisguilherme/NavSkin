@@ -6,7 +6,7 @@ import { VectorTile } from '@mapbox/vector-tile';
 import { PbfReader } from 'pbf';
 
 const builder = await import('../scripts/prepare-world-maps.mjs').catch(() => ({}));
-const themes = ['gta', 'rosa', 'rdr2'];
+const themes = ['gta', 'rosa', 'rdr2', 'smw', 'cyberpunk', 'pipboy', 'hollow', 'crossy'];
 const variants = themes.flatMap(theme => [theme, `${theme}-night`]);
 const categories = ['parks', 'fuel', 'food', 'parking', 'health', 'shops', 'education', 'culture', 'religion'];
 const gameCatalog = JSON.parse(await readFile(new URL('../android/maps/game-assets/catalog.json', import.meta.url), 'utf8'));
@@ -116,14 +116,15 @@ test('world oneway arrows follow real directions and never infer missing road re
   assert.ok(style.layers.indexOf(layer) < style.layers.findIndex(item => item.id === 'road-labels'));
 });
 
-test('GTA TO-BE labels expose names sooner and distinguish streets from POI typography', () => {
+test('GTA navigation names use readable sizes and light outlines without decorative letter spacing', () => {
   const style = builder.buildWorldStyle('gta');
   const road = style.layers.find(layer => layer.id === 'road-labels');
-  assert.equal(road.layout['text-transform'], 'uppercase');
-  assert.ok(road.layout['text-letter-spacing'] >= 0.16);
+  assert.equal(road.layout['text-transform'], 'none');
+  assert.ok(road.layout['text-letter-spacing'] <= 0.05);
+  assert.ok(evaluate(road.layout['text-size'], {}, 15.5) >= 16);
   const restaurant = style.layers.find(layer => layer.id === 'poi-food');
   assert.ok(evaluate(restaurant.layout['text-size'], {}, 15.5) >= 12.5);
-  assert.ok(restaurant.paint['text-halo-width'] >= 2);
+  assert.ok(restaurant.paint['text-halo-width'] <= 1.25);
   assert.equal(restaurant.paint['text-halo-color'], '#000000');
 });
 
@@ -149,7 +150,7 @@ test('world subtype icons retain nine visibility groups while distinguishing act
   }
 });
 
-test('world builder produces six valid variants using the production planet service', async () => {
+test('world builder produces ten valid variants using the production planet service', async () => {
   assert.equal(typeof builder.buildWorldStyle, 'function', 'world cartography builder is missing');
   const styles = variants.map(builder.buildWorldStyle);
   for (const [index, style] of styles.entries()) {
@@ -251,9 +252,16 @@ test('world themes keep their palettes and global font coverage without changing
   for (const mode of variants) {
     const style = builder.buildWorldStyle(mode);
     const palette = tokens.palettes[mode];
-    assert.equal(style.layers.find(layer => layer.id === 'background').paint['background-color'], palette.background);
-    assert.equal(style.layers.find(layer => layer.id === 'vegetation-parks').paint['fill-color'], palette.park);
-    assert.equal(style.layers.find(layer => layer.id === 'water-fill').paint['fill-color'], palette.water);
+    const approved = {
+      gta: ['#a6a3a8','#326b2b','#719bb8'], 'gta-night': ['#55595d','#29472e','#416d86'],
+      rosa: ['#ffd5e8','#93e7c2','#98e5ef'], 'rosa-night': ['#6f3c83','#48b99c','#4baac9'],
+      rdr2: ['#e6d4ac','#c4bf96','#b7c7b3'], 'rdr2-night': ['#877558','#7c8060','#78928a'],
+      cyberpunk: ['#0b1420','#173a3c','#102b45'], 'cyberpunk-night': ['#070e18','#102e32','#0c223a'],
+      smw: [palette.background,palette.park,'#5898f0'], 'smw-night': [palette.background,palette.park,'#3f659b'],
+    }[mode] ?? [palette.background,palette.park,palette.water];
+    assert.equal(style.layers.find(layer => layer.id === 'background').paint['background-color'], approved[0]);
+    assert.equal(style.layers.find(layer => layer.id === 'vegetation-parks').paint['fill-color'], approved[1]);
+    assert.equal(style.layers.find(layer => layer.id === 'water-fill').paint['fill-color'].toLowerCase(), approved[2].toLowerCase());
     for (const layer of style.layers.filter(layer => layer.layout?.['text-field'])) {
       const role = layer.id === 'road-labels' ? 'road' : layer.id.startsWith('poi-') ? 'poi' : 'place';
       assert.deepEqual(layer.layout['text-font'], [gameCatalog.themes[mode.replace(/-night$/, '')]?.map?.[role] ?? 'Noto Sans Bold']);

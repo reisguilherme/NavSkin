@@ -48,6 +48,9 @@ data class RouteStep(
     val exitNumber: Int? = null,
 )
 
+/** Endpoint of a provider leg, measured against the deduplicated route geometry. */
+data class RouteStop(val destination: Destination, val geometryIndex: Int, val alongRouteMeters: Double)
+
 data class NavRoute(
     val id: String,
     val geometry: List<GeoPoint>,
@@ -56,6 +59,7 @@ data class NavRoute(
     val durationSeconds: Double,
     val destination: Destination,
     val calculatedAtMs: Long,
+    val intermediateStops: List<RouteStop> = emptyList(),
 )
 
 data class RouteProgress(

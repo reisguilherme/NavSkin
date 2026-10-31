@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import br.com.gamemap.navigation.NavigationPreferences
+import br.com.gamemap.navigation.MapOrientation
 import br.com.gamemap.navigation.NavigationSnapshot
 import br.com.gamemap.navigation.model.GeoPoint
 import br.com.gamemap.navigation.storage.SavedPlace
 import br.com.gamemap.preferences.MapTheme
+import br.com.gamemap.preferences.MapPreferences
 import br.com.gamemap.traffic.TrafficMapOverlay
 import br.com.gamemap.traffic.TrafficOverlayStatus
 import org.maplibre.android.MapLibre
@@ -62,11 +64,18 @@ class NativeMapRenderer(
             NavigationCameraMode.entries.firstOrNull { it.name == saved }
         } ?: NavigationCameraMode.FOLLOW,
         savedInstanceState?.takeIf { it.containsKey(CAMERA_SESSION_KEY) }?.getLong(CAMERA_SESSION_KEY),
+        savedInstanceState?.getBoolean(CAMERA_FLAT_OVERVIEW_KEY) == true ||
+            savedInstanceState?.getString(CAMERA_MODE_KEY) == NavigationCameraMode.OVERVIEW.name,
     )
     private var navigation: NavigationSnapshot? = null
     private var navigationPreferences = NavigationPreferences()
+    private var mapPreferences = MapPreferences()
+    private var mapPreferencesApplied = false
+    private var applied3D: Boolean? = null
     private var cameraModeListener: ((Boolean) -> Unit)? = null
     private var destinationListener: ((GeoPoint) -> Unit)? = null
+    private var mapTapListener: (() -> Boolean)? = null
+    private var vibing = false
     private var followNeedsRecenter = true
     private val adaptiveCamera = AdaptiveNavigationCamera()
     private var followTransition: FollowCameraTarget? = null
@@ -80,18 +89,25 @@ class NativeMapRenderer(
 
     internal val navigationCameraMode: NavigationCameraMode get() = navigationCamera.mode
     internal val navigationSessionId: Long? get() = navigationCamera.sessionId
+    internal val isFlatOverview: Boolean get() = navigationCamera.flatOverview
+    internal val navigationAvatarFramePath: String? get() = navigationOverlay.renderedAvatarPath
 
     private val cameraMoveListener = MapLibreMap.OnCameraMoveStartedListener { reason ->
         if (reason == MapLibreMap.OnCameraMoveStartedListener.REASON_API_GESTURE) enterManualMode()
     }
+    private val avatarCameraListener = MapLibreMap.OnCameraMoveListener {
+        if (!destroyed) map?.cameraPosition?.let { navigationOverlay.updateCamera(it.bearing, it.tilt) }
+    }
     private val mapLongClickListener = MapLibreMap.OnMapLongClickListener { position ->
         val callback = destinationListener
-        if (callback == null || destroyed) false else {
+        if (vibing) mapTapListener?.invoke() ?: false
+        else if (callback == null || destroyed) false else {
             enterManualMode()
             callback(GeoPoint(position.latitude, position.longitude))
             true
         }
     }
+    private val mapClickListener = MapLibreMap.OnMapClickListener { !destroyed && mapTapListener?.invoke() == true }
     private val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
         if (!destroyed && pendingOverview) fitRouteOverview()
     }
@@ -169,7 +185,10 @@ class NativeMapRenderer(
                 nativeMap.setMinZoomPreference(1.0)
                 nativeMap.setMaxZoomPreference(18.5)
                 nativeMap.addOnCameraMoveStartedListener(cameraMoveListener)
+                nativeMap.addOnCameraMoveListener(avatarCameraListener)
                 nativeMap.addOnMapLongClickListener(mapLongClickListener)
+                nativeMap.addOnMapClickListener(mapClickListener)
+                updateMapDimension(forceCamera = true)
                 if (navigation != null) {
                     nativeMap.setMinZoomPreference(1.0)
                     updateFollowCamera()
@@ -259,6 +278,8 @@ class NativeMapRenderer(
                 // Reinstall sources and current icon images before reporting style readiness/idle.
                 trafficOverlay.styleLoaded(loadedStyle)
                 navigationOverlay.styleLoaded(loadedStyle)
+                navigationOverlay.updateCamera(nativeMap.cameraPosition.bearing, nativeMap.cameraPosition.tilt)
+                apply3DLayerVisibility(loadedStyle)
                 applyPadding()
                 onStatus("MapLibre Native: estilo carregado")
             }
@@ -320,7 +341,9 @@ class NativeMapRenderer(
         requireMainThread()
         if (destroyed) return
         enterManualMode()
-        pendingCamera = defaultCamera()
+        navigationCamera.usePreferredDimension()
+        updateMapDimension()
+        pendingCamera = CameraPosition.Builder(defaultCamera()).tilt(mapTilt()).build()
         map?.let {
             it.cancelTransitions()
             it.cameraPosition = pendingCamera
@@ -333,6 +356,8 @@ class NativeMapRenderer(
         requireMainThread()
         if (destroyed || !latitude.isFinite() || !longitude.isFinite()) return
         enterManualMode()
+        navigationCamera.usePreferredDimension()
+        updateMapDimension()
         pendingCamera = CameraPosition.Builder(map?.cameraPosition ?: pendingCamera)
             .target(LatLng(latitude, longitude)).zoom(16.0).build()
         map?.let {
@@ -359,6 +384,55 @@ class NativeMapRenderer(
         trafficStatus?.let(listener)
     }
 
+    /** Changes only pitch and building visibility; never resumes follow after a manual gesture. */
+    fun applyMapPreferences(preferences: MapPreferences) {
+        requireMainThread()
+        if (destroyed) return
+        if (mapPreferencesApplied &&
+            (mapPreferences.browse3D != preferences.browse3D || mapPreferences.navigation3D != preferences.navigation3D))
+            navigationCamera.usePreferredDimension()
+        mapPreferences = preferences
+        mapPreferencesApplied = true
+        updateMapDimension()
+    }
+
+    /** Display-only driving mode; route/session and persisted preferences remain owned by their stores. */
+    fun setVibing(enabled: Boolean) {
+        requireMainThread()
+        if (destroyed || vibing == enabled) return
+        vibing = enabled
+        navigationOverlay.setVibing(enabled)
+        adaptiveCamera.reset()
+        recenter()
+    }
+
+    fun setOnMapTapListener(listener: () -> Boolean) { mapTapListener = listener }
+
+    private fun mapTilt(): Double = if (mapUses3D(mapPreferences, navigation, navigationCamera.dimensionMode, vibing)) MAP_3D_TILT else 0.0
+
+    private fun updateMapDimension(forceCamera: Boolean = false) {
+        val is3D = mapUses3D(mapPreferences, navigation, navigationCamera.dimensionMode, vibing)
+        if (!forceCamera && applied3D == is3D) return
+        applied3D = is3D
+        if (styleReady) map?.style?.let(::apply3DLayerVisibility)
+        val nativeMap = map
+        val current = nativeMap?.cameraPosition ?: pendingCamera
+        pendingCamera = CameraPosition.Builder(current).tilt(if (is3D) MAP_3D_TILT else 0.0).build()
+        if (current.tilt != pendingCamera.tilt) {
+            // A dimension toggle must not strand an accepted GPS animation halfway.
+            // The next observation can legitimately contain the same target and be deduplicated.
+            val acceptedFollow = followTransition?.takeIf { isFollowing }
+            nativeMap?.cancelTransitions()
+            nativeMap?.cameraPosition = pendingCamera
+            acceptedFollow?.let(::easeFollowCamera)
+        }
+    }
+
+    private fun apply3DLayerVisibility(style: Style) {
+        val value = if (mapUses3D(mapPreferences, navigation, navigationCamera.dimensionMode, vibing)) "visible" else "none"
+        style.layers.filter { it.id.startsWith(MAP_3D_LAYER_PREFIX) }.forEach { it.setProperties(visibility(value)) }
+    }
+
     fun updateNavigation(
         state: NavigationSnapshot,
         prefs: NavigationPreferences,
@@ -381,6 +455,7 @@ class NativeMapRenderer(
         navigationOverlay.update(state, prefs, saved, theme)
         trafficOverlay.updateTheme(theme)
         map?.setMinZoomPreference(1.0)
+        updateMapDimension()
         updateFollowCamera()
         if (pendingOverview) fitRouteOverview()
     }
@@ -392,19 +467,21 @@ class NativeMapRenderer(
         pendingOverview = false
         followNeedsRecenter = true
         cameraModeListener?.invoke(true)
+        updateMapDimension()
         updateFollowCamera()
     }
 
     fun showRouteOverview() {
         requireMainThread()
-        if (destroyed) return
+        if (destroyed || vibing) return
         navigationCamera.overview()
         pendingOverview = true
         cameraModeListener?.invoke(false)
+        updateMapDimension()
         fitRouteOverview()
     }
 
-    internal fun restoreNavigationCamera(mode: NavigationCameraMode, sessionId: Long?) {
+    internal fun restoreNavigationCamera(mode: NavigationCameraMode, sessionId: Long?, flatOverview: Boolean = mode == NavigationCameraMode.OVERVIEW) {
         requireMainThread()
         when (mode) {
             NavigationCameraMode.FOLLOW -> navigationCamera.follow()
@@ -413,7 +490,9 @@ class NativeMapRenderer(
         }
         // Observe the retained session without resetting manual/overview on surface reconnect.
         if (sessionId != null) navigationCamera.restoreSession(sessionId)
+        navigationCamera.restoreFlatOverview(flatOverview)
         followNeedsRecenter = false
+        updateMapDimension()
         cameraModeListener?.invoke(isFollowing)
     }
 
@@ -429,7 +508,8 @@ class NativeMapRenderer(
         if (map == null) return
         val state = navigation ?: return
         if (!isFollowing) return
-        val target = adaptiveCamera.update(state, navigationPreferences.orientation, followNeedsRecenter) ?: return
+        val orientation = if (vibing) MapOrientation.MOVEMENT_UP else navigationPreferences.orientation
+        val target = adaptiveCamera.update(state, orientation, followNeedsRecenter, freeDrive = vibing) ?: return
         // Padding updates cancel native transitions, so apply them before starting the ease.
         applyPadding(resumeFollow = false)
         easeFollowCamera(target)
@@ -442,7 +522,7 @@ class NativeMapRenderer(
         followTransition = target
         val camera = CameraPosition.Builder(nativeMap.cameraPosition)
             .target(LatLng(target.point.latitude, target.point.longitude))
-            .bearing(target.bearing).zoom(target.zoom).tilt(0.0).build()
+            .bearing(target.bearing).zoom(target.zoom).tilt(mapTilt()).build()
         nativeMap.easeCamera(CameraUpdateFactory.newCameraPosition(camera), target.durationMs,
             object : MapLibreMap.CancelableCallback {
                 override fun onFinish() = clearIfCurrent()
@@ -533,6 +613,7 @@ class NativeMapRenderer(
         if (!destroyed) {
             mapView.onSaveInstanceState(outState)
             outState.putString(CAMERA_MODE_KEY, navigationCamera.mode.name)
+            outState.putBoolean(CAMERA_FLAT_OVERVIEW_KEY, navigationCamera.flatOverview)
             navigationCamera.sessionId?.let { outState.putLong(CAMERA_SESSION_KEY, it) }
         }
     }
@@ -551,8 +632,11 @@ class NativeMapRenderer(
         mapView.removeOnDidBecomeIdleListener(idleListener)
         mapView.removeOnLayoutChangeListener(layoutListener)
         map?.removeOnCameraMoveStartedListener(cameraMoveListener)
+        map?.removeOnCameraMoveListener(avatarCameraListener)
         map?.removeOnMapLongClickListener(mapLongClickListener)
+        map?.removeOnMapClickListener(mapClickListener)
         trafficOverlay.close()
+        navigationOverlay.close()
         mapView.onDestroy()
         map = null
     }
@@ -561,6 +645,7 @@ class NativeMapRenderer(
         const val PROBE_STYLE_ASSET = "maps/probe-style.json"
         private const val CAMERA_MODE_KEY = "gamemap.navigation.camera.mode"
         private const val CAMERA_SESSION_KEY = "gamemap.navigation.camera.session"
+        private const val CAMERA_FLAT_OVERVIEW_KEY = "gamemap.navigation.camera.flatOverview"
 
         fun probeStyle(context: Context): String =
             context.assets.open(PROBE_STYLE_ASSET).bufferedReader().use { it.readText() }

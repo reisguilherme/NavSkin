@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#e9eceb">
+  <title>NavSkin — Vidro / protótipo interativo</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23edf1ed'/%3E%3Cpath d='m16 6 8 20-8-5-8 5z' fill='%233b5347'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="studio">
+    <aside class="studio-sidebar">
+      <div class="studio-kicker"><span class="studio-dot"></span> NAVSKIN / DESIGN STUDY 01</div>
+      <h1>Mais mapa.<br>Menos distração.</h1>
+      <p class="studio-intro">Vidro discreto, controles essenciais.<br>Explore a interface de verdade.</p>
+      <div class="prototype-label"><span></span> Protótipo interativo · revisão 03</div>
+      <nav class="scenes" aria-label="Cenas do protótipo">
+        <button data-scene="explore"><span class="scene-number">01</span><span>Explorar<small>Mapa livre e busca</small></span><span class="scene-arrow">↗</span></button>
+        <button data-scene="navigate"><span class="scene-number">02</span><span>Navegar<small>Manobra, ETA e ações</small></span><span class="scene-arrow">↗</span></button>
+        <button data-scene="menu"><span class="scene-number">03</span><span>Menu<small>Tudo em três pontos</small></span><span class="scene-arrow">↗</span></button>
+        <button data-scene="themes"><span class="scene-number">04</span><span>Temas<small>GTA SA, Rosa Pop e RDR2</small></span><span class="scene-arrow">↗</span></button>
+        <button data-scene="stop"><span class="scene-number">05</span><span>Adicionar parada<small>Continue a sua viagem</small></span><span class="scene-arrow">↗</span></button>
+      </nav>
+      <div class="studio-note"><strong>Mapa real. Viagem de exemplo.</strong><p>GPS, velocidade e ETA são simulados. A busca usa uma seleção local de lugares. Nenhuma chave de API é necessária.</p></div>
+      <div class="studio-footer">HTML + CSS + MapLibre <span>·</span> Sem imagens geradas por IA</div>
+    </aside>
+    <main class="stage">
+      <div class="stage-caption"><span class="status-led"></span><span id="scene-caption">Navegação · toque nos controles</span><button id="reset-demo" title="Restaurar demonstração" aria-label="Restaurar demonstração">↺</button></div>
+      <div class="device">
+        <section id="app" class="app navigating" data-theme="gta" aria-label="Protótipo NavSkin">
+          <div id="map" aria-label="Mapa interativo de Goiânia"></div>
+          <div class="map-shade"></div>
+          <div class="phone-status" aria-hidden="true"><span>9:41</span><span class="status-icons"><svg viewBox="0 0 60 16"><path d="M2 14V10h3v4zm5 0V7h3v7zm5 0V4h3v10zm5 0V1h3v13z" fill="currentColor"/><path d="M25 5q8-7 16 0m-13 3q5-5 10 0m-7 3q2-2 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="45" y="3" width="12" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M58 6v3" stroke="currentColor" stroke-width="2"/><rect x="47" y="5" width="8" height="5" rx=".6" fill="currentColor"/></svg></span></div>
+          <div class="demo-badge">DEMONSTRAÇÃO</div>
+          <div id="map-status" class="map-status" role="status">Preparando o mapa…</div>
+          <section id="direction" class="direction glass" aria-label="Próxima manobra">
+            <div class="maneuver-content"><svg class="turn-arrow" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 40V23q0-10 10-10h18M29 4l10 9-10 9"/></svg><div class="maneuver-text"><div class="turn-distance">200 <span>m</span></div><div class="turn-street">Av. Universitária</div></div></div>
+            <button id="more" class="more-button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>
+          </section>
+          <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+          <nav id="menu" class="overflow-menu glass" aria-label="Opções do mapa" hidden>
+            <button data-panel="themes"><span data-icon="layers"></span>Temas<span class="menu-chevron">›</span></button>
+            <button data-panel="filters"><span data-icon="sliders"></span>Filtros<span class="menu-chevron">›</span></button>
+            <button data-panel="saved"><span data-icon="bookmark"></span>Seus lugares<span class="menu-chevron">›</span></button>
+            <button data-panel="settings"><span data-icon="settings"></span>Configurações<span class="menu-chevron">›</span></button>
+          </nav>
+          <div class="bottom-dock">
+            <button id="stop-chip" class="stop-chip glass" hidden><span data-icon="pin"></span><span id="stop-chip-text"></span><span class="stop-remove">×</span></button>
+            <div class="floating-controls"><div id="speed" class="float-circle glass speed" aria-label="Velocidade simulada: 38 quilômetros por hora"><strong id="speed-value">38</strong><span>km/h</span></div><button id="recenter" class="float-circle glass recenter" aria-label="Recentralizar mapa"><span data-icon="target"></span></button></div>
+            <div id="trip-card" class="trip-card glass">
+              <div class="trip-summary" aria-label="Resumo da viagem"><div><strong id="eta-duration">12 <span>min</span></strong><small>Tempo</small></div><div><strong id="eta-distance">4,8 <span>km</span></strong><small>Distância</small></div><div><strong id="eta-arrival">18:42</strong><small>Chegada</small></div></div>
+              <div class="trip-actions"><button id="stop-navigation" class="stop-navigation"><span data-icon="stop"></span>Parar</button><button id="add-stop" class="add-stop"><span data-icon="plus"></span>Adicionar parada</button></div>
+            </div>
+            <button id="search-trigger" class="search-trigger glass" hidden><span data-icon="search"></span><span>Para onde?</span></button>
+          </div>
+          <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+          <section id="sheet" class="sheet glass" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+            <div class="sheet-handle" aria-hidden="true"></div>
+            <header class="sheet-header"><div><h2 id="sheet-title"></h2><p id="sheet-description"></p></div><button id="close-sheet" class="close-sheet" aria-label="Fechar painel"><span data-icon="close"></span></button></header>
+            <div id="sheet-content" class="sheet-content"></div>
+          </section>
+          <div id="toast" class="toast" role="status" hidden></div>
+          <div class="home-indicator" aria-hidden="true"></div>
+        </section>
+      </div>
+      <p class="stage-help">Arraste o mapa · abra o menu ⋯ · teste os botões</p>
+    </main>
+    <aside class="design-notes"><span class="note-marker">03</span><p>Um único menu.<br>Mais espaço para<br>o que vem à frente.</p><div class="note-rule"></div><div class="note-swatch"></div><p>Vidro claro<br><small>Contraste suave<br>Superfícies translúcidas</small></p><div class="note-rule"></div><p><strong>64 × 64</strong><br><small>Velocidade e recentralização<br>com o mesmo tamanho.</small></p></aside>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,7 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="home">
-  <title>Rosa Pop · saved · home</title>
-  <!-- Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
-  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M10 30L32 11L54 30L48 30V53H17V30Z" fill="#ff77b4" /><path d="M9 30L32 10L55 30" fill="#ad8bff" /><rect x="27" y="36" width="11" height="17" rx="1" fill="#fff7fc"/><path d="M0 2C-3 -2 -6 0 -6 3C-6 6 0 10 0 10C0 10 6 6 6 3C6 0 3 -2 0 2Z" transform="translate(23 27) scale(1)" fill="#fed45e" vector-effect="non-scaling-stroke"/></g></defs>
-  <use href="#art" stroke="#fff7fc" stroke-width="6.2"/>
-  <use href="#art" stroke="#731b55" stroke-width="3.2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Minha casinha de glacê</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M43 9h8v18h-8Z" fill="#C7ACE8"/>
+    <path d="M12 28h40v29H12Z" fill="#FFF0DB"/>
+    <path d="M45 28h7v29h-7Z" fill="#F0AFBF" stroke="none"/>
+    <path d="m7 28 25-22 25 22-5 6-20-17-20 17Z" fill="#FF8AB8"/>
+    <path d="m12 27 20-17 20 17" stroke="#FFD5E7"/>
+    <path d="M26 57V44a6 6 0 0 1 12 0v13" fill="#BDABE8"/>
+    <path d="M17 37h5v9h-5Zm25 0h5v9h-5Z" fill="#AFE9CE" stroke-width="2.5"/>
+    <path d="M32 34s-7-4-7-8c0-4 5-5 7-1 2-4 7-3 7 1 0 4-7 8-7 8Z" fill="#F992B7" stroke-width="2"/>
+    <path d="M8 58h48" stroke-width="4"/>
+  </g>
 </svg>

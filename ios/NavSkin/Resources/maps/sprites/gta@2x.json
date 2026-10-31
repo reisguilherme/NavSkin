@@ -1,0 +1,177 @@
+{
+  "poi-bar": {
+    "width": 64,
+    "height": 64,
+    "x": 4,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-cafe": {
+    "width": 64,
+    "height": 64,
+    "x": 76,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-clinic": {
+    "width": 64,
+    "height": 64,
+    "x": 148,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-culture": {
+    "width": 64,
+    "height": 64,
+    "x": 220,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-education": {
+    "width": 64,
+    "height": 64,
+    "x": 292,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-fast-food": {
+    "width": 64,
+    "height": 64,
+    "x": 364,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-food": {
+    "width": 64,
+    "height": 64,
+    "x": 436,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-fuel": {
+    "width": 64,
+    "height": 64,
+    "x": 508,
+    "y": 4,
+    "pixelRatio": 2
+  },
+  "poi-health": {
+    "width": 64,
+    "height": 64,
+    "x": 4,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-hospital": {
+    "width": 64,
+    "height": 64,
+    "x": 76,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-museum": {
+    "width": 64,
+    "height": 64,
+    "x": 148,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-parking": {
+    "width": 64,
+    "height": 64,
+    "x": 220,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-parks": {
+    "width": 64,
+    "height": 64,
+    "x": 292,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-pharmacy": {
+    "width": 64,
+    "height": 64,
+    "x": 364,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-religion": {
+    "width": 64,
+    "height": 64,
+    "x": 436,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-restaurant": {
+    "width": 64,
+    "height": 64,
+    "x": 508,
+    "y": 76,
+    "pixelRatio": 2
+  },
+  "poi-school": {
+    "width": 64,
+    "height": 64,
+    "x": 4,
+    "y": 148,
+    "pixelRatio": 2
+  },
+  "poi-shops": {
+    "width": 64,
+    "height": 64,
+    "x": 76,
+    "y": 148,
+    "pixelRatio": 2
+  },
+  "poi-theatre": {
+    "width": 64,
+    "height": 64,
+    "x": 148,
+    "y": 148,
+    "pixelRatio": 2
+  },
+  "poi-worship": {
+    "width": 64,
+    "height": 64,
+    "x": 220,
+    "y": 148,
+    "pixelRatio": 2
+  },
+  "road-oneway-forward": {
+    "width": 64,
+    "height": 64,
+    "x": 292,
+    "y": 148,
+    "pixelRatio": 2
+  },
+  "lab-gta-paper-day": {
+    "width": 128,
+    "height": 128,
+    "x": 4,
+    "y": 220,
+    "pixelRatio": 2
+  },
+  "lab-gta-water-day": {
+    "width": 128,
+    "height": 128,
+    "x": 140,
+    "y": 220,
+    "pixelRatio": 2
+  },
+  "lab-gta-paper-night": {
+    "width": 128,
+    "height": 128,
+    "x": 276,
+    "y": 220,
+    "pixelRatio": 2
+  },
+  "lab-gta-water-night": {
+    "width": 128,
+    "height": 128,
+    "x": 412,
+    "y": 220,
+    "pixelRatio": 2
+  }
+}

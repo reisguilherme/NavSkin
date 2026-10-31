@@ -1,10 +1,20 @@
-# NavSkin · 0.8.0
+# NavSkin · 0.12.0
 
-Mapas com os temas GTA SA, Rosa Pop e RDR2, GPS e navegação em aplicativos nativos para Android e iOS. O **NavSkin 0.8.0** abre com **mapa mundial online** e mantém o recorte de **Goiânia offline** como alternativa. O repositório do projeto é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin).
+A **0.12.0** adiciona marcadores 3D próprios de cada tema durante navegação e Vibing: CJ na BMX, carrinho Hello Kitty, cavalo com sela, Yoshi, Kusanagi, Vault Boy, Cavaleiro e galinha Crossy Road. A perspectiva acompanha o rumo e o giro da câmera. [Uso e modelos](docs/navigation-avatars-v0.12.md) · [Galeria interativa](http://127.0.0.1:4176/markers-3d.html).
+
+Mapas com oito temas — GTA SA, Rosa Pop, RDR2, Super Mario World, Cyberpunk 2077, Pip-Boy, Hollow Knight e Crossy Road —, GPS e navegação em aplicativos nativos para Android e iOS. O NavSkin abre com **mapa mundial online** e mantém **Goiânia offline** como alternativa. O repositório do projeto é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin).
+
+A **0.11.0** reúne os oito temas aprovados, seus redesenhos e **Mapa 3D**. O modo **⋯ → Vibing** deixa apenas o mapa e o veículo, acompanha o GPS em 3D e funciona com ou sem rota. Toque no mapa para revelar a saída e a recentralização; no Android, Voltar também sai. [Uso da versão](docs/vibing-v0.11.md) · [Recursos e reprodução](docs/eight-theme-assets.md) · [Painéis no computador](prototypes/navskin-map-lab/README.md).
 
 Os dois modos oferecem temas dia/noite, filtros de lugares, favoritos, Casa/Trabalho, recentes e marcadores de veículo. Busca e rotas de automóvel usam a chave Geoapify configurada pelo usuário. A navegação inclui manobras visuais, velocidade, distância e tempo restantes, chegada e recálculo por desvio; trocar o estilo preserva a sessão.
 
-A **0.8.0** acrescenta rotação livre, acompanhamento suave do rumo e zoom por velocidade/proximidade de manobras, instrução superior maior e ETA em três colunas. Trânsito **TomTom opcional** usa chave separada para fluxo e incidentes; o ETA continua Geoapify, sem trânsito ao vivo. [Uso e limites](docs/navigation-v0.8.md).
+A **0.10.0** adiciona **Super Mario World e Cyberpunk 2077**, com variantes dia/noite, ícones de locais e veículos e prévias reais no carrossel. São 20 estilos entre os dois modos de cobertura e cinco prévias. GTA SA passa a usar Bank Gothic nas ruas e nos POIs para facilitar a leitura; Pricedown fica nos nomes maiores. [Temas, fontes e uso](docs/maps-v0.10.md).
+
+Minecraft e GTA V foram retirados desta entrega a pedido do usuário. Seus SVGs e paletas permanecem como rascunhos no projeto, fora dos temas selecionáveis e dos catálogos ativos.
+
+A **0.9.0** aplica a interface Vidro aprovada: menu único **⋯**, velocidade e recentralização do mesmo tamanho, ETA com três valores e ações **Parar / Adicionar parada** durante a viagem. Paradas intermediárias entram na rota Geoapify em ordem, preservando o destino final; erros mantêm a rota confirmada e oferecem nova tentativa. A interface usa tipografia nativa legível; as fontes e os ícones dos mapas permanecem temáticos. [Uso e limites](docs/navigation-v0.9.md).
+
+A **0.8.0** acrescentou rotação livre, acompanhamento suave do rumo e zoom por velocidade/proximidade de manobras, instrução superior maior e ETA em três colunas. Trânsito **TomTom opcional** usa chave separada para fluxo e incidentes; o ETA continua Geoapify, sem trânsito ao vivo. [Uso e limites](docs/navigation-v0.8.md).
 
 A 0.7.1 corrige o falso erro ao escolher destino antes do primeiro GPS: mostra **Buscando sua localização…**, depois **Calculando rota…**, e retoma automaticamente quando a posição está atual e precisa. Falhas reais mostram a causa e a ação de tentar novamente. [Validação do hotfix](android/docs/VALIDATION-v0.7.1.md).
 
@@ -20,7 +30,7 @@ A versão 0.6 reúne nove filtros: parques, combustível, alimentação, estacio
 
 ## Cobertura e conexão
 
-O mapa mundial usa tiles vetoriais do [OpenFreeMap](https://openfreemap.org/), com dados OpenStreetMap e schema OpenMapTiles. O serviço público não exige chave de mapa. A conexão é necessária para carregar tiles e blocos adicionais de caracteres; as fontes temáticas GTA/RDR2 ficam locais. A densidade dos detalhes varia conforme os dados de cada região. Os temas mudam a apresentação da mesma geografia.
+O mapa mundial usa tiles vetoriais do [OpenFreeMap](https://openfreemap.org/), com dados OpenStreetMap e schema OpenMapTiles. O serviço público não exige chave de mapa. A conexão é necessária para carregar tiles e blocos adicionais de caracteres; as fontes temáticas ficam locais. A densidade dos detalhes varia conforme os dados de cada região. Os temas mudam a apresentação da mesma geografia.
 
 A opção **Goiânia offline**, em **Temas**, usa o recorte cartográfico incluído no aplicativo. Ela cobre longitude −49,325 a −49,205 e latitude −16,755 a −16,640. Busca, cálculo e recálculo continuam online nos dois modos. O mapa local não inclui navegação offline completa. Os créditos cartográficos estão acessíveis no menu e nos recursos empacotados.
 
@@ -28,7 +38,7 @@ Configure sua chave Geoapify nas configurações do aplicativo e ative o GPS par
 
 ## Compilar e conferir
 
-O código está no repositório; o pacote de assets originais é entregue localmente, separado da licença do código. Para o Mac, prefira o ZIP iOS completo, que já contém os recursos preparados. Um clone isolado precisa receber esse pacote antes do build; siga a [procedência e importação](docs/game-assets-provenance.md).
+O repositório inclui código, painéis HTML, modelos 3D editáveis, fontes, sprites, avisos de origem e recursos preparados de Android/iOS. Um clone completo já contém os mapas e seus tiles; não é necessário receber um pacote visual separado. As licenças dos recursos continuam distintas da licença do código; veja a [procedência e importação](docs/game-assets-provenance.md).
 
 Para obter o código:
 
@@ -37,13 +47,23 @@ git clone https://github.com/reisguilherme/NavSkin.git
 cd NavSkin
 ```
 
+Para continuar em outro computador, instale Node.js 22.12+ e rode `npm ci`. Abra os painéis com `node prototypes/navskin-map-lab/server.mjs` e acesse **http://127.0.0.1:4176/**; no Windows, depois de instalar as dependências, também pode usar `Abrir-paineis-NavSkin.cmd`. A PoC web histórica usa `npm run dev` na porta 4173.
+
+Para Android no Windows, execute `./scripts/android-toolchain.ps1 -Action Bootstrap`, depois `-Action InstallSdk` e, após revisar os termos do SDK, `-Action Gradle -ToolArguments @(':app:assembleDebug')`. Para iOS, abra `ios/NavSkin.xcodeproj` em um Mac com Xcode; os recursos preparados já estão no clone. Os detalhes e requisitos estão nos READMEs de cada plataforma.
+
+As chaves Geoapify/TomTom devem ser configuradas novamente no aplicativo; elas não ficam no repositório. SDKs, dependências instaladas, caches, assinaturas e configurações pessoais também não são copiados. Um build debug feito no outro PC pode usar uma assinatura diferente da versão já instalada; preserve seus dados antes de substituir a instalação. Os testes portáveis podem ser executados com `npm test` e `npm run build`.
+
+Os tiles de Goiânia estão prontos para uso. Para reconstruir os dados de prédios, rode `node scripts/restore-source-data.mjs`: ele restaura os dois GeoJSONs grandes a partir dos arquivos compactados em `data/overture/archive/`, conferindo seus hashes. A regeneração de fontes usa `npm run assets:game`, com entradas portáveis em `android/maps/game-assets/source/`; nenhuma dessas etapas é necessária apenas para abrir os painéis ou compilar os apps.
+
+A próxima etapa é preparar a publicação no Google Play: o aplicativo atual é debug, ainda sem AAB release assinado, chave de upload configurada ou política de privacidade própria publicada. A conta Play Console foi criada pelo responsável; a validação em central Android Auto e a revisão das licenças de terceiros para distribuição pública continuam pendentes. O iOS precisa de compilação e teste no Mac; não há IPA desta versão nem integração CarPlay.
+
 O Android usa Gradle. Para o iOS, o caminho desta entrega é **um amigo compilar no Mac com Xcode**, seguindo o [README preparado para ele](ios/README.md#para-quem-vai-compilar-no-mac). O comando `RUN_APPLE_TESTS=true bash scripts/build-ios-cloud.sh` também roda nesse Mac local: testa, compila e gera `ios/artifacts/cloud/NavSkin-unsigned.ipa` sem login Apple. O amigo envia o IPA ao Guilherme, que usa sua própria Apple Account no AltServer do Windows para assinar e instalar. [Passos no Windows](ios/docs/SEM-MAC.md).
 
-APKs, AABs, IPAs e saídas de build não fazem parte do código versionado. O nome local previsto para o APK desta versão é `NavSkin-v0.8.0-debug.apk`. O projeto iOS está preparado, mas a compilação Apple ainda precisa ser executada no Mac. O [workflow do GitHub Actions](.github/workflows/ios-cloud.yml) permanece como alternativa manual; sua execução nesta conta foi bloqueada pelo GitHub e não é necessária para esse caminho. Consulte a [documentação Android](android/README.md) e a [validação iOS](ios/docs/VALIDATION.md) para as evidências e os testes ainda pendentes.
+APKs, AABs, IPAs e saídas de build não fazem parte do código versionado. O APK desta versão é `android/artifacts/NavSkin-v0.12.0-debug.apk`; o download pronto fica nas [Releases do GitHub](https://github.com/reisguilherme/NavSkin/releases). O projeto iOS está preparado, mas a compilação Apple ainda precisa ser executada no Mac. O [workflow do GitHub Actions](.github/workflows/ios-cloud.yml) permanece como alternativa manual; sua execução nesta conta foi bloqueada pelo GitHub e não é necessária para esse caminho. Consulte a [documentação Android](android/README.md) e a [validação iOS](ios/docs/VALIDATION.md) para as evidências e os testes ainda pendentes.
 
 Os [catálogos de ícones](docs/navigation-icon-catalogs.md) são locais e editáveis. Os registros da [versão Android 0.4.0](android/docs/VALIDATION-v0.4.md), da [0.3.0](android/docs/VALIDATION-v0.3.md) e suas capturas permanecem como histórico.
 
-O pacote local de fontes e sprites solicitado é separado da licença do código. Seus arquivos originais, conversões e avisos acompanham a preparação local; a documentação de [importação e geração dos glyphs](docs/game-assets-provenance.md#reproduzir-a-importação-local) explica o manifesto de entrada e o conversor oficial MapLibre. A PoC web abaixo mantém seus assets históricos próprios.
+As fontes e os sprites solicitados acompanham este repositório com seus arquivos originais, conversões e avisos, separados da licença do código; a documentação de [importação e geração dos glyphs](docs/game-assets-provenance.md#reproduzir-a-importação-local) explica o manifesto de entrada e o conversor oficial MapLibre. A PoC web abaixo mantém seus assets históricos próprios.
 
 ## PoC web histórica · Goiânia / San Andreas
 
@@ -122,4 +142,4 @@ O arquivo completo de edifícios tem cerca de 107 MB, fica disponível para repr
 
 Requer navegador com **WebGL2**. O build pode informar um aviso de tamanho de bundle do MapLibre; não é falha de compilação. Dados © **OpenStreetMap contributors**, [ODbL](https://www.openstreetmap.org/copyright). Referências do jogo pertencem aos respectivos titulares; projeto independente, sem vínculo com Rockstar Games.
 
-O pacote local `NavSkin-game-assets-0.7.0.zip` contém a árvore de recursos preparada: extraia seu conteúdo na raiz do clone, mantendo as pastas `android` e `ios`. O ZIP iOS completo já está preparado para abrir no Mac e dispensa essa etapa. Os arquivos de assinatura pessoal continuam excluídos.
+Clones atuais já incluem a árvore completa de recursos. O pacote `NavSkin-game-assets-0.7.0.zip` é histórico e não é necessário. Chaves de API, certificados pessoais, caches e SDKs permanecem fora do Git.

@@ -24,6 +24,26 @@ final class NavigationMapOverlay {
     private var renderedSavedVisible: Bool?
     private var renderedDestination: GeoPoint?
     private var renderedVehicle: String?
+    private var avatarRoot: URL?
+    private var avatarCatalog: NavigationAvatarCatalog?
+    private var avatarTheme = ""
+    private var avatarEnabled = false
+    private var renderedAvatarPath: String?
+    private var renderedAvatar3D = false
+    private var renderedIconRotation: Double?
+    private var unavailableAvatarFrames = Set<String>()
+    private struct AvatarImageRequest: Equatable {
+        let path: String
+        let url: URL
+        let generation: UInt64
+    }
+    private let avatarDecodeQueue = DispatchQueue(label: "br.com.navskin.avatar-decode", qos: .userInitiated)
+    private var avatarDecodeInFlight = false
+    private var avatarStyleGeneration: UInt64 = 0
+    private var desiredAvatarRequest: AvatarImageRequest?
+    private var fallbackVehicle: (url: URL, name: String)?
+    private var cameraBearing = 0.0
+    private var cameraPitch = 0.0
     private var vehicleTimer: Timer?
     private var vehicleTarget: GeoPoint?
     private var vehicleTargetBearing: Double?
@@ -35,6 +55,8 @@ final class NavigationMapOverlay {
     private let prefix = "navskin-nav-"
 
     init() {
+        images.countLimit = 24
+        images.totalCostLimit = 12 * 1_024 * 1_024
         backgroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification,
             object: nil, queue: .main) { [weak self] _ in
                 Task { @MainActor [weak self] in self?.stopVehicleAnimation() }
@@ -48,6 +70,8 @@ final class NavigationMapOverlay {
 
     func styleLoading() {
         stopVehicleAnimation()
+        avatarStyleGeneration &+= 1
+        desiredAvatarRequest = nil
         vehicleTarget = nil; vehicleTargetBearing = nil; vehicleFixTimestamp = nil
         style = nil
     }
@@ -61,13 +85,24 @@ final class NavigationMapOverlay {
 
     func styleLoaded(_ style: MLNStyle) {
         stopVehicleAnimation()
+        avatarStyleGeneration &+= 1
+        desiredAvatarRequest = nil
         self.style = style
         resourceError = nil
         renderedRouteKey = nil; geometry = []; renderedSegment = nil; renderedHead = nil
         renderedPalette = nil; renderedPosition = nil; renderedBearing = nil; renderedOpacity = nil
         renderedAccuracy = nil; renderedSaved = nil
         renderedSavedVisible = nil; renderedDestination = nil; renderedVehicle = nil
+        renderedAvatarPath = nil; renderedAvatar3D = false; renderedIconRotation = nil
         install(style)
+    }
+
+    /// Camera callbacks update only a quantized avatar view, never route geometry.
+    func updateCamera(bearing: Double, pitch: Double) {
+        guard bearing.isFinite, pitch.isFinite else { return }
+        cameraBearing = bearing
+        cameraPitch = pitch
+        updateVehicleAppearance()
     }
 
     func update(store: AppStore) {
@@ -140,14 +175,19 @@ final class NavigationMapOverlay {
             renderedSaved = store.places.savedPlaces
             renderedSavedVisible = store.navigationPreferences.savedPlacesVisible
         }
-        if let icon = store.resources.vehicleIcon(id: store.navigationPreferences.vehicleId),
-           let url = store.resources.imageURL(for: icon, theme: theme, preview: false) {
-            let name = "vehicle-\(theme.rawValue)-\(icon.id)"
-            if renderedVehicle != name, ensureImage(url: url, name: name, style: style) {
-                (style.layer(withIdentifier: prefix + "vehicle-symbol") as? MLNSymbolStyleLayer)?.iconImageName = NSExpression(forConstantValue: name)
-                renderedVehicle = name
-            }
+        if avatarRoot != store.resources.root {
+            avatarRoot = store.resources.root
+            avatarCatalog = NavigationAvatarCatalog.load(root: store.resources.root)
+            unavailableAvatarFrames.removeAll()
+            renderedAvatarPath = nil
+            desiredAvatarRequest = nil
         }
+        avatarEnabled = NavigationAvatarCatalog.isEnabled(navigationActive: snapshot.navigationActive, vibing: store.vibing)
+        avatarTheme = theme.rawValue
+        fallbackVehicle = store.resources.vehicleIcon(id: store.vehicleID).flatMap { icon in
+            store.resources.imageURL(for: icon, theme: theme, preview: false).map { ($0, "vehicle-\(theme.rawValue)-\(icon.id)") }
+        }
+        updateVehicleAppearance()
         updateVehicle(snapshot)
         let vehicleLayer = style.layer(withIdentifier: prefix + "vehicle-symbol") as? MLNSymbolStyleLayer
         if renderedOpacity != snapshot.mapVehicleOpacity {
@@ -155,7 +195,7 @@ final class NavigationMapOverlay {
             renderedOpacity = snapshot.mapVehicleOpacity
         }
         let accuracy: AccuracyKey?
-        if snapshot.hasCurrentMapFix, let fix = snapshot.location.fix,
+        if !store.vibing, snapshot.hasCurrentMapFix, let fix = snapshot.location.fix,
            fix.accuracyMeters.isFinite, fix.accuracyMeters > 0, fix.accuracyMeters <= 2_000 {
             accuracy = AccuracyKey(point: fix.point, radius: fix.accuracyMeters)
         } else { accuracy = nil }
@@ -213,9 +253,100 @@ final class NavigationMapOverlay {
             source("vehicle")?.shape = point(position)
             renderedPosition = position
         }
-        if renderedBearing != bearing {
-            (style?.layer(withIdentifier: prefix + "vehicle-symbol") as? MLNSymbolStyleLayer)?.iconRotation = NSExpression(forConstantValue: bearing)
-            renderedBearing = bearing
+        renderedBearing = bearing
+        updateVehicleAppearance()
+    }
+
+    private func updateVehicleAppearance() {
+        guard let style, let layer = style.layer(withIdentifier: prefix + "vehicle-symbol") as? MLNSymbolStyleLayer else {
+            desiredAvatarRequest = nil
+            return
+        }
+        if avatarEnabled, let catalog = avatarCatalog, let root = avatarRoot,
+           let frame = catalog.frame(theme: avatarTheme, heading: renderedBearing ?? 0,
+                                     cameraBearing: cameraBearing, pitch: cameraPitch),
+           !unavailableAvatarFrames.contains(frame.path) {
+            let url = root.appendingPathComponent("navigation-3d").appendingPathComponent(frame.path)
+            let request = AvatarImageRequest(path: frame.path, url: url, generation: avatarStyleGeneration)
+            desiredAvatarRequest = request
+            if renderedAvatarPath != frame.path {
+                if let decoded = images.object(forKey: url.path as NSString) {
+                    // Camera callbacks only upload a decoded cache hit, with one atlas slot.
+                    style.setImage(decoded, forName: prefix + "vehicle-3d")
+                    renderedAvatarPath = frame.path
+                } else { requestAvatarDecode(request) }
+            }
+            if renderedAvatarPath == frame.path {
+                if !renderedAvatar3D {
+                    layer.iconImageName = NSExpression(forConstantValue: prefix + "vehicle-3d")
+                    layer.iconScale = NSExpression(forConstantValue: catalog.iconScale)
+                    layer.iconOffset = NSExpression(forConstantValue: NSValue(cgVector: CGVector(dx: catalog.offsetX, dy: catalog.offsetY)))
+                    layer.iconRotationAlignment = NSExpression(forConstantValue: "viewport")
+                    layer.iconPitchAlignment = NSExpression(forConstantValue: "viewport")
+                    layer.iconRotation = NSExpression(forConstantValue: 0)
+                    renderedIconRotation = 0
+                    renderedAvatar3D = true
+                    renderedVehicle = nil
+                }
+                return
+            }
+            // Keep the preceding angle while the next view loads; do not flash the flat icon.
+            if renderedAvatar3D, renderedAvatarPath?.hasPrefix(avatarTheme + "/") == true { return }
+        } else { desiredAvatarRequest = nil }
+        if let fallbackVehicle, renderedVehicle != fallbackVehicle.name,
+           ensureImage(url: fallbackVehicle.url, name: fallbackVehicle.name, style: style) {
+            layer.iconImageName = NSExpression(forConstantValue: fallbackVehicle.name)
+            renderedVehicle = fallbackVehicle.name
+        }
+        if renderedAvatar3D {
+            layer.iconScale = NSExpression(forConstantValue: 1)
+            layer.iconOffset = NSExpression(forConstantValue: NSValue(cgVector: .zero))
+            layer.iconRotationAlignment = NSExpression(forConstantValue: "map")
+            layer.iconPitchAlignment = NSExpression(forConstantValue: "map")
+            renderedAvatar3D = false
+        }
+        let rotation = renderedBearing ?? 0
+        if renderedIconRotation != rotation {
+            layer.iconRotation = NSExpression(forConstantValue: rotation)
+            renderedIconRotation = rotation
+        }
+    }
+
+    private func requestAvatarDecode(_ request: AvatarImageRequest) {
+        guard !avatarDecodeInFlight else { return }
+        avatarDecodeInFlight = true
+        avatarDecodeQueue.async { [weak self] in
+            let decoded = Self.decodeAvatar(request.url)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.avatarDecodeInFlight = false
+                if let decoded {
+                    self.images.setObject(decoded, forKey: request.url.path as NSString,
+                        cost: (decoded.cgImage?.bytesPerRow ?? 0) * (decoded.cgImage?.height ?? 0))
+                } else if self.desiredAvatarRequest == request, request.generation == self.avatarStyleGeneration {
+                    self.unavailableAvatarFrames.insert(request.path)
+                    self.resourceError = "Não foi possível abrir um marcador 3D local. O ícone padrão continua disponível."
+                }
+                // A stale task may warm the bounded cache, but only the latest live context
+                // selects an image. No reference to the old MLNStyle crosses the queue.
+                if let desired = self.desiredAvatarRequest,
+                   desired.generation == self.avatarStyleGeneration, self.avatarEnabled, self.style != nil {
+                    self.updateVehicleAppearance()
+                }
+            }
+        }
+    }
+
+    nonisolated private static func decodeAvatar(_ url: URL) -> UIImage? {
+        autoreleasepool {
+            guard let image = UIImage(contentsOfFile: url.path), let source = image.cgImage,
+                  let context = CGContext(data: nil, width: source.width, height: source.height,
+                    bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+            // Drawing into a bitmap forces PNG decompression off the render/UI thread.
+            context.draw(source, in: CGRect(x: 0, y: 0, width: CGFloat(source.width), height: CGFloat(source.height)))
+            guard let decoded = context.makeImage() else { return nil }
+            return UIImage(cgImage: decoded, scale: 1, orientation: .up)
         }
     }
 
@@ -271,7 +402,10 @@ final class NavigationMapOverlay {
         let key = url.path as NSString
         let image: UIImage
         if let cached = images.object(forKey: key) { image = cached }
-        else if let loaded = UIImage(contentsOfFile: url.path) { image = loaded; images.setObject(loaded, forKey: key) }
+        else if let loaded = UIImage(contentsOfFile: url.path) {
+            image = loaded
+            images.setObject(loaded, forKey: key, cost: (loaded.cgImage?.bytesPerRow ?? 0) * (loaded.cgImage?.height ?? 0))
+        }
         else {
             resourceError = "Não foi possível abrir um ícone local do mapa. Confira os recursos do aplicativo."
             return false
@@ -311,6 +445,11 @@ final class NavigationMapOverlay {
         case .gta: return (UIColor(red: 0.278, green: 0.847, blue: 1, alpha: 1), UIColor(red: 0.027, green: 0.067, blue: 0.067, alpha: 1))
         case .rosa: return (UIColor(red: 0.208, green: 0.341, blue: 0.910, alpha: 1), .white)
         case .rdr2: return (UIColor(red: 0.906, green: 0.749, blue: 0.333, alpha: 1), UIColor(red: 0.094, green: 0.063, blue: 0.039, alpha: 1))
+        case .smw: return (UIColor(red: 0.925, green: 0.204, blue: 0.204, alpha: 1), .white)
+        case .cyberpunk: return (UIColor(red: 0.957, green: 0.910, blue: 0.290, alpha: 1), UIColor(red: 0.063, green: 0.094, blue: 0.153, alpha: 1))
+        case .pipboy: return (UIColor(red: 0.855, green: 1, blue: 0.682, alpha: 1), UIColor(red: 0.024, green: 0.098, blue: 0.047, alpha: 1))
+        case .hollow: return (UIColor(red: 0.839, green: 0.922, blue: 1, alpha: 1), UIColor(red: 0.090, green: 0.145, blue: 0.247, alpha: 1))
+        case .crossy: return (UIColor(red: 0.965, green: 0.388, blue: 0.212, alpha: 1), .white)
         }
     }
 }

@@ -12,6 +12,7 @@ import br.com.gamemap.navigation.NavigationSnapshot
 import br.com.gamemap.navigation.model.*
 import br.com.gamemap.phone.MainActivity
 import br.com.gamemap.preferences.MapTheme
+import br.com.gamemap.preferences.MapPreferences
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.Collections
@@ -74,6 +75,7 @@ class NativeAdaptiveCameraTest {
                 scenario.onActivity {
                     renderer!!.setViewport(width, height, visible, visible)
                     renderer!!.applyStyle(BACKGROUND_STYLE.replace("#101010", "#202020"))
+                    renderer!!.applyMapPreferences(MapPreferences(navigation3D = false))
                     // The policy intentionally suppresses an identical target on the next
                     // observation. Padding must preserve the target without relying on it.
                     renderer!!.updateNavigation(snapshot(2_000L, 90.0, point = far), preferences, emptyList(), MapTheme.GTA_SA)
@@ -83,6 +85,7 @@ class NativeAdaptiveCameraTest {
                 scenario.onActivity {
                     assertEquals(40.0, native!!.cameraPosition.padding!![0], 0.01)
                     assertEquals(80.0, native!!.cameraPosition.padding!![1], 0.01)
+                    assertEquals("Dimension changes retain the accepted animated target", 0.0, native!!.cameraPosition.tilt, .01)
                     renderer!!.updateNavigation(snapshot(3_000L, 90.0), preferences, emptyList(), MapTheme.GTA_SA)
                 }
                 await {
@@ -157,6 +160,7 @@ class NativeAdaptiveCameraTest {
                 }
                 await { native!!.cameraPosition.bearing in 0.5..1.1 }
                 scenario.onActivity {
+                    assertEquals("Navigation defaults to 3D", 48.0, native!!.cameraPosition.tilt, .01)
                     assertTrue("North crossing spun around the long arc: $samples", samples.all { it > 350.0 || it < 10.0 })
                 }
                 var count = 0
@@ -176,17 +180,38 @@ class NativeAdaptiveCameraTest {
                     renderer!!.panBy(80f, 20f)
                     native!!.cameraPosition = CameraPosition.Builder(native!!.cameraPosition).bearing(123.0).zoom(15.0).build()
                     manual = native!!.cameraPosition
+                    renderer!!.applyMapPreferences(MapPreferences(navigation3D = false))
+                    assertEquals(0.0, native!!.cameraPosition.tilt, .01)
+                    // Native projection/unprojection can differ by a few ULPs after changing pitch.
+                    assertEquals(manual!!.target!!.latitude, native!!.cameraPosition.target!!.latitude, .000001)
+                    assertEquals(manual!!.target!!.longitude, native!!.cameraPosition.target!!.longitude, .000001)
+                    assertEquals(manual!!.target!!.altitude, native!!.cameraPosition.target!!.altitude, .000001)
+                    assertEquals(manual!!.zoom, native!!.cameraPosition.zoom, .000001)
+                    assertEquals(manual!!.bearing, native!!.cameraPosition.bearing, .000001)
+                    manual = native!!.cameraPosition
                     renderer!!.updateNavigation(snapshot(3_000L, 90.0, 15.0, 20.0), prefs, emptyList(), MapTheme.ROSA_POP)
                     assertEquals(NavigationCameraMode.MANUAL, renderer!!.navigationCameraMode)
-                    assertEquals(manual, native!!.cameraPosition)
+                    assertEquals(manual!!.target!!.latitude, native!!.cameraPosition.target!!.latitude, .000001)
+                    assertEquals(manual!!.target!!.longitude, native!!.cameraPosition.target!!.longitude, .000001)
+                    assertEquals(manual!!.target!!.altitude, native!!.cameraPosition.target!!.altitude, .000001)
+                    assertEquals(manual!!.zoom, native!!.cameraPosition.zoom, .000001)
+                    assertEquals(manual!!.bearing, native!!.cameraPosition.bearing, .000001)
+                    assertEquals(manual!!.tilt, native!!.cameraPosition.tilt, .000001)
+                    assertArrayEquals(manual!!.padding, native!!.cameraPosition.padding, .000001)
                     renderer!!.showRouteOverview()
+                    assertEquals("Route overview remains flat", 0.0, native!!.cameraPosition.tilt, .01)
                     renderer!!.updateNavigation(snapshot(4_000L, 90.0).copy(phase = NavigationPhase.RECALCULATING), prefs, emptyList(), MapTheme.ROSA_POP)
                     assertEquals(NavigationCameraMode.OVERVIEW, renderer!!.navigationCameraMode)
                     renderer!!.updateNavigation(snapshot(5_000L, 90.0, 15.0, 20.0), prefs, emptyList(), MapTheme.ROSA_POP)
+                    renderer!!.applyMapPreferences(MapPreferences(navigation3D = true))
+                    assertEquals("A preference change must not tilt the overview", 0.0, native!!.cameraPosition.tilt, .01)
                     renderer!!.recenter()
                 }
                 await { native!!.cameraPosition.zoom > 17.99 && kotlin.math.abs(native!!.cameraPosition.bearing - 90.0) < 0.01 }
-                scenario.onActivity { assertTrue(renderer!!.isFollowing) }
+                scenario.onActivity {
+                    assertTrue(renderer!!.isFollowing)
+                    assertEquals(48.0, native!!.cameraPosition.tilt, .01)
+                }
                 val moved = GeoPoint(origin.latitude - 0.0002, origin.longitude - 0.0002)
                 scenario.onActivity {
                     recordFrames.set(true)

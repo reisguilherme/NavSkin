@@ -18,7 +18,7 @@ struct AppearanceSheet: View {
     var section: AppearanceSection = .themes
     @State private var settings = false
     @Environment(\.dismiss) private var dismiss
-    private var palette: ThemePalette { store.theme.palette }
+    private var palette: ThemePalette { store.theme.glassPalette }
 
     var body: some View {
         NavigationStack {
@@ -26,7 +26,7 @@ struct AppearanceSheet: View {
                 VStack(alignment: .leading, spacing: 24) {
                     switch section {
                     case .themes:
-                        SheetHeading(title: "Do seu jeito", subtitle: "Três universos para explorar o mundo.", palette: palette).padding(.horizontal, 20)
+                        SheetHeading(title: "Do seu jeito", subtitle: "Escolha um universo para explorar o mundo.", palette: palette).padding(.horizontal, 20)
                         ThemeCarousel(store: store, onSelect: {})
                         VStack(alignment: .leading, spacing: 24) {
                             vehicleSelection
@@ -37,7 +37,7 @@ struct AppearanceSheet: View {
                             categories
                             if store.baseMapMode == .goianiaOffline {
                                 Text("Este snapshot offline não inclui escolas, cultura e locais de culto. Use o mapa mundial para esses grupos.")
-                                    .gameFont(.caption).foregroundStyle(palette.muted)
+                                    .interfaceFont(.caption).foregroundStyle(palette.muted)
                             }
                         }.padding(.horizontal, 20)
                     case .options:
@@ -48,14 +48,14 @@ struct AppearanceSheet: View {
                                 Label("Chave Geoapify e localização", systemImage: "key").frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                             }.buttonStyle(.bordered).controlSize(.large)
                             Text("Busca e rotas dependem de conexão com a internet. A estimativa de chegada não inclui trânsito ao vivo.")
-                                .gameFont(.footnote).foregroundStyle(palette.muted)
+                                .interfaceFont(.footnote).foregroundStyle(palette.muted)
                         }.padding(.horizontal, 20)
                     }
                 }.padding(.vertical, 20)
             }
             .background(palette.surface).foregroundStyle(palette.text)
-            .gameNavigationTitle(section.title).navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.gameFont(.body) } }
+            .navigationTitle(section.title).navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Fechar") { dismiss() }.interfaceFont(.body) } }
             .sheet(isPresented: $settings) { APIKeySheet(store: store) }
         }
         .tint(palette.accent)
@@ -63,15 +63,15 @@ struct AppearanceSheet: View {
 
     private var baseMapSelection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Cobertura do mapa").gameFont(.headline)
+            Text("Cobertura do mapa").interfaceFont(.headline)
             ForEach(MapBaseMode.allCases) { mode in
                 Button { store.setBaseMapMode(mode) } label: {
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: mode == .world ? "globe.americas" : "arrow.down.circle")
                             .frame(width: 24).padding(.top, 2)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(mode.title).gameFont(.subheadline, weight: .semibold)
-                            Text(mode.description).gameFont(.caption).foregroundStyle(palette.muted)
+                            Text(mode.title).interfaceFont(.subheadline, weight: .semibold)
+                            Text(mode.description).interfaceFont(.caption).foregroundStyle(palette.muted)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         Spacer(minLength: 4)
@@ -87,7 +87,7 @@ struct AppearanceSheet: View {
             }
             if store.baseMapMode == .goianiaOffline {
                 Text("Este snapshot offline não inclui escolas, cultura e locais de culto. Use o mapa mundial para esses grupos.")
-                    .gameFont(.caption).foregroundStyle(palette.muted)
+                    .interfaceFont(.caption).foregroundStyle(palette.muted)
                 Button {
                     store.showOfflineCoverage()
                     dismiss()
@@ -97,21 +97,21 @@ struct AppearanceSheet: View {
                 }
                 .buttonStyle(.bordered)
                 Text("Fora do recorte, use o mapa mundial. Enquadrar a região não encerra o GPS nem a navegação.")
-                    .gameFont(.caption).foregroundStyle(palette.muted)
+                    .interfaceFont(.caption).foregroundStyle(palette.muted)
             }
         }
     }
 
     private var categories: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("O que aparece no mapa").gameFont(.headline)
+            Text("O que aparece no mapa").interfaceFont(.headline)
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 ForEach(PoiCategory.allCases) { category in
                     let enabled = store.enabledCategories.contains(category.id)
                     Button { store.setCategory(category.id, enabled: !enabled) } label: {
                         HStack(spacing: 8) {
                             Image(systemName: category.symbol).frame(width: 23)
-                            Text(category.title).gameFont(.subheadline, weight: .semibold).lineLimit(1)
+                            Text(category.title).interfaceFont(.subheadline, weight: .semibold).lineLimit(1)
                             Spacer(minLength: 0)
                             Image(systemName: enabled ? "checkmark.circle.fill" : "circle").font(.caption)
                         }
@@ -129,15 +129,15 @@ struct AppearanceSheet: View {
 
     private var vehicleSelection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Seu marcador em movimento").gameFont(.headline)
-            Text("O veículo muda com o tema e preserva sua rota.").gameFont(.caption).foregroundStyle(palette.muted)
+            Text("Seu marcador em movimento").interfaceFont(.headline)
+            Text("O veículo muda com o tema e preserva sua rota.").interfaceFont(.caption).foregroundStyle(palette.muted)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 88))], spacing: 10) {
                 ForEach(store.resources.vehicles) { vehicle in
-                    let selected = store.navigationPreferences.vehicleId == vehicle.id
+                    let selected = store.vehicleID == vehicle.id
                     Button { store.setVehicle(vehicle.id) } label: {
                         VStack(spacing: 7) {
                             CatalogBitmap(url: store.resources.imageURL(for: vehicle, theme: store.theme), size: 58)
-                            Text(vehicle.label).gameFont(.caption).lineLimit(2).multilineTextAlignment(.center)
+                            Text(vehicle.label).interfaceFont(.caption).lineLimit(2).multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity, minHeight: 100).foregroundStyle(palette.text)
                         .background(selected ? palette.soft : Color.clear, in: RoundedRectangle(cornerRadius: 15))
@@ -153,7 +153,8 @@ struct AppearanceSheet: View {
 
     private var mapPreferences: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Preferências do mapa").gameFont(.headline)
+            Text("Preferências do mapa").interfaceFont(.headline)
+            MapDimensionToggle(store: store)
             Toggle("Mostrar locais salvos", isOn: Binding(
                 get: { store.navigationPreferences.savedPlacesVisible },
                 set: { store.setSavedVisible($0) }
@@ -163,7 +164,7 @@ struct AppearanceSheet: View {
                     Label("Orientação", systemImage: "location.north.line")
                     Spacer()
                     Text(store.navigationPreferences.orientation == .northUp ? "Norte para cima" : "Direção do movimento")
-                        .gameFont(.caption).foregroundStyle(palette.muted)
+                        .interfaceFont(.caption).foregroundStyle(palette.muted)
                 }.frame(minHeight: 44)
             }.buttonStyle(.plain)
         }
@@ -172,13 +173,13 @@ struct AppearanceSheet: View {
 
     private var markerCatalog: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Ícones dos seus lugares").gameFont(.headline)
-            Text("Escolha um destes ícones ao criar ou editar um favorito.").gameFont(.caption).foregroundStyle(palette.muted)
+            Text("Ícones dos seus lugares").interfaceFont(.headline)
+            Text("Escolha um destes ícones ao criar ou editar um favorito.").interfaceFont(.caption).foregroundStyle(palette.muted)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 14) {
                 ForEach(store.resources.saved) { icon in
                     VStack(spacing: 5) {
                         CatalogBitmap(url: store.resources.imageURL(for: icon, theme: store.theme), size: 42)
-                        Text(icon.label).gameFont(.caption2).lineLimit(2).multilineTextAlignment(.center)
+                        Text(icon.label).interfaceFont(.caption2).lineLimit(2).multilineTextAlignment(.center)
                     }.frame(maxWidth: .infinity, minHeight: 72)
                 }
             }

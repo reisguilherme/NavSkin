@@ -3,7 +3,12 @@
   "themes": [
     "gta",
     "rosa",
-    "rdr2"
+    "rdr2",
+    "smw",
+    "cyberpunk",
+    "pipboy",
+    "hollow",
+    "crossy"
   ],
   "saved": [
     {
@@ -18,12 +23,50 @@
         "rosa": {
           "image": "rosa/saved/home.png",
           "preview": "rosa/saved/home@2x.png",
-          "svg": "rosa/saved/home.svg"
+          "svg": "rosa/saved/home.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0",
+          "source": "scripts/theme-art/pink-icons/saved-home.svg"
         },
         "rdr2": {
           "image": "rdr2/saved/home.png",
           "preview": "rdr2/saved/home@2x.png",
           "svg": "rdr2/saved/home.svg"
+        },
+        "smw": {
+          "image": "smw/saved/home.png",
+          "preview": "smw/saved/home@2x.png",
+          "svg": "smw/saved/home.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/home.png",
+          "preview": "cyberpunk/saved/home@2x.png",
+          "svg": "cyberpunk/saved/home.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/home.png",
+          "preview": "pipboy/saved/home@2x.png",
+          "svg": "pipboy/saved/home.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/home.png",
+          "preview": "hollow/saved/home@2x.png",
+          "svg": "hollow/saved/home.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/home.png",
+          "preview": "crossy/saved/home@2x.png",
+          "svg": "crossy/saved/home.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -39,12 +82,50 @@
         "rosa": {
           "image": "rosa/saved/work.png",
           "preview": "rosa/saved/work@2x.png",
-          "svg": "rosa/saved/work.svg"
+          "svg": "rosa/saved/work.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0",
+          "source": "scripts/theme-art/pink-icons/saved-work.svg"
         },
         "rdr2": {
           "image": "rdr2/saved/work.png",
           "preview": "rdr2/saved/work@2x.png",
           "svg": "rdr2/saved/work.svg"
+        },
+        "smw": {
+          "image": "smw/saved/work.png",
+          "preview": "smw/saved/work@2x.png",
+          "svg": "smw/saved/work.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/work.png",
+          "preview": "cyberpunk/saved/work@2x.png",
+          "svg": "cyberpunk/saved/work.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/work.png",
+          "preview": "pipboy/saved/work@2x.png",
+          "svg": "pipboy/saved/work.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/work.png",
+          "preview": "hollow/saved/work@2x.png",
+          "svg": "hollow/saved/work.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/work.png",
+          "preview": "crossy/saved/work@2x.png",
+          "svg": "crossy/saved/work.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -60,12 +141,50 @@
         "rosa": {
           "image": "rosa/saved/favorite.png",
           "preview": "rosa/saved/favorite@2x.png",
-          "svg": "rosa/saved/favorite.svg"
+          "svg": "rosa/saved/favorite.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0",
+          "source": "scripts/theme-art/pink-icons/saved-heart.svg"
         },
         "rdr2": {
           "image": "rdr2/saved/favorite.png",
           "preview": "rdr2/saved/favorite@2x.png",
           "svg": "rdr2/saved/favorite.svg"
+        },
+        "smw": {
+          "image": "smw/saved/favorite.png",
+          "preview": "smw/saved/favorite@2x.png",
+          "svg": "smw/saved/favorite.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/favorite.png",
+          "preview": "cyberpunk/saved/favorite@2x.png",
+          "svg": "cyberpunk/saved/favorite.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/favorite.png",
+          "preview": "pipboy/saved/favorite@2x.png",
+          "svg": "pipboy/saved/favorite.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/favorite.png",
+          "preview": "hollow/saved/favorite@2x.png",
+          "svg": "hollow/saved/favorite.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/favorite.png",
+          "preview": "crossy/saved/favorite@2x.png",
+          "svg": "crossy/saved/favorite.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -87,6 +206,41 @@
           "image": "rdr2/saved/restaurant.png",
           "preview": "rdr2/saved/restaurant@2x.png",
           "svg": "rdr2/saved/restaurant.svg"
+        },
+        "smw": {
+          "image": "smw/saved/restaurant.png",
+          "preview": "smw/saved/restaurant@2x.png",
+          "svg": "smw/saved/restaurant.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/restaurant.png",
+          "preview": "cyberpunk/saved/restaurant@2x.png",
+          "svg": "cyberpunk/saved/restaurant.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/restaurant.png",
+          "preview": "pipboy/saved/restaurant@2x.png",
+          "svg": "pipboy/saved/restaurant.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/restaurant.png",
+          "preview": "hollow/saved/restaurant@2x.png",
+          "svg": "hollow/saved/restaurant.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/restaurant.png",
+          "preview": "crossy/saved/restaurant@2x.png",
+          "svg": "crossy/saved/restaurant.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -108,6 +262,41 @@
           "image": "rdr2/saved/cafe.png",
           "preview": "rdr2/saved/cafe@2x.png",
           "svg": "rdr2/saved/cafe.svg"
+        },
+        "smw": {
+          "image": "smw/saved/cafe.png",
+          "preview": "smw/saved/cafe@2x.png",
+          "svg": "smw/saved/cafe.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/cafe.png",
+          "preview": "cyberpunk/saved/cafe@2x.png",
+          "svg": "cyberpunk/saved/cafe.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/cafe.png",
+          "preview": "pipboy/saved/cafe@2x.png",
+          "svg": "pipboy/saved/cafe.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/cafe.png",
+          "preview": "hollow/saved/cafe@2x.png",
+          "svg": "hollow/saved/cafe.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/cafe.png",
+          "preview": "crossy/saved/cafe@2x.png",
+          "svg": "crossy/saved/cafe.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -129,6 +318,41 @@
           "image": "rdr2/saved/park.png",
           "preview": "rdr2/saved/park@2x.png",
           "svg": "rdr2/saved/park.svg"
+        },
+        "smw": {
+          "image": "smw/saved/park.png",
+          "preview": "smw/saved/park@2x.png",
+          "svg": "smw/saved/park.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/park.png",
+          "preview": "cyberpunk/saved/park@2x.png",
+          "svg": "cyberpunk/saved/park.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/park.png",
+          "preview": "pipboy/saved/park@2x.png",
+          "svg": "pipboy/saved/park.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/park.png",
+          "preview": "hollow/saved/park@2x.png",
+          "svg": "hollow/saved/park.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/park.png",
+          "preview": "crossy/saved/park@2x.png",
+          "svg": "crossy/saved/park.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -150,6 +374,41 @@
           "image": "rdr2/saved/shopping.png",
           "preview": "rdr2/saved/shopping@2x.png",
           "svg": "rdr2/saved/shopping.svg"
+        },
+        "smw": {
+          "image": "smw/saved/shopping.png",
+          "preview": "smw/saved/shopping@2x.png",
+          "svg": "smw/saved/shopping.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/shopping.png",
+          "preview": "cyberpunk/saved/shopping@2x.png",
+          "svg": "cyberpunk/saved/shopping.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/shopping.png",
+          "preview": "pipboy/saved/shopping@2x.png",
+          "svg": "pipboy/saved/shopping.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/shopping.png",
+          "preview": "hollow/saved/shopping@2x.png",
+          "svg": "hollow/saved/shopping.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/shopping.png",
+          "preview": "crossy/saved/shopping@2x.png",
+          "svg": "crossy/saved/shopping.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -171,6 +430,41 @@
           "image": "rdr2/saved/gym.png",
           "preview": "rdr2/saved/gym@2x.png",
           "svg": "rdr2/saved/gym.svg"
+        },
+        "smw": {
+          "image": "smw/saved/gym.png",
+          "preview": "smw/saved/gym@2x.png",
+          "svg": "smw/saved/gym.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/gym.png",
+          "preview": "cyberpunk/saved/gym@2x.png",
+          "svg": "cyberpunk/saved/gym.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/gym.png",
+          "preview": "pipboy/saved/gym@2x.png",
+          "svg": "pipboy/saved/gym.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/gym.png",
+          "preview": "hollow/saved/gym@2x.png",
+          "svg": "hollow/saved/gym.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/gym.png",
+          "preview": "crossy/saved/gym@2x.png",
+          "svg": "crossy/saved/gym.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -192,6 +486,41 @@
           "image": "rdr2/saved/health.png",
           "preview": "rdr2/saved/health@2x.png",
           "svg": "rdr2/saved/health.svg"
+        },
+        "smw": {
+          "image": "smw/saved/health.png",
+          "preview": "smw/saved/health@2x.png",
+          "svg": "smw/saved/health.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/health.png",
+          "preview": "cyberpunk/saved/health@2x.png",
+          "svg": "cyberpunk/saved/health.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/health.png",
+          "preview": "pipboy/saved/health@2x.png",
+          "svg": "pipboy/saved/health.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/health.png",
+          "preview": "hollow/saved/health@2x.png",
+          "svg": "hollow/saved/health.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/health.png",
+          "preview": "crossy/saved/health@2x.png",
+          "svg": "crossy/saved/health.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -213,6 +542,41 @@
           "image": "rdr2/saved/parking.png",
           "preview": "rdr2/saved/parking@2x.png",
           "svg": "rdr2/saved/parking.svg"
+        },
+        "smw": {
+          "image": "smw/saved/parking.png",
+          "preview": "smw/saved/parking@2x.png",
+          "svg": "smw/saved/parking.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/parking.png",
+          "preview": "cyberpunk/saved/parking@2x.png",
+          "svg": "cyberpunk/saved/parking.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/parking.png",
+          "preview": "pipboy/saved/parking@2x.png",
+          "svg": "pipboy/saved/parking.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/parking.png",
+          "preview": "hollow/saved/parking@2x.png",
+          "svg": "hollow/saved/parking.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/parking.png",
+          "preview": "crossy/saved/parking@2x.png",
+          "svg": "crossy/saved/parking.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -234,6 +598,41 @@
           "image": "rdr2/saved/meeting.png",
           "preview": "rdr2/saved/meeting@2x.png",
           "svg": "rdr2/saved/meeting.svg"
+        },
+        "smw": {
+          "image": "smw/saved/meeting.png",
+          "preview": "smw/saved/meeting@2x.png",
+          "svg": "smw/saved/meeting.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/meeting.png",
+          "preview": "cyberpunk/saved/meeting@2x.png",
+          "svg": "cyberpunk/saved/meeting.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/meeting.png",
+          "preview": "pipboy/saved/meeting@2x.png",
+          "svg": "pipboy/saved/meeting.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/meeting.png",
+          "preview": "hollow/saved/meeting@2x.png",
+          "svg": "hollow/saved/meeting.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/meeting.png",
+          "preview": "crossy/saved/meeting@2x.png",
+          "svg": "crossy/saved/meeting.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -255,6 +654,41 @@
           "image": "rdr2/saved/special.png",
           "preview": "rdr2/saved/special@2x.png",
           "svg": "rdr2/saved/special.svg"
+        },
+        "smw": {
+          "image": "smw/saved/special.png",
+          "preview": "smw/saved/special@2x.png",
+          "svg": "smw/saved/special.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/saved/special.png",
+          "preview": "cyberpunk/saved/special@2x.png",
+          "svg": "cyberpunk/saved/special.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/saved/special.png",
+          "preview": "pipboy/saved/special@2x.png",
+          "svg": "pipboy/saved/special.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/saved/special.png",
+          "preview": "hollow/saved/special@2x.png",
+          "svg": "hollow/saved/special.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/saved/special.png",
+          "preview": "crossy/saved/special@2x.png",
+          "svg": "crossy/saved/special.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     }
@@ -290,6 +724,41 @@
           "image": "rdr2/vehicles/arrow.png",
           "preview": "rdr2/vehicles/arrow@2x.png",
           "svg": "rdr2/vehicles/arrow.svg"
+        },
+        "smw": {
+          "image": "smw/vehicles/arrow.png",
+          "preview": "smw/vehicles/arrow@2x.png",
+          "svg": "smw/vehicles/arrow.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/vehicles/arrow.png",
+          "preview": "cyberpunk/vehicles/arrow@2x.png",
+          "svg": "cyberpunk/vehicles/arrow.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/vehicles/arrow.png",
+          "preview": "pipboy/vehicles/arrow@2x.png",
+          "svg": "pipboy/vehicles/arrow.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/vehicles/arrow.png",
+          "preview": "hollow/vehicles/arrow@2x.png",
+          "svg": "hollow/vehicles/arrow.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/vehicles/arrow.png",
+          "preview": "crossy/vehicles/arrow@2x.png",
+          "svg": "crossy/vehicles/arrow.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -311,6 +780,41 @@
           "image": "rdr2/vehicles/compact.png",
           "preview": "rdr2/vehicles/compact@2x.png",
           "svg": "rdr2/vehicles/compact.svg"
+        },
+        "smw": {
+          "image": "smw/vehicles/compact.png",
+          "preview": "smw/vehicles/compact@2x.png",
+          "svg": "smw/vehicles/compact.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/vehicles/compact.png",
+          "preview": "cyberpunk/vehicles/compact@2x.png",
+          "svg": "cyberpunk/vehicles/compact.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/vehicles/compact.png",
+          "preview": "pipboy/vehicles/compact@2x.png",
+          "svg": "pipboy/vehicles/compact.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/vehicles/compact.png",
+          "preview": "hollow/vehicles/compact@2x.png",
+          "svg": "hollow/vehicles/compact.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/vehicles/compact.png",
+          "preview": "crossy/vehicles/compact@2x.png",
+          "svg": "crossy/vehicles/compact.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -332,6 +836,41 @@
           "image": "rdr2/vehicles/sport.png",
           "preview": "rdr2/vehicles/sport@2x.png",
           "svg": "rdr2/vehicles/sport.svg"
+        },
+        "smw": {
+          "image": "smw/vehicles/sport.png",
+          "preview": "smw/vehicles/sport@2x.png",
+          "svg": "smw/vehicles/sport.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/vehicles/sport.png",
+          "preview": "cyberpunk/vehicles/sport@2x.png",
+          "svg": "cyberpunk/vehicles/sport.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/vehicles/sport.png",
+          "preview": "pipboy/vehicles/sport@2x.png",
+          "svg": "pipboy/vehicles/sport.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/vehicles/sport.png",
+          "preview": "hollow/vehicles/sport@2x.png",
+          "svg": "hollow/vehicles/sport.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/vehicles/sport.png",
+          "preview": "crossy/vehicles/sport@2x.png",
+          "svg": "crossy/vehicles/sport.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -353,6 +892,41 @@
           "image": "rdr2/vehicles/suv.png",
           "preview": "rdr2/vehicles/suv@2x.png",
           "svg": "rdr2/vehicles/suv.svg"
+        },
+        "smw": {
+          "image": "smw/vehicles/suv.png",
+          "preview": "smw/vehicles/suv@2x.png",
+          "svg": "smw/vehicles/suv.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/vehicles/suv.png",
+          "preview": "cyberpunk/vehicles/suv@2x.png",
+          "svg": "cyberpunk/vehicles/suv.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/vehicles/suv.png",
+          "preview": "pipboy/vehicles/suv@2x.png",
+          "svg": "pipboy/vehicles/suv.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/vehicles/suv.png",
+          "preview": "hollow/vehicles/suv@2x.png",
+          "svg": "hollow/vehicles/suv.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/vehicles/suv.png",
+          "preview": "crossy/vehicles/suv@2x.png",
+          "svg": "crossy/vehicles/suv.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -374,6 +948,41 @@
           "image": "rdr2/vehicles/motorcycle.png",
           "preview": "rdr2/vehicles/motorcycle@2x.png",
           "svg": "rdr2/vehicles/motorcycle.svg"
+        },
+        "smw": {
+          "image": "smw/vehicles/motorcycle.png",
+          "preview": "smw/vehicles/motorcycle@2x.png",
+          "svg": "smw/vehicles/motorcycle.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/vehicles/motorcycle.png",
+          "preview": "cyberpunk/vehicles/motorcycle@2x.png",
+          "svg": "cyberpunk/vehicles/motorcycle.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/vehicles/motorcycle.png",
+          "preview": "pipboy/vehicles/motorcycle@2x.png",
+          "svg": "pipboy/vehicles/motorcycle.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/vehicles/motorcycle.png",
+          "preview": "hollow/vehicles/motorcycle@2x.png",
+          "svg": "hollow/vehicles/motorcycle.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/vehicles/motorcycle.png",
+          "preview": "crossy/vehicles/motorcycle@2x.png",
+          "svg": "crossy/vehicles/motorcycle.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     },
@@ -389,12 +998,52 @@
         "rosa": {
           "image": "rosa/vehicles/themed.png",
           "preview": "rosa/vehicles/themed@2x.png",
-          "svg": "rosa/vehicles/themed.svg"
+          "svg": "rosa/vehicles/themed.svg",
+          "origin": "navskin-authored-character-adaptation",
+          "license": "Original NavSkin vector drawing from user-provided toy reference. Hello Kitty character rights remain with Sanrio; excluded from CC0.",
+          "source": "scripts/theme-art/pink-icons/vehicle.svg",
+          "title": "Carrinho Hello Kitty",
+          "vehicleHeading": "north"
         },
         "rdr2": {
           "image": "rdr2/vehicles/themed.png",
           "preview": "rdr2/vehicles/themed@2x.png",
           "svg": "rdr2/vehicles/themed.svg"
+        },
+        "smw": {
+          "image": "smw/vehicles/themed.png",
+          "preview": "smw/vehicles/themed@2x.png",
+          "svg": "smw/vehicles/themed.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "cyberpunk": {
+          "image": "cyberpunk/vehicles/themed.png",
+          "preview": "cyberpunk/vehicles/themed@2x.png",
+          "svg": "cyberpunk/vehicles/themed.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "pipboy": {
+          "image": "pipboy/vehicles/themed.png",
+          "preview": "pipboy/vehicles/themed@2x.png",
+          "svg": "pipboy/vehicles/themed.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "hollow": {
+          "image": "hollow/vehicles/themed.png",
+          "preview": "hollow/vehicles/themed@2x.png",
+          "svg": "hollow/vehicles/themed.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
+        },
+        "crossy": {
+          "image": "crossy/vehicles/themed.png",
+          "preview": "crossy/vehicles/themed@2x.png",
+          "svg": "crossy/vehicles/themed.svg",
+          "origin": "navskin-authored",
+          "license": "CC0-1.0"
         }
       }
     }

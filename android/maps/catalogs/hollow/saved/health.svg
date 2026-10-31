@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="health">
+  <title>hollow · saved · health</title>
+  <!-- NavSkin authored collection navigation adaptation, CC0-1.0.  Original GameMap geometry, CC0. Vehicle front points up (north); anchor 0.5,0.5. -->
+  <defs><g id="art" stroke-linejoin="round" stroke-linecap="round"><path d="M23 9H41V23H55V41H41V55H23V41H9V23H23Z" fill="#e5d9bb" /><path d="M21 33H27L31 26L35 38L39 32H44" fill="none" stroke="#353b3d" stroke-width="3"/></g></defs>
+  <use href="#art" stroke="#a6b3aa" stroke-width="6.2"/>
+  <use href="#art" stroke="#808b91" stroke-width="3.2"/>
+</svg>

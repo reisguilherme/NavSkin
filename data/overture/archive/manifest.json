@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "compression": "gzip level 6; zero timestamp; no original filename header",
+  "files": [
+    {
+      "archive": "buildings.geojson.gz",
+      "originalPath": "public/data/buildings.geojson",
+      "bytes": 107230787,
+      "sha256": "b094bb59e08b2104c0bed6de0072f8e2932dd338f4f4b230819f172096371941",
+      "compressedBytes": 16240152,
+      "compressedSha256": "7bb859448cee56a93455b3aac6faac2fd852d9ada06a4fddac06d97cf6b47325"
+    },
+    {
+      "archive": "buildings.raw.geojson.gz",
+      "originalPath": "data/overture/buildings.raw.geojson",
+      "bytes": 155081891,
+      "sha256": "69d3c3c439bbb42d4262f864e1fe760558dcfad0c0c90ccbb4606dc8509fdbc6",
+      "compressedBytes": 19247547,
+      "compressedSha256": "e1860d3fb149974a07c1aa0ecbdbf25eb370f60fec22790b55423a4a8165a435"
+    }
+  ],
+  "metadata": [
+    {
+      "file": "building-collection.json",
+      "originalPath": "data/overture/building-collection.json",
+      "bytes": 164747,
+      "sha256": "7eb358feb4cf1ca3c46b13ea76ce8f990d6afe313ab7d00adcc02b95f45298bd"
+    },
+    {
+      "file": "buildings.raw.geojson.state",
+      "originalPath": "data/overture/buildings.raw.geojson.state",
+      "bytes": 363,
+      "sha256": "697102b62dc63105a9491d0994348dcb6ed24a0a8be85e19ea70fc38ebf297ac"
+    }
+  ]
+}

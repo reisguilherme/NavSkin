@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Coração de jujuba</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 13a9 9 0 0 1 18 0" stroke="#B6E6CC" stroke-width="5"/>
+    <path d="M32 58S6 43 6 25c0-13 16-19 26-5 10-14 26-8 26 5 0 18-26 33-26 33Z" fill="#FF92BD"/>
+    <path d="M50 18c10 18-13 34-18 37l-3-8c8-5 18-17 21-29Z" fill="#E974A7" stroke="none"/>
+    <path d="M32 58S6 43 6 25c0-13 16-19 26-5 10-14 26-8 26 5 0 18-26 33-26 33Z"/>
+    <path d="M13 26c0-6 5-10 10-7" stroke="#FFE1EF" stroke-width="4"/>
+    <path d="m32 28 2 6 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="#FFF1CF" stroke-width="2"/>
+    <path d="m17 38 3 4" stroke="#FFCAE1" stroke-width="3.5"/>
+  </g>
+</svg>

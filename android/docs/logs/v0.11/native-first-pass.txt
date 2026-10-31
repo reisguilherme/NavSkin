@@ -1,0 +1,441 @@
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeVibingTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+br.com.gamemap.render.NativeVibingTest:
+INSTRUMENTATION_STATUS: test=activeRouteKeepsSessionAndRestoresItsFlatNavigationPreference
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeVibingTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=activeRouteKeepsSessionAndRestoresItsFlatNavigationPreference
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeVibingTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeVibingTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError
+	at org.junit.Assert.fail(Assert.java:87)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertTrue(Assert.java:53)
+	at br.com.gamemap.render.NativeVibingTest.phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi$lambda$0$2(NativeVibingTest.kt:116)
+	at br.com.gamemap.render.NativeVibingTest.$r8$lambda$Pv8AiZHzg-DDO1lsZIHdP6uXkro(Unknown Source:0)
+	at br.com.gamemap.render.NativeVibingTest$$ExternalSyntheticLambda7.perform(D8$$SyntheticClass:0)
+	at androidx.test.core.app.ActivityScenario.lambda$onActivity$2$androidx-test-core-app-ActivityScenario(ActivityScenario.java:794)
+	at androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2616)
+	at android.os.Handler.handleCallback(Handler.java:995)
+	at android.os.Handler.dispatchMessage(Handler.java:103)
+	at android.os.Looper.loopOnce(Looper.java:248)
+	at android.os.Looper.loop(Looper.java:338)
+	at android.app.ActivityThread.main(ActivityThread.java:9067)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+
+INSTRUMENTATION_STATUS: stream=
+Error in phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi(br.com.gamemap.render.NativeVibingTest):
+java.lang.AssertionError
+	at org.junit.Assert.fail(Assert.java:87)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertTrue(Assert.java:53)
+	at br.com.gamemap.render.NativeVibingTest.phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi$lambda$0$2(NativeVibingTest.kt:116)
+	at br.com.gamemap.render.NativeVibingTest.$r8$lambda$Pv8AiZHzg-DDO1lsZIHdP6uXkro(Unknown Source:0)
+	at br.com.gamemap.render.NativeVibingTest$$ExternalSyntheticLambda7.perform(D8$$SyntheticClass:0)
+	at androidx.test.core.app.ActivityScenario.lambda$onActivity$2$androidx-test-core-app-ActivityScenario(ActivityScenario.java:794)
+	at androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2616)
+	at android.os.Handler.handleCallback(Handler.java:995)
+	at android.os.Handler.dispatchMessage(Handler.java:103)
+	at android.os.Looper.loopOnce(Looper.java:248)
+	at android.os.Looper.loop(Looper.java:338)
+	at android.app.ActivityThread.main(ActivityThread.java:9067)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+
+INSTRUMENTATION_STATUS: test=phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeVibingTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=freeDrivingForces3DHeadingAndRestoresFlatBrowsePreferences
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeVibingTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=freeDrivingForces3DHeadingAndRestoresFlatBrowsePreferences
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeCatalog3DTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+br.com.gamemap.render.NativeCatalog3DTest:
+INSTRUMENTATION_STATUS: test=allEightThemesDrawRealVolumesAndCanReturnToFlatFootprints
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeCatalog3DTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=allEightThemesDrawRealVolumesAndCanReturnToFlatFootprints
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+br.com.gamemap.render.NativeMvpRenderingTest:
+INSTRUMENTATION_STATUS: test=phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Missing accessible control: Para onde? Buscar destinos; foreground=br.com.gamemap.goiania.dev; safeBottom=1794
+	at br.com.gamemap.render.NativeMvpRenderingTest.failSheetScroll(NativeMvpRenderingTest.kt:562)
+	at br.com.gamemap.render.NativeMvpRenderingTest.waitForDescription(NativeMvpRenderingTest.kt:434)
+	at br.com.gamemap.render.NativeMvpRenderingTest.phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu(NativeMvpRenderingTest.kt:123)
+
+INSTRUMENTATION_STATUS: stream=
+Error in phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu(br.com.gamemap.render.NativeMvpRenderingTest):
+java.lang.AssertionError: Missing accessible control: Para onde? Buscar destinos; foreground=br.com.gamemap.goiania.dev; safeBottom=1794
+	at br.com.gamemap.render.NativeMvpRenderingTest.failSheetScroll(NativeMvpRenderingTest.kt:562)
+	at br.com.gamemap.render.NativeMvpRenderingTest.waitForDescription(NativeMvpRenderingTest.kt:434)
+	at br.com.gamemap.render.NativeMvpRenderingTest.phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu(NativeMvpRenderingTest.kt:123)
+
+INSTRUMENTATION_STATUS: test=phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=phoneRosaNightKeepsLightChromeAndVibrantMap
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=phoneRosaNightKeepsLightChromeAndVibrantMap
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=phoneThemeAndCategoryControlsPersistWithOptionalLocationPermission
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=phoneThemeAndCategoryControlsPersistWithOptionalLocationPermission
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeMvpRenderingTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Surface did not render complete NativeMapPalette(name=pipboy, park=-15719154, road=-4722278, water=-16046836, building=-16114675) geometry
+	at br.com.gamemap.render.NativeMvpRenderingTest$SurfaceCapture.awaitAndSave(NativeMvpRenderingTest.kt:716)
+	at br.com.gamemap.render.NativeMvpRenderingTest.completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges(NativeMvpRenderingTest.kt:179)
+
+INSTRUMENTATION_STATUS: stream=
+Error in completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges(br.com.gamemap.render.NativeMvpRenderingTest):
+java.lang.AssertionError: Surface did not render complete NativeMapPalette(name=pipboy, park=-15719154, road=-4722278, water=-16046836, building=-16114675) geometry
+	at br.com.gamemap.render.NativeMvpRenderingTest$SurfaceCapture.awaitAndSave(NativeMvpRenderingTest.kt:716)
+	at br.com.gamemap.render.NativeMvpRenderingTest.completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges(NativeMvpRenderingTest.kt:179)
+
+INSTRUMENTATION_STATUS: test=completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeAdaptiveCameraTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+br.com.gamemap.render.NativeAdaptiveCameraTest:
+INSTRUMENTATION_STATUS: test=nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeAdaptiveCameraTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<LatLng [latitude=-16.680922399999915, longitude=-49.25627480000006, altitude=0.0]> but was:<LatLng [latitude=-16.680922399999965, longitude=-49.25627480000006, altitude=0.0]>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest.nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera$lambda$0$7(NativeAdaptiveCameraTest.kt:185)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest.$r8$lambda$E-eywdrxWV8_asr1hzOvihFU_zo(Unknown Source:0)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest$$ExternalSyntheticLambda26.perform(D8$$SyntheticClass:0)
+	at androidx.test.core.app.ActivityScenario.lambda$onActivity$2$androidx-test-core-app-ActivityScenario(ActivityScenario.java:794)
+	at androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2616)
+	at android.os.Handler.handleCallback(Handler.java:995)
+	at android.os.Handler.dispatchMessage(Handler.java:103)
+	at android.os.Looper.loopOnce(Looper.java:248)
+	at android.os.Looper.loop(Looper.java:338)
+	at android.app.ActivityThread.main(ActivityThread.java:9067)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+
+INSTRUMENTATION_STATUS: stream=
+Error in nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera(br.com.gamemap.render.NativeAdaptiveCameraTest):
+java.lang.AssertionError: expected:<LatLng [latitude=-16.680922399999915, longitude=-49.25627480000006, altitude=0.0]> but was:<LatLng [latitude=-16.680922399999965, longitude=-49.25627480000006, altitude=0.0]>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest.nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera$lambda$0$7(NativeAdaptiveCameraTest.kt:185)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest.$r8$lambda$E-eywdrxWV8_asr1hzOvihFU_zo(Unknown Source:0)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest$$ExternalSyntheticLambda26.perform(D8$$SyntheticClass:0)
+	at androidx.test.core.app.ActivityScenario.lambda$onActivity$2$androidx-test-core-app-ActivityScenario(ActivityScenario.java:794)
+	at androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2616)
+	at android.os.Handler.handleCallback(Handler.java:995)
+	at android.os.Handler.dispatchMessage(Handler.java:103)
+	at android.os.Looper.loopOnce(Looper.java:248)
+	at android.os.Looper.loop(Looper.java:338)
+	at android.app.ActivityThread.main(ActivityThread.java:9067)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+
+INSTRUMENTATION_STATUS: test=nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeAdaptiveCameraTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=changedViewportAndStylePreserveTheAcceptedFollowTargetDuringAnEase
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeAdaptiveCameraTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=changedViewportAndStylePreserveTheAcceptedFollowTargetDuringAnEase
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeWorldMapTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+br.com.gamemap.render.NativeWorldMapTest:
+INSTRUMENTATION_STATUS: test=saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeWorldMapTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Timed out after 30s: Cyberpunk 2077 online São Paulo geometry, labels, sprites and saved overlay. styleTheme=crossy, savedSourceContainsMarker=true. Native error: none reported
+	at org.junit.Assert.fail(Assert.java:89)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitNative(NativeWorldMapTest.kt:368)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitWorldFrame(NativeWorldMapTest.kt:261)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitWorldFrame$default(NativeWorldMapTest.kt:252)
+	at br.com.gamemap.render.NativeWorldMapTest.saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges(NativeWorldMapTest.kt:138)
+
+INSTRUMENTATION_STATUS: stream=
+Error in saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges(br.com.gamemap.render.NativeWorldMapTest):
+java.lang.AssertionError: Timed out after 30s: Cyberpunk 2077 online São Paulo geometry, labels, sprites and saved overlay. styleTheme=crossy, savedSourceContainsMarker=true. Native error: none reported
+	at org.junit.Assert.fail(Assert.java:89)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitNative(NativeWorldMapTest.kt:368)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitWorldFrame(NativeWorldMapTest.kt:261)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitWorldFrame$default(NativeWorldMapTest.kt:252)
+	at br.com.gamemap.render.NativeWorldMapTest.saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges(NativeWorldMapTest.kt:138)
+
+INSTRUMENTATION_STATUS: test=saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+br.com.gamemap.render.NativeNavigationTest:
+INSTRUMENTATION_STATUS: test=twoNewThemesKeepTheActiveRouteAndSemanticVehicleAndSavedIcons
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=twoNewThemesKeepTheActiveRouteAndSemanticVehicleAndSavedIcons
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=deviceKeyStoreEncryptsAndRestoresProviderKeyWithoutPlaintextPreferences
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=deviceKeyStoreEncryptsAndRestoresProviderKeyWithoutPlaintextPreferences
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=addStopSearchKeepsFinalDestinationAndStopButtonEndsNavigation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=addStopSearchKeepsFinalDestinationAndStopButtonEndsNavigation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError
+	at org.junit.Assert.fail(Assert.java:87)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertTrue(Assert.java:53)
+	at br.com.gamemap.render.NativeNavigationTest.simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation(NativeNavigationTest.kt:243)
+
+INSTRUMENTATION_STATUS: stream=
+Error in simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation(br.com.gamemap.render.NativeNavigationTest):
+java.lang.AssertionError
+	at org.junit.Assert.fail(Assert.java:87)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertTrue(Assert.java:53)
+	at br.com.gamemap.render.NativeNavigationTest.simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation(NativeNavigationTest.kt:243)
+
+INSTRUMENTATION_STATUS: test=simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=actualAndroidAtomicStorageReopensRepeatedEditsAndRemoval
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=br.com.gamemap.render.NativeNavigationTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=16
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=actualAndroidAtomicStorageReopensRepeatedEditsAndRemoval
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 510.528
+There were 6 failures:
+1) phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi(br.com.gamemap.render.NativeVibingTest)
+java.lang.AssertionError
+	at org.junit.Assert.fail(Assert.java:87)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertTrue(Assert.java:53)
+	at br.com.gamemap.render.NativeVibingTest.phoneHidesControlsSurvivesRecreationAndBackRestoresTheMapUi$lambda$0$2(NativeVibingTest.kt:116)
+	at br.com.gamemap.render.NativeVibingTest.$r8$lambda$Pv8AiZHzg-DDO1lsZIHdP6uXkro(Unknown Source:0)
+	at br.com.gamemap.render.NativeVibingTest$$ExternalSyntheticLambda7.perform(D8$$SyntheticClass:0)
+	at androidx.test.core.app.ActivityScenario.lambda$onActivity$2$androidx-test-core-app-ActivityScenario(ActivityScenario.java:794)
+	at androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2616)
+	at android.os.Handler.handleCallback(Handler.java:995)
+	at android.os.Handler.dispatchMessage(Handler.java:103)
+	at android.os.Looper.loopOnce(Looper.java:248)
+	at android.os.Looper.loop(Looper.java:338)
+	at android.app.ActivityThread.main(ActivityThread.java:9067)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+2) phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu(br.com.gamemap.render.NativeMvpRenderingTest)
+java.lang.AssertionError: Missing accessible control: Para onde? Buscar destinos; foreground=br.com.gamemap.goiania.dev; safeBottom=1794
+	at br.com.gamemap.render.NativeMvpRenderingTest.failSheetScroll(NativeMvpRenderingTest.kt:562)
+	at br.com.gamemap.render.NativeMvpRenderingTest.waitForDescription(NativeMvpRenderingTest.kt:434)
+	at br.com.gamemap.render.NativeMvpRenderingTest.phoneChromeKeepsSearchBelowMapAndOptionsInRetractableMenu(NativeMvpRenderingTest.kt:123)
+3) completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges(br.com.gamemap.render.NativeMvpRenderingTest)
+java.lang.AssertionError: Surface did not render complete NativeMapPalette(name=pipboy, park=-15719154, road=-4722278, water=-16046836, building=-16114675) geometry
+	at br.com.gamemap.render.NativeMvpRenderingTest$SurfaceCapture.awaitAndSave(NativeMvpRenderingTest.kt:716)
+	at br.com.gamemap.render.NativeMvpRenderingTest.completeThemesRetainCameraAndParkCartographyAcrossStyleAndFilterChanges(NativeMvpRenderingTest.kt:179)
+4) nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera(br.com.gamemap.render.NativeAdaptiveCameraTest)
+java.lang.AssertionError: expected:<LatLng [latitude=-16.680922399999915, longitude=-49.25627480000006, altitude=0.0]> but was:<LatLng [latitude=-16.680922399999965, longitude=-49.25627480000006, altitude=0.0]>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest.nativeFollowEasesAcrossNorthIgnoresClockTicksAndHonorsManualCamera$lambda$0$7(NativeAdaptiveCameraTest.kt:185)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest.$r8$lambda$E-eywdrxWV8_asr1hzOvihFU_zo(Unknown Source:0)
+	at br.com.gamemap.render.NativeAdaptiveCameraTest$$ExternalSyntheticLambda26.perform(D8$$SyntheticClass:0)
+	at androidx.test.core.app.ActivityScenario.lambda$onActivity$2$androidx-test-core-app-ActivityScenario(ActivityScenario.java:794)
+	at androidx.test.core.app.ActivityScenario$$ExternalSyntheticLambda2.run(D8$$SyntheticClass:0)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:524)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at android.app.Instrumentation$SyncRunnable.run(Instrumentation.java:2616)
+	at android.os.Handler.handleCallback(Handler.java:995)
+	at android.os.Handler.dispatchMessage(Handler.java:103)
+	at android.os.Looper.loopOnce(Looper.java:248)
+	at android.os.Looper.loop(Looper.java:338)
+	at android.app.ActivityThread.main(ActivityThread.java:9067)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:932)
+5) saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges(br.com.gamemap.render.NativeWorldMapTest)
+java.lang.AssertionError: Timed out after 30s: Cyberpunk 2077 online São Paulo geometry, labels, sprites and saved overlay. styleTheme=crossy, savedSourceContainsMarker=true. Native error: none reported
+	at org.junit.Assert.fail(Assert.java:89)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitNative(NativeWorldMapTest.kt:368)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitWorldFrame(NativeWorldMapTest.kt:261)
+	at br.com.gamemap.render.NativeWorldMapTest.awaitWorldFrame$default(NativeWorldMapTest.kt:252)
+	at br.com.gamemap.render.NativeWorldMapTest.saoPauloRendersFiveOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges(NativeWorldMapTest.kt:138)
+6) simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation(br.com.gamemap.render.NativeNavigationTest)
+java.lang.AssertionError
+	at org.junit.Assert.fail(Assert.java:87)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertTrue(Assert.java:53)
+	at br.com.gamemap.render.NativeNavigationTest.simulationAndSavedIconsSurviveThemeFiltersVehicleAndActivityRecreation(NativeNavigationTest.kt:243)
+
+FAILURES!!!
+Tests run: 16,  Failures: 6
+
+
+INSTRUMENTATION_CODE: -1

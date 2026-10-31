@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>NavSkin religion: original adaptation for a category without an exact game counterpart</title><g stroke="#914D63" stroke-width="1.8" stroke-linejoin="round"><path d="M13 2h6v10h10v6H19v13h-6V18H3v-6h10Z" fill="#FFB8DB"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Santuário de luz</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 53V35h42v18Z" fill="#FFF1DF"/>
+    <path d="M46 35h7v18h-7Z" fill="#ECB0C6" stroke="none"/>
+    <path d="M16 31c0-11 7-18 16-23 9 5 16 12 16 23Z" fill="#C7ADE9"/>
+    <path d="M32 13c-6 5-10 10-10 15" stroke="#EDDCFF"/>
+    <path d="M8 30h48v7H8Z" fill="#FF98C2"/>
+    <path d="M24 54V43c0-5 8-10 8-10s8 5 8 10v11" fill="#B5EBD1"/>
+    <path d="M32 52V42" stroke="#653452" stroke-width="3.5"/>
+    <path d="M32 40c-5-2-3-7 0-9 3 2 5 7 0 9Z" fill="#FFCF81" stroke-width="2"/>
+    <path d="M8 54h48v6H8Z" fill="#D9B5EC"/>
+    <path d="M7 18 4 15m53 3 3-3M32 3V1" stroke="#F39CBF"/>
+  </g>
+</svg>

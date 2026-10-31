@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f4">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./novos-mapas.css">
+  <title>Três novos mundos · NavSkin Map Lab</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./index.html"><span class="brand-mark">N<sup>↗</sup></span><span>NavSkin<small>MAP LAB</small></span></a>
+    <nav aria-label="Painéis"><a href="./index.html">Coleção atual</a><a href="./novos-mapas.html" aria-current="page">Novos mapas <span>03</span></a><a href="./propostas.html">Outros conceitos</a></nav>
+    <span class="preview-tag"><i></i>PRÉVIA WEB</span>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">COLEÇÃO 02 / ESTUDOS CARTOGRÁFICOS</p><h1>Goiânia, em outros mundos.</h1></div>
+      <p class="intro-copy">Três formas de desenhar a mesma cidade.<br>Explore os recortes ou amplie um mapa para ver os detalhes.</p>
+    </section>
+    <section class="toolbar" aria-label="Controles dos recortes">
+      <label class="region-label">RECORTE <select id="region"><option value="bosque">Bosque dos Buritis</option><option value="universidade">Praça Universitária</option><option value="centro">Praça Cívica</option></select></label>
+      <div class="map-options"><label><input type="checkbox" id="show-places" checked><span>Lugares</span></label><label><input type="checkbox" id="show-names" checked><span>Nomes</span></label><button id="reset-all" type="button">Restaurar vistas ↺</button></div>
+      <button id="back-to-all" type="button" hidden>← Ver os três mapas</button>
+    </section>
+    <div id="map-grid" class="map-grid" aria-busy="true"></div>
+    <section class="notes">
+      <div><span class="eyebrow">MESMA CIDADE. OUTRO DESENHO.</span><p>Ruas, parques, lagos e contornos dos prédios vêm dos dados locais de Goiânia. Arraste para explorar; use a roda para aproximar e o botão direito para girar.</p></div>
+      <div><span class="eyebrow">CATÁLOGO INTEGRADO</span><p>Os três temas agora fazem parte do catálogo de oito mapas, todos com opção 2D/3D. A navegação começa em 3D. Os temas estão incluídos no APK 0.11.0, com modo Vibing para dirigir em 3D com ou sem rota.</p></div>
+    </section>
+    <footer><span id="overall-status" role="status">Preparando os três mapas…</span><a href="./README.md">Dados e origem dos recursos ↗</a><span>© OpenStreetMap · Overture · Google Open Buildings · Microsoft</span></footer>
+  </main>
+  <script type="module" src="./novos-mapas.js"></script>
+</body>
+</html>

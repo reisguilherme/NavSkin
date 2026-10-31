@@ -1,0 +1,15 @@
+
+10-29 16:07:02.045  5741  5741 I NativeFillDiagnostic: antialias source={park=322, water=42, building=2171} rendered={vegetation-parks=44, art-base-vegetation-parks=0, water-fill=5, art-base-water-fill=0} camera=Target: LatLng [latitude=-16.680922399999965, longitude=-49.2562748, altitude=0.0], Center Altitude:0.0, Zoom:14.4, Bearing:-0.0, Tilt:0.0, Roll:0.0, FOV:36.86989764584402, Padding:[0.0, 0.0, 0.0, 0.0]
+10-29 16:07:02.576  5741  5756 I NativeFillDiagnostic: rdr-to-antialias-native pixels park/road/water/building=[0, 7804, 15, 5803] 1080x1920 file=Pictures/NavSkinWorld/v0.10/fill-diagnostic/rdr-to-antialias-native.png
+10-29 16:07:02.847  5741  5756 I NativeFillDiagnostic: rdr-to-antialias-phone pixels park/road/water/building=[0, 7804, 15, 5803] 1080x1920 file=Pictures/NavSkinWorld/v0.10/fill-diagnostic/rdr-to-antialias-phone.png
+10-29 16:07:05.116  5741  5756 I NativeFillDiagnostic: rdr-before-no-area-pattern completed native frame and idle
+10-29 16:07:11.760  5741  5756 I NativeFillDiagnostic: no-area-pattern completed native frame and idle
+10-29 16:07:14.899  5741  5741 I NativeFillDiagnostic: no-area-pattern source={park=322, water=42, building=2171} rendered={vegetation-parks=44, art-base-vegetation-parks=0, water-fill=5, art-base-water-fill=0} camera=Target: LatLng [latitude=-16.680922399999965, longitude=-49.2562748, altitude=0.0], Center Altitude:0.0, Zoom:14.4, Bearing:-0.0, Tilt:0.0, Roll:0.0, FOV:36.86989764584402, Padding:[0.0, 0.0, 0.0, 0.0]
+10-29 16:07:15.430  5741  5756 I NativeFillDiagnostic: rdr-to-no-area-pattern-native pixels park/road/water/building=[1592, 7804, 439, 5803] 1080x1920 file=Pictures/NavSkinWorld/v0.10/fill-diagnostic/rdr-to-no-area-pattern-native.png
+10-29 16:07:15.719  5741  5756 I NativeFillDiagnostic: rdr-to-no-area-pattern-phone pixels park/road/water/building=[1592, 7804, 439, 5803] 1080x1920 file=Pictures/NavSkinWorld/v0.10/fill-diagnostic/rdr-to-no-area-pattern-phone.png
+10-29 16:07:18.003  5741  5756 I NativeFillDiagnostic: rdr-before-antialias-no-area-pattern completed native frame and idle
+10-29 16:07:21.855  5741  5756 I NativeFillDiagnostic: antialias-no-area-pattern completed native frame and idle
+10-29 16:07:24.992  5741  5741 I NativeFillDiagnostic: antialias-no-area-pattern source={park=322, water=42, building=2171} rendered={vegetation-parks=44, art-base-vegetation-parks=0, water-fill=5, art-base-water-fill=0} camera=Target: LatLng [latitude=-16.680922399999965, longitude=-49.2562748, altitude=0.0], Center Altitude:0.0, Zoom:14.4, Bearing:-0.0, Tilt:0.0, Roll:0.0, FOV:36.86989764584402, Padding:[0.0, 0.0, 0.0, 0.0]
+10-29 16:07:25.470  5741  5756 I NativeFillDiagnostic: rdr-to-antialias-no-area-pattern-native pixels park/road/water/building=[1593, 7804, 441, 5803] 1080x1920 file=Pictures/NavSkinWorld/v0.10/fill-diagnostic/rdr-to-antialias-no-area-pattern-native.png
+10-29 16:07:25.758  5741  5756 I NativeFillDiagnostic: rdr-to-antialias-no-area-pattern-phone pixels park/road/water/building=[1593, 7804, 441, 5803] 1080x1920 file=Pictures/NavSkinWorld/v0.10/fill-diagnostic/rdr-to-antialias-no-area-pattern-phone.png
+

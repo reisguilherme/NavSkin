@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "description": "Portable active importer inputs; original source bytes and notices retained.",
+  "converter": {
+    "project": "https://github.com/maplibre/font-maker",
+    "javascript": "https://maplibre.org/font-maker/sdfglyph.js",
+    "wasm": "https://maplibre.org/font-maker/sdfglyph.wasm",
+    "license": "https://github.com/maplibre/font-maker/blob/main/LICENSE.txt"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 1698,
+      "sha256": "1ac6a6843878ab53da9a0a4886354ff721aa14dac09c2d80f220cb064285f7a1"
+    },
+    {
+      "path": "font-maker/LICENSE.txt",
+      "bytes": 1551,
+      "sha256": "c239a1d19211c7629389c8b46526ebbd05d32af59e1cb83b747321ea44142fef"
+    },
+    {
+      "path": "font-maker/Noto-Sans-LICENSE.md",
+      "bytes": 4300,
+      "sha256": "9f6ffa4d4ceb839c1d12b830273c1d9f01cb0f5e2535f6143b8f7befdd5650d5"
+    },
+    {
+      "path": "font-maker/noto-1024-1279.pbf",
+      "bytes": 135287,
+      "sha256": "f0ab5cecbf1b1d04e8d38c7d64451a20b5707ab1fc8aa8dbbc1b660905cd4142"
+    },
+    {
+      "path": "font-maker/noto-256-511.pbf",
+      "bytes": 134545,
+      "sha256": "77c830f114b84a58f8829ca1eac4627a6a688bbce4bdb6a04de00f98fa74bb52"
+    },
+    {
+      "path": "font-maker/noto-512-767.pbf",
+      "bytes": 101458,
+      "sha256": "c0f1fee1a46851224f1c962c6f3d35bd450122125ed18870f39e82d0b962a545"
+    },
+    {
+      "path": "font-maker/noto-61440-61695.pbf",
+      "bytes": 567,
+      "sha256": "182365c9fc08e49c341fa13cbda4df5a4bd4629b33233724b68a4353a5907c96"
+    },
+    {
+      "path": "font-maker/noto-62976-63231.pbf",
+      "bytes": 567,
+      "sha256": "2c6a58986e9ba021013fbe60e7ddab1bea793db872891c94024b54ca0d56caf6"
+    },
+    {
+      "path": "font-maker/noto-63488-63743.pbf",
+      "bytes": 567,
+      "sha256": "0e76fdd3ba36ba91d643b54dd765888bf9b3414b94b21a4121e3423d96aeae07"
+    },
+    {
+      "path": "font-maker/noto-64256-64511.pbf",
+      "bytes": 99845,
+      "sha256": "8c2909ef9d083b70c359fdda661ec854c1543aabc11f6770898009d26d2053da"
+    },
+    {
+      "path": "font-maker/noto-768-1023.pbf",
+      "bytes": 78937,
+      "sha256": "3c7ea7f7b52a97c75bfc123a303badd4fd7c5eaa1bfe66ebaba38cf3fce16ee7"
+    },
+    {
+      "path": "font-maker/noto-7680-7935.pbf",
+      "bytes": 139322,
+      "sha256": "abe63a2773dd655bfbcd400b431add586e3da5e6e4801b74774e4a089a56dc29"
+    },
+    {
+      "path": "font-maker/noto-8448-8703.pbf",
+      "bytes": 44216,
+      "sha256": "4ae71fe9df8ddbce5fa437d5d9db6846cdd0fa3dd11d2aff621b62f6a14f4701"
+    },
+    {
+      "path": "font-maker/noto-8704-8959.pbf",
+      "bytes": 41607,
+      "sha256": "19bd9837e589775cee63768618a36e354899ee3ff88c3446823c8fee1833660b"
+    },
+    {
+      "path": "font-maker/noto-9472-9727.pbf",
+      "bytes": 110922,
+      "sha256": "5bb4a9e9e593ecb7f855b56394dd298e60e4709b85e8ff199bed537a3337d63e"
+    },
+    {
+      "path": "font-maker/sdfglyph.mjs",
+      "bytes": 220444,
+      "sha256": "2d5cce9e20511e3e1798a696b496cfb4fb9c55cd9cceaa73fd77849e1c3d7a64"
+    },
+    {
+      "path": "font-maker/sdfglyph.wasm",
+      "bytes": 893164,
+      "sha256": "de2986e66201499de76f21bb3a649e1f27d7d68af21cb2616dc3a7b25bade691"
+    },
+    {
+      "path": "fonts/cyberpunk/BlenderPro-Bold.ttf",
+      "bytes": 104104,
+      "sha256": "f4feaaa78d44a180432f6fe79564b14a0110a70a0c15feb559ef9aac74ad3262"
+    },
+    {
+      "path": "fonts/cyberpunk/BlenderPro-Bold.woff",
+      "bytes": 44648,
+      "sha256": "1c0ab7fb634bd5fdfde6e9bc91d5aba8e4a43337818e4e6a7c6fd354238b46b8"
+    },
+    {
+      "path": "fonts/cyberpunk/cyberpunk-SOURCE-NOTES.txt",
+      "bytes": 653,
+      "sha256": "1c9685718ba1e91750dbaeebfdfbe302c85e84b209c89bdc94e86fc9dcfef15d"
+    },
+    {
+      "path": "fonts/gta/READ_ME.TXT",
+      "bytes": 4782,
+      "sha256": "243d4b93a29ac1a57defbe5f59b1f304919ef736f87c94a8be5a6169579fc099"
+    },
+    {
+      "path": "fonts/gta/copyright",
+      "bytes": 3905,
+      "sha256": "ef0a6fa6888eabe62c8dd0c177eed01e618dd9efa82a912951f1ccf6b7381ab6"
+    },
+    {
+      "path": "fonts/gta/pricedow-prince-2004.ttf",
+      "bytes": 36552,
+      "sha256": "973c5294ea6e0fe07e58b986b38c0393244bc835cc65889ca9f7b39b8c89ba1e"
+    },
+    {
+      "path": "fonts/gta/pricedown-prince-2004-LICENSE.html",
+      "bytes": 9850,
+      "sha256": "c92ac4471e5d8772a9d0456cfdc9ca5b87eacca41e155e29be4ce3fddbb83fe0"
+    },
+    {
+      "path": "fonts/gta/prince-host-permission.html",
+      "bytes": 399,
+      "sha256": "d4e084b5165f4e2b895e8e94404309d9502b4f1b1d5c8862773b31fdc0010eb6"
+    },
+    {
+      "path": "fonts/gtaread/gtaread-SOURCE-NOTES.txt",
+      "bytes": 485,
+      "sha256": "23fcf50fc17109cd212ea7673790fe8b7cef478e2303d7553ac09871db38e2d5"
+    },
+    {
+      "path": "fonts/gtaread/sabankgothic.ttf",
+      "bytes": 35908,
+      "sha256": "3a0e078160d7a0e9d0d17c246ba3937ebe4ae264c0a19955f59b2557c4500a95"
+    },
+    {
+      "path": "fonts/rdr2map/RDRLino-Regular.LICENSING-NOTES.txt",
+      "bytes": 555,
+      "sha256": "a392f3e72714367bd7c984f5ac30539211ce758df19886bf0dc54a3f65698329"
+    },
+    {
+      "path": "fonts/rdr2map/RDRLino-Regular.PROVENANCE.json",
+      "bytes": 1390,
+      "sha256": "304a3adf507f5f65241a792c73a4108fc4255e1de4b9edefba749c95d99adab7"
+    },
+    {
+      "path": "fonts/rdr2map/RDRLino-Regular.ttf",
+      "bytes": 832152,
+      "sha256": "f1c1d83487c9607e5d9fb22ba6fc74464947134302ceb97aabb4a5e2bafea99f"
+    },
+    {
+      "path": "fonts/rdr2map/Readme-20.11.2019.txt",
+      "bytes": 7847,
+      "sha256": "6cdf78ab604275b95da59b902f4d7da4dcce7aad5a5a402e05acc446fc7266f7"
+    },
+    {
+      "path": "fonts/rdr2ui/HapnaSlabSerif-DemiBold.LICENSING-NOTES.txt",
+      "bytes": 578,
+      "sha256": "f14842976175b4b2e94060b97e2ce66cb7bcc5e6e66cb19d8896e9dcff861ba3"
+    },
+    {
+      "path": "fonts/rdr2ui/HapnaSlabSerif-DemiBold.PROVENANCE.json",
+      "bytes": 1454,
+      "sha256": "09cfafebd9adea96a5f9bce2d222fb652ec42cf2ba34f34137c0e2f72282c0b1"
+    },
+    {
+      "path": "fonts/rdr2ui/HapnaSlabSerif-DemiBold.ttf",
+      "bytes": 84644,
+      "sha256": "468a87efc589dc45ab1142b28083d8a109192d53af619a7598921e861157ff64"
+    },
+    {
+      "path": "fonts/rdr2ui/Readme-20.11.2019.txt",
+      "bytes": 7847,
+      "sha256": "6cdf78ab604275b95da59b902f4d7da4dcce7aad5a5a402e05acc446fc7266f7"
+    },
+    {
+      "path": "fonts/smw/SMW-LICENSE.md",
+      "bytes": 19921,
+      "sha256": "327a71fc6dde573ec05f9b931c63da6561c9622258bb8636fe5d353ec92c1dd8"
+    },
+    {
+      "path": "fonts/smw/SMW.ttf",
+      "bytes": 36024,
+      "sha256": "9d3318585c695fb22e8ef9e5d5f4908fac67b0734871addc31ed2d00f4aa4bc3"
+    },
+    {
+      "path": "fonts/smw/smw-SOURCE-NOTES.txt",
+      "bytes": 424,
+      "sha256": "62639e9ac42d367f7271a7e910af13516faa0fb70f44b49a72618e369c01c37c"
+    },
+    {
+      "path": "fonts/smw/smw-readme.txt",
+      "bytes": 2352,
+      "sha256": "1303fb7cf1e72394dcb7213608ddefb9c9bca1598cd4f93ce02009ada5260b19"
+    },
+    {
+      "path": "import-manifest.json",
+      "bytes": 7403,
+      "sha256": "0640de3a6edb9eeeb07cd954b11a1cb2a9ca1154d4d401677d03f791dd1b058d"
+    },
+    {
+      "path": "sprites/gta/radar_burgerShot.png",
+      "bytes": 421,
+      "sha256": "e687bcd0de41a1a958472403af36f6528d0174c77679d7da4de4d08130117d47"
+    },
+    {
+      "path": "sprites/gta/radar_centre.png",
+      "bytes": 310,
+      "sha256": "2a7f822a3493cc0840823bc6d241ec84b2a220fafe3235637ad721dd3a7c237e"
+    },
+    {
+      "path": "sprites/gta/radar_dateDrink.png",
+      "bytes": 291,
+      "sha256": "882895598cf7ce81301292d5241204475734f700d9e528acfc55e4fb764c40f3"
+    },
+    {
+      "path": "sprites/gta/radar_dateFood.png",
+      "bytes": 259,
+      "sha256": "acf47a946304515f526769fabc050fe11d758ab2d03b9c5c56d2c2789f41c4c7"
+    },
+    {
+      "path": "sprites/gta/radar_diner.png",
+      "bytes": 275,
+      "sha256": "811959a1a16d63ff182fb437f68c85e3564c51f19da1d9ddc0d6393ac5ba939e"
+    },
+    {
+      "path": "sprites/gta/radar_hostpital.png",
+      "bytes": 198,
+      "sha256": "a380c943ec69554e2f57683bea89865dcee95e5c3e3f212b1abe45abc1808217"
+    },
+    {
+      "path": "sprites/gta/radar_impound.png",
+      "bytes": 353,
+      "sha256": "ed79463ff6db0069f9ccedae1df7871df8cb0b4d89020a704e58c15f8f71c1d4"
+    },
+    {
+      "path": "sprites/rdr2/blip_ambient_theatre.png",
+      "bytes": 1772,
+      "sha256": "1a505a2805807834a4a649d861622785636821fefc80d6203853dd0c234b1bcd"
+    },
+    {
+      "path": "sprites/rdr2/blip_saloon.png",
+      "bytes": 1889,
+      "sha256": "7847d5cb40b2e099863b84da45df7d0cfa87b5b392db9236e3fefd03405dddfa"
+    },
+    {
+      "path": "sprites/rdr2/blip_shop_doctor.png",
+      "bytes": 1704,
+      "sha256": "ce86560bbeb74384b82ac611081614ee890994f158a060c7eb82828b20030f33"
+    },
+    {
+      "path": "sprites/rdr2/blip_shop_store.png",
+      "bytes": 1646,
+      "sha256": "251e026e5a6b8a9ccb560e59be5e7327f5e8bd4f78e2b21abfcbb933c99ae6c8"
+    },
+    {
+      "path": "sprites/rdr2/blip_supplies_food.png",
+      "bytes": 1643,
+      "sha256": "6b551464ef92cb82799cbcb80e96760948ae8a741468f4a33ff0185d0a6d6b9c"
+    }
+  ]
+}

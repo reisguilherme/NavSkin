@@ -1,6 +1,6 @@
 /** Import a locally obtained game-asset manifest and prepare real font glyphs.
  * The original notices are retained. This script does not grant redistribution rights.
- * MapLibre's official WASM converter must be in .runtime/font-maker (see docs).
+ * Portable source inputs and the official converter are included with the project.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -8,13 +8,19 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { PbfReader, PbfWriter } from 'pbf';
 import sharp from 'sharp';
+import { prepareCollectionAssets } from './prepare-collection-assets.mjs';
+import { loadGameAssetInputs } from './game-asset-inputs.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
-const input = JSON.parse(await fs.readFile(path.resolve(process.argv[2] ?? '.runtime/font-research/import-manifest.json'), 'utf8'));
+const { input, wasmRoot } = await loadGameAssetInputs(process.argv[2]);
+const requiredExpansion = ['gtaread', 'smw', 'cyberpunk'];
+if (requiredExpansion.some(id => !input.fonts?.[id] || !input.extraFonts?.some(font => font.id === id))
+  || ['gta', 'smw', 'cyberpunk'].some(theme => !input.themes?.[theme])) {
+  throw new Error('NavSkin 0.10 requires the expanded six-font import manifest. Use android/maps/game-assets/source/import-manifest.json or pass its path explicitly; the legacy manifest would overwrite the new themes and GTA readability.');
+}
 const output = path.join(root, 'android/maps/game-assets');
 const hash = data => createHash('sha256').update(data).digest('hex');
 const json = async (file, data) => { await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, JSON.stringify(data, null, 2) + '\n'); };
-const wasmRoot = path.join(root, '.runtime/font-maker');
 const tool = await fs.readFile(path.join(wasmRoot, 'sdfglyph.mjs'), 'utf8');
 const wasm = await new Promise(async (resolve, reject) => {
   try {
@@ -56,11 +62,17 @@ const catalog = { schemaVersion: 1, themes: {
   gta: { ui: { file: 'game-assets/gta/fonts/pricedow.ttf', postScriptName: input.fonts.gta.postScriptName }, map: { road: 'NavSkinGtaRoad', poi: 'NavSkinGtaDisplay', place: 'NavSkinGtaDisplay' } },
   rdr2: { ui: { file: 'game-assets/rdr2/fonts/HapnaSlabSerif-DemiBold.ttf', postScriptName: input.fonts.rdr2ui.postScriptName }, map: { road: 'NavSkinRdrMap', poi: 'NavSkinRdrUi', place: 'NavSkinRdrMap' } },
 } };
+// Expansion manifests supply sourced fonts without discarding the original pack.
+const activeFontThemes = ['gta', 'rdr2', 'smw', 'cyberpunk'];
+Object.assign(catalog.themes, Object.fromEntries(Object.entries(input.themes ?? {}).filter(([theme]) => activeFontThemes.includes(theme))));
+const extraFonts = (input.extraFonts ?? []).filter(font => requiredExpansion.includes(font.id));
+const overriddenAliases = new Set(extraFonts.flatMap(item => item.aliases));
 const provenance = { schemaVersion: 1, fonts: [], sprites: [], conversion: { tool: 'MapLibre font-maker', url: 'https://github.com/maplibre/font-maker', kerning: 'Glyph PBF stores metrics, not TTF kerning tables.', unicodeFallback: 'Missing codepoints merge Noto Sans Bold; other world blocks use the online Noto font.' }, mapFontNotes: input.mapFontNotes };
 for (const [id, theme, filename, aliases] of [
-  ['gta', 'gta', 'pricedow.ttf', ['NavSkinGtaRoad', 'NavSkinGtaDisplay']],
+  ['gta', 'gta', 'pricedow.ttf', ['NavSkinGtaRoad', 'NavSkinGtaDisplay'].filter(alias => !overriddenAliases.has(alias))],
   ['rdr2ui', 'rdr2', 'HapnaSlabSerif-DemiBold.ttf', ['NavSkinRdrUi']],
   ['rdr2map', 'rdr2', 'RDRLino-Regular.ttf', ['NavSkinRdrMap']],
+  ...extraFonts.map(item => [item.id, item.theme, item.filename, item.aliases]),
 ]) {
   const record = input.fonts[id], bytes = await fs.readFile(record.path);
   if (hash(bytes) !== record.sha256) throw new Error(`Font checksum mismatch: ${id}`);
@@ -85,15 +97,19 @@ for (const [id, theme, filename, aliases] of [
       let fallback;
       try { fallback = await fs.readFile(path.join(root, `android/maps/fonts/GameMapSans/${range}.pbf`)); }
       catch {
-        const cache = path.join(wasmRoot, `noto-${range}.pbf`);
-        try { fallback = await fs.readFile(cache); }
-        catch { const response = await fetch(`https://tiles.openfreemap.org/fonts/Noto%20Sans%20Bold/${range}.pbf`); if (!response.ok) throw new Error(`Noto range ${range}: ${response.status}`); fallback = Buffer.from(await response.arrayBuffer()); await fs.writeFile(cache, fallback); }
+        try { fallback = await fs.readFile(path.join(wasmRoot, `noto-${range}.pbf`)); }
+        catch {
+          const cacheRoot = path.join(root, '.runtime/font-maker-cache');
+          const cache = path.join(cacheRoot, `noto-${range}.pbf`);
+          try { fallback = await fs.readFile(cache); }
+          catch { const response = await fetch(`https://tiles.openfreemap.org/fonts/Noto%20Sans%20Bold/${range}.pbf`); if (!response.ok) throw new Error(`Noto range ${range}: ${response.status}`); fallback = Buffer.from(await response.arrayBuffer()); await fs.mkdir(cacheRoot, { recursive: true }); await fs.writeFile(cache, fallback); }
+        }
       }
       const data = combineGlyphs(original, fallback, record.name, range);
       for (const alias of aliases) { const directory = path.join(output, 'glyphs', alias); await fs.mkdir(directory, { recursive: true }); await fs.writeFile(path.join(directory, `${range}.pbf`), data); }
     }
   } finally { wasm._free_fontstack(stack); }
-  provenance.fonts.push({ id, name: record.name, file: `${theme}/fonts/${filename}`, postScriptName: record.postScriptName, sha256: record.sha256, sourceUrl: record.sourceUrl, copyrightStatus: record.copyrightStatus, provenance: record.provenance ?? 'historical original author font release', notices, aliases });
+  provenance.fonts.push({ id, name: record.name, file: `${theme}/fonts/${filename}`, postScriptName: record.postScriptName, sha256: record.sha256, sourceUrl: record.sourceUrl, copyrightStatus: record.copyrightStatus, provenance: record.provenance ?? 'historical original author font release', sourceSha256: record.sourceSha256, conversion: record.conversion, notices, aliases });
 }
 
 // Original game pixels are preserved as embedded images, never traced or renamed CC0.
@@ -136,4 +152,5 @@ for (const theme of ['gta', 'rosa', 'rdr2']) {
 }
 await json(path.join(output, 'catalog.json'), catalog);
 await json(path.join(output, 'provenance.json'), provenance);
+await prepareCollectionAssets();
 console.log(`Prepared ${provenance.fonts.length} game-font files, ${provenance.sprites.length} original sprite mappings and semantic adaptations.`);

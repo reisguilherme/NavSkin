@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.LruCache
 import android.os.SystemClock
+import android.os.Handler
+import android.os.Looper
 import android.view.animation.AccelerateDecelerateInterpolator
 import br.com.gamemap.navigation.MapOrientation
 import br.com.gamemap.navigation.NavigationPreferences
@@ -31,12 +33,23 @@ import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import java.util.concurrent.Executors
 
 /** Small mutable sources above the base map; a GPS fix never replaces the style. */
 internal class NavigationMapOverlay(context: Context) {
     private val assets = context.applicationContext.assets
     private val catalog by lazy { IconCatalogRepository(context.applicationContext) }
+    private val avatarCatalog by lazy { NavigationAvatarCatalog(assets) }
     private val bitmaps = LruCache<String, Bitmap>(24)
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val avatarDecoder = Executors.newSingleThreadExecutor { task -> Thread(task, "navskin-avatar").apply { isDaemon = true } }
+    private var avatarLoading = false
+    private var avatarRequest: NavigationAvatarAsset? = null
+    private var appliedAvatar: NavigationAvatarAsset? = null
+    private val unavailableAvatarFrames = mutableSetOf<String>()
+    private var cameraBearing = 0.0
+    private var cameraPitch = 0.0
+    private var closed = false
     private var style: Style? = null
     private var snapshot: NavigationSnapshot? = null
     private var preferences = NavigationPreferences()
@@ -62,11 +75,35 @@ internal class NavigationMapOverlay(context: Context) {
     private var active = false
     private var accuracyKey: Pair<GeoPoint, Double>? = null
     private var destinationPoint: GeoPoint? = null
+    private var vibing = false
+    internal val renderedAvatarPath: String? get() = appliedAvatar?.path.takeIf { vehicleImage == AVATAR_IMAGE }
+
+    fun setVibing(enabled: Boolean) {
+        vibing = enabled
+        if (style != null) installAndRender()
+    }
 
     fun styleLoading() {
         vehicleAnimator?.cancel()
         vehicleAnimator = null
         style = null
+        avatarRequest = null
+        appliedAvatar = null
+    }
+
+    /** Called for gestures and animated follow camera updates; only a changed view uploads an image. */
+    fun updateCamera(bearing: Double, pitch: Double) {
+        cameraBearing = bearing
+        cameraPitch = pitch
+        updateVehicleAppearance(vehicleBearing ?: lastObservedBearing)
+    }
+
+    fun close() {
+        closed = true
+        styleLoading()
+        avatarDecoder.shutdownNow()
+        mainHandler.removeCallbacksAndMessages(null)
+        bitmaps.evictAll()
     }
 
     fun setActive(value: Boolean) {
@@ -88,6 +125,8 @@ internal class NavigationMapOverlay(context: Context) {
         renderedTheme = null
         vehicleImage = null
         renderedVehicleId = null
+        avatarRequest = null
+        appliedAvatar = null
         vehiclePoint = null
         vehicleBearing = null
         vehicleAlpha = null
@@ -162,18 +201,10 @@ internal class NavigationMapOverlay(context: Context) {
             renderedSavedVisible = preferences.savedPlacesVisible
         }
 
-        if (renderedVehicleId != preferences.vehicleId || renderedTheme != theme) {
-            val image = catalog.vehicleIcon(preferences.vehicleId, theme).image
-            if (vehicleImage != image) {
-                ensureImage(loaded, image)
-                loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconImage(image))
-                vehicleImage = image
-            }
-            renderedVehicleId = preferences.vehicleId
-        }
         val vehicle = state.renderPosition()
         val heading = state.followBearing(MapOrientation.MOVEMENT_UP, lastObservedBearing)
         lastObservedBearing = heading
+        updateVehicleAppearance(vehicleBearing ?: heading)
         renderVehicle(state, vehicle, heading)
         val alpha = state.vehicleOpacity()
         if (vehicleAlpha != alpha) {
@@ -183,7 +214,7 @@ internal class NavigationMapOverlay(context: Context) {
         // The uncertainty ring is centered on the measured fix, never the snapped route point.
         val fix = state.location.fix
         val accuracy = fix?.accuracyMeters?.takeIf { it.isFinite() && it > 0.0 && it <= 2_000.0 }
-        val accuracyInput = if (state.hasCurrentFix() && fix != null && accuracy != null) fix.point to accuracy else null
+        val accuracyInput = if (!vibing && state.hasCurrentFix() && fix != null && accuracy != null) fix.point to accuracy else null
         if (accuracyInput != accuracyKey) {
             source(ACCURACY_SOURCE)?.setGeoJson(accuracyInput?.let { accuracyCircle(it.first, it.second) } ?: EMPTY)
             accuracyKey = accuracyInput
@@ -236,10 +267,83 @@ internal class NavigationMapOverlay(context: Context) {
             source(VEHICLE_SOURCE)?.setGeoJson(point(position))
             vehiclePoint = position
         }
-        if (vehicleBearing != heading) {
-            style?.getLayer(VEHICLE_LAYER)?.setProperties(iconRotate(heading.toFloat()))
-            vehicleBearing = heading
+        vehicleBearing = heading
+        updateVehicleAppearance(heading)
+    }
+
+    private fun updateVehicleAppearance(heading: Double) {
+        val loaded = style ?: return
+        if (closed || loaded.getLayer(VEHICLE_LAYER) == null) return
+        val useAvatar = NavigationAvatarFrameSelector.isEnabled(snapshot?.navigationActive == true, vibing)
+        val request = if (useAvatar) avatarCatalog.frame(theme, heading, cameraBearing, cameraPitch) else null
+        avatarRequest = request?.takeUnless { it.path in unavailableAvatarFrames }
+        if (avatarRequest != null) {
+            loadRequestedAvatar()
+            // Keep the last 3D view during decoding. The first view uses the existing
+            // marker as a brief fallback, so a missing asset never loses the driver.
+            if (vehicleImage == AVATAR_IMAGE) return
+        } else {
+            appliedAvatar = null
         }
+        showFlatVehicle(loaded, heading)
+    }
+
+    private fun showFlatVehicle(loaded: Style, heading: Double) {
+        val vehicleId = preferences.vehicleIdFor(theme)
+        val image = catalog.vehicleIcon(vehicleId, theme).image
+        if (vehicleImage != image) {
+            ensureImage(loaded, image)
+            loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconImage(image), iconSize(1f), iconOffset(arrayOf(0f, 0f)),
+                iconRotationAlignment("map"), iconPitchAlignment("map"), iconRotate(heading.toFloat()))
+            vehicleImage = image
+        } else if (renderedVehicleId != vehicleId || vehicleBearing != heading || appliedFlatHeading != heading) {
+            loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconRotate(heading.toFloat()))
+        }
+        renderedVehicleId = vehicleId
+        appliedFlatHeading = heading
+    }
+
+    private var appliedFlatHeading: Double? = null
+
+    private fun loadRequestedAvatar() {
+        val request = avatarRequest ?: return
+        val loaded = style ?: return
+        if (appliedAvatar == request && vehicleImage == AVATAR_IMAGE) return
+        bitmaps.get(request.path)?.let { applyAvatar(loaded, request, it); return }
+        if (avatarLoading || closed) return
+        avatarLoading = true
+        // Single flight + latest requested frame avoids queuing decodes while the
+        // camera spins. The atlas has one reusable image, not hundreds of frames.
+        avatarDecoder.execute {
+            val bitmap = runCatching { decodeBitmap(request.path).takeIf {
+                it.width == request.imageSize && it.height == request.imageSize
+            } }.getOrNull()
+            mainHandler.post {
+                avatarLoading = false
+                if (closed) return@post
+                if (bitmap != null) bitmaps.put(request.path, bitmap) else unavailableAvatarFrames.add(request.path)
+                if (style === loaded && avatarRequest == request) {
+                    if (bitmap != null) applyAvatar(loaded, request, bitmap)
+                    else {
+                        avatarRequest = null
+                        appliedAvatar = null
+                        showFlatVehicle(loaded, vehicleBearing ?: lastObservedBearing)
+                    }
+                }
+                loadRequestedAvatar()
+            }
+        }
+    }
+
+    private fun applyAvatar(loaded: Style, request: NavigationAvatarAsset, bitmap: Bitmap) {
+        loaded.addImage(AVATAR_IMAGE, bitmap)
+        loaded.getLayer(VEHICLE_LAYER)?.setProperties(iconImage(AVATAR_IMAGE),
+            iconSize(request.displaySize.toFloat() / request.imageSize),
+            iconOffset(arrayOf(NavigationAvatarFrameSelector.anchorOffset(request.anchorX, request.imageSize),
+                NavigationAvatarFrameSelector.anchorOffset(request.anchorY, request.imageSize))),
+            iconRotationAlignment("viewport"), iconPitchAlignment("viewport"), iconRotate(0f))
+        vehicleImage = AVATAR_IMAGE
+        appliedAvatar = request
     }
 
     private fun install(loaded: Style) {
@@ -284,14 +388,16 @@ internal class NavigationMapOverlay(context: Context) {
 
     private fun ensureImage(loaded: Style, path: String) {
         if (loaded.getImage(path) != null) return
-        val bitmap = bitmaps.get(path) ?: assets.open(path).use {
+        val bitmap = bitmaps.get(path) ?: decodeBitmap(path).also { bitmaps.put(path, it) }
+        loaded.addImage(path, bitmap)
+    }
+
+    private fun decodeBitmap(path: String): Bitmap = assets.open(path).use {
             checkNotNull(BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inScaled = false })).apply {
-                // Catalog PNGs are authored at 48 logical pixels. Asset decoding otherwise
-                // inherits the phone DPI, which makes MapLibre shrink them on dense screens.
+                // Use authored pixels. The layer defines logical size, including 192px
+                // mesh views displayed at 72dp; inherited phone DPI would shrink them twice.
                 density = android.util.DisplayMetrics.DENSITY_DEFAULT
             }
-        }.also { bitmaps.put(path, it) }
-        loaded.addImage(path, bitmap)
     }
 
     private fun source(id: String): GeoJsonSource? = style?.getSourceAs(id)
@@ -301,6 +407,11 @@ internal class NavigationMapOverlay(context: Context) {
         MapTheme.GTA_SA -> Palette("#47D8FF", "#071111")
         MapTheme.ROSA_POP -> Palette("#3557E8", "#FFFFFF")
         MapTheme.RDR2 -> Palette("#E7BF55", "#18100A")
+        MapTheme.SUPER_MARIO_WORLD -> Palette("#EC3434", "#FFFFFF")
+        MapTheme.CYBERPUNK_2077 -> Palette("#F4E84A", "#101827")
+        MapTheme.PIP_BOY -> Palette("#82FF78", "#071B10")
+        MapTheme.HOLLOW_KNIGHT -> Palette("#C8E4F1", "#162231")
+        MapTheme.CROSSY_ROAD -> Palette("#FFF1A8", "#34543B")
     }
 
     private fun GeoPoint.toPoint(): Point = Point.fromLngLat(longitude, latitude)
@@ -340,6 +451,7 @@ internal class NavigationMapOverlay(context: Context) {
         internal const val DESTINATION_LAYER = "gamemap-nav-destination-circle"
         internal const val VEHICLE_LAYER = "gamemap-nav-vehicle-symbol"
         internal const val ACCURACY_LAYER = "gamemap-nav-accuracy-fill"
+        internal const val AVATAR_IMAGE = "gamemap-nav-avatar-3d"
         private val EMPTY = FeatureCollection.fromFeatures(emptyList<Feature>())
     }
 }

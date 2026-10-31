@@ -14,7 +14,13 @@ internal class CarAppearanceScreen(context: CarContext, app: GameMapApplication,
     PagedCarListScreen(context, app, "Aparência") {
     override fun rows(): List<Row> {
         val settings = app.navigationSettings.snapshot()
+        val navigationActive = app.navigation.snapshot().navigationActive
         return listOf(
+            Row.Builder().setTitle("Mapa 3D")
+                .addText(if (navigationActive) "Durante a navegação" else "Ao explorar; prévia da rota em 2D")
+                .setToggle(Toggle.Builder { enabled ->
+                    app.preferences.setMap3D(app.navigation.snapshot().navigationActive, enabled)
+                }.setChecked(app.preferences.snapshot().is3D(navigationActive)).build()).build(),
             Row.Builder().setTitle("Cobertura do mapa").addText(app.preferences.snapshot().baseMapMode.let {
                 if (it == MapBaseMode.WORLD && !app.mapConnectivity.isOnline) "Mundo sem internet · escolha Goiânia offline"
                 else it.label
@@ -55,7 +61,7 @@ internal class CarVehicleScreen(context: CarContext, app: GameMapApplication) :
         val pages = ((icons.size + limit - 1) / limit).coerceAtLeast(1)
         page = page.coerceIn(0, pages - 1)
         val choices = icons.drop(page * limit).take(limit)
-        val current = app.navigationSettings.snapshot().vehicleId
+        val current = app.navigationSettings.snapshot().vehicleIdFor(app.preferences.snapshot().theme)
         val selected = choices.indexOfFirst { it.id == current }
         val items = ItemList.Builder()
         // ItemList radio mode requires a selected row within this page. When the current

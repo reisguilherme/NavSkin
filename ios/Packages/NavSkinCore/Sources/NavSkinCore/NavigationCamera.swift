@@ -4,6 +4,7 @@ public struct NavigationCameraPosition: Equatable, Sendable {
     public var point: GeoPoint
     public var zoom: Double
     public var bearing: Double
+    public var pitch: Double
 }
 
 /// Shared navigation defaults: city detail, speed-aware look-ahead and gradual turn approach.
@@ -20,6 +21,7 @@ public struct NavigationCameraPolicy: Sendable {
         var quality: LocationQuality
         var orientation: MapOrientation
         var navigation: Bool
+        var pitch: Double
         var maneuver: ManeuverKind?
         var distance: Double?
     }
@@ -32,7 +34,8 @@ public struct NavigationCameraPolicy: Sendable {
     }
 
     public mutating func update(_ snapshot: NavigationSnapshot, orientation: MapOrientation,
-                                fallbackBearing: Double = 0) -> NavigationCameraPosition? {
+                                fallbackBearing: Double = 0, map3D: Bool? = nil,
+                                vibing: Bool = false) -> NavigationCameraPosition? {
         guard snapshot.hasCurrentMapFix, let fix = snapshot.location.fix,
               let point = snapshot.mapRenderPosition else { return nil }
         let speed = snapshot.location.speedKmh.flatMap { $0.isFinite && $0 >= 0 ? min($0, 270) : nil }
@@ -43,9 +46,12 @@ public struct NavigationCameraPolicy: Sendable {
             snapshot.route.flatMap { $0.steps.indices.contains(progress.stepIndex) ? $0.steps[progress.stepIndex].kind : nil }
         }
         let distance = progress?.distanceToManeuverMeters.flatMapFiniteNonnegative
+        let driving = snapshot.navigationActive || vibing
+        let orientation: MapOrientation = vibing ? .movementUp : orientation
+        let pitch = Self.targetPitch(map3D: vibing || ((map3D ?? snapshot.navigationActive) && snapshot.phase != .preview))
         let input = Input(timestamp: fix.elapsedRealtimeMs, point: point, speed: speed, bearing: bearing,
-            quality: snapshot.location.quality, orientation: orientation, navigation: snapshot.navigationActive,
-            maneuver: maneuver, distance: distance)
+            quality: snapshot.location.quality, orientation: orientation, navigation: driving,
+            pitch: pitch, maneuver: maneuver, distance: distance)
         // Store ticks and UI updates must not restart the native camera animation.
         if input == previousInput { return position }
         let previous = previousInput
@@ -54,12 +60,14 @@ public struct NavigationCameraPolicy: Sendable {
         let usableHeading = snapshot.location.quality == .good && moving ? bearing : nil
         let initialBearing = fallbackBearing.isFinite ? GeoMath.normalizeBearing(fallbackBearing) : 0
         let desiredBearing = orientation == .northUp ? 0 : usableHeading ?? position?.bearing ?? initialBearing
-        let desiredZoom = snapshot.navigationActive ? Self.targetZoom(speedKmh: speed, maneuver: maneuver, distanceMeters: distance) : 16
+        let desiredZoom = driving ? Self.targetZoom(speedKmh: speed, maneuver: maneuver, distanceMeters: distance) : 16
         guard var next = position else {
-            let initial = NavigationCameraPosition(point: point, zoom: desiredZoom, bearing: desiredBearing)
+            let initial = NavigationCameraPosition(point: point, zoom: desiredZoom, bearing: desiredBearing, pitch: pitch)
             position = initial
             return initial
         }
+        // Dimension changes are explicit user choices and apply even without a new reliable fix.
+        next.pitch = pitch
         // Imprecise GPS keeps the last reliable framing, including its zoom.
         if snapshot.location.quality != .good {
             if orientation == .northUp { next.bearing = 0 }
@@ -83,6 +91,8 @@ public struct NavigationCameraPolicy: Sendable {
         position = next
         return next
     }
+
+    public static func targetPitch(map3D: Bool) -> Double { map3D ? 48 : 0 }
 
     public static func targetZoom(speedKmh: Double?, maneuver: ManeuverKind?, distanceMeters: Double?) -> Double {
         let speed = speedKmh.flatMap { $0.isFinite && $0 >= 0 ? min($0, 270) : nil }

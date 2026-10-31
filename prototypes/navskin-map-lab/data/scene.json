@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "kind": "Browser design study; not an installable app or live navigation",
+  "bounds": [
+    -49.2485,
+    -16.6817,
+    -49.2358,
+    -16.672
+  ],
+  "buildingCount": 2284,
+  "source": {
+    "file": "public/data/buildings.geojson",
+    "sha256": "b094bb59e08b2104c0bed6de0072f8e2932dd338f4f4b230819f172096371941",
+    "attribution": "© OpenStreetMap contributors · Overture Maps Foundation · Google Open Buildings · Microsoft Global ML Building Footprints",
+    "coordinatesModified": false
+  },
+  "heights": {
+    "fromSource": 15,
+    "illustrative": 2269,
+    "note": "Alturas disponíveis na fonte foram mantidas. As demais são volumes ilustrativos estáveis, sem precisão de levantamento.",
+    "mockRangeMeters": [
+      6,
+      33
+    ]
+  },
+  "route": {
+    "demonstration": true,
+    "source": "Local OSM road coordinates reused from prototypes/navskin-glass/map.js; not a routing API response",
+    "coordinates": [
+      [
+        -49.241999,
+        -16.6789193
+      ],
+      [
+        -49.2423778,
+        -16.6777175
+      ],
+      [
+        -49.2424604,
+        -16.6774921
+      ],
+      [
+        -49.2424696,
+        -16.6774179
+      ],
+      [
+        -49.2424619,
+        -16.6773357
+      ],
+      [
+        -49.2424435,
+        -16.677311
+      ],
+      [
+        -49.242298,
+        -16.6772164
+      ],
+      [
+        -49.2421639,
+        -16.6771445
+      ],
+      [
+        -49.2419701,
+        -16.6769102
+      ],
+      [
+        -49.2418883,
+        -16.6765066
+      ],
+      [
+        -49.2418726,
+        -16.6764487
+      ],
+      [
+        -49.2418203,
+        -16.6764327
+      ],
+      [
+        -49.2411407,
+        -16.6762287
+      ],
+      [
+        -49.2407741,
+        -16.6761233
+      ],
+      [
+        -49.2406792,
+        -16.676096
+      ],
+      [
+        -49.2405367,
+        -16.6760542
+      ],
+      [
+        -49.2399123,
+        -16.6758722
+      ]
+    ]
+  },
+  "camera": {
+    "center": [
+      -49.241999,
+      -16.6789193
+    ],
+    "zoom": 17,
+    "bearing": -17,
+    "pitch": 48
+  }
+}

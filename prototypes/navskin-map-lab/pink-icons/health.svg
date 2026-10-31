@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Clínica do coração</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 29h40v25H12Z" fill="#FFF1E5"/>
+    <path d="M45 29h7v25h-7Z" fill="#F0A6BF" stroke="none"/>
+    <path d="M8 28 14 19h36l6 9v5H8Z" fill="#FF88B3"/>
+    <path d="M13 27h38" stroke="#FFD5E8"/>
+    <path d="M12 33v21h40V33"/>
+    <path d="M25 54V43a7 7 0 0 1 14 0v11" fill="#AFEBD2"/>
+    <path d="M32 45v9" stroke-width="2"/>
+    <path d="M16 38h4m24 0h4" stroke="#C7A0DB" stroke-width="4"/>
+    <path d="M32 25S20 19 20 12c0-8 9-9 12-3 3-6 12-5 12 3 0 7-12 13-12 13Z" fill="#FFB3CE"/>
+    <path d="M32 10v8m-4-4h8" stroke="#653452" stroke-width="3"/>
+    <path d="M8 55h48v5H8Z" fill="#C9A9E9"/>
+  </g>
+</svg>

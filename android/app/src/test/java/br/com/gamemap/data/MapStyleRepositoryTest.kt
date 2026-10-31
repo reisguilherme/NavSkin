@@ -15,8 +15,23 @@ import org.robolectric.annotation.Config
 @Config(application = Application::class, sdk = [35])
 class MapStyleRepositoryTest {
     private val repository get() = MapStyleRepository(RuntimeEnvironment.getApplication())
+    @Test fun everyThemeHasHiddenBuildingVolumesForBothCoveragesAndAppearances() {
+        for (theme in MapTheme.entries) for (mode in MapBaseMode.entries) for (night in listOf(false, true)) {
+            val style = JSONObject(repository.styleFor(MapPreferences(theme = theme, baseMapMode = mode), night))
+            val layers = style.getJSONArray("layers")
+            val volumes = (0 until layers.length()).map { layers.getJSONObject(it) }
+                .filter { it.getString("id").startsWith("navskin-3d-") }
+            assertTrue("${theme.assetName}/$mode/night=$night needs 3D building layers", volumes.isNotEmpty())
+            for (layer in volumes) {
+                assertEquals("fill-extrusion", layer.getString("type"))
+                assertEquals("none", layer.getJSONObject("layout").getString("visibility"))
+                assertTrue(style.getJSONObject("sources").has(layer.getString("source")))
+                assertTrue(layer.getJSONObject("paint").has("fill-extrusion-height"))
+            }
+        }
+    }
     @Test fun disablingAnyCategoryChangesOnlyItsPoiLayerForEveryDayAndNightTheme() {
-        for (theme in listOf(MapTheme.GTA_SA, MapTheme.ROSA_POP, MapTheme.RDR2)) {
+        for (theme in MapTheme.entries) {
             for (night in listOf(false, true)) {
                 for (category in PoiCategory.entries) {
                     val before = JSONObject(repository.styleFor(MapPreferences(theme, baseMapMode = MapBaseMode.GOIANIA_OFFLINE), night))
@@ -36,8 +51,8 @@ class MapStyleRepositoryTest {
             }
         }
     }
-    @Test fun allThreeThemesContainExactlyTheSameSemanticGroups() {
-        for (theme in listOf(MapTheme.GTA_SA, MapTheme.ROSA_POP, MapTheme.RDR2)) {
+    @Test fun allThemesContainExactlyTheSameSemanticGroups() {
+        for (theme in MapTheme.entries) {
             val layers = JSONObject(repository.styleFor(MapPreferences(theme, baseMapMode = MapBaseMode.GOIANIA_OFFLINE))).getJSONArray("layers")
             val ids = (0 until layers.length()).map { layers.getJSONObject(it).getString("id") }.filter { it.startsWith("poi-") }
             assertEquals(PoiCategory.entries.map { "poi-${it.id}" }.toSet(), ids.toSet())

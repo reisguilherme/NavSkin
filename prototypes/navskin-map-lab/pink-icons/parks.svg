@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <title>Bosque de algodão-doce</title>
+  <g stroke="#653452" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 44 30 36 57 44v7L34 59 7 51Z" fill="#64CBA7"/>
+    <path d="m7 44 23-8 27 8-23 9Z" fill="#B8F4D2"/>
+    <path d="M34 53v6"/>
+    <path d="M42 43V27" stroke-width="5"/>
+    <path d="M52 25c7-8-2-18-10-14-8-6-18 2-13 10-4 10 7 15 13 10 4 3 11 1 10-6Z" fill="#C8AFE9"/>
+    <path d="M45 14c6 0 9 7 5 11" stroke="#EEDFFE" stroke-width="3.5"/>
+    <path d="M22 46V26" stroke-width="5"/>
+    <path d="M32 27c8-6 5-17-4-18-3-9-16-7-18 2-9 2-10 15-2 19 3 9 17 10 24-3Z" fill="#FF91C1"/>
+    <path d="M29 11c6 3 7 9 3 13" stroke="#FFCBE6" stroke-width="3.5"/>
+    <path d="M10 18c0-3 2-5 5-5" stroke="#FFF4FC" stroke-width="3.5"/>
+    <path d="m21 32 5-6"/>
+    <path d="m42 30-4-5"/>
+    <path d="m43 46 4-1" stroke="#F9FFF2" stroke-width="3.5"/>
+  </g>
+</svg>

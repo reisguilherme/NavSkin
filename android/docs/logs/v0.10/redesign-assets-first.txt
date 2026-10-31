@@ -1,0 +1,27 @@
+✔ illustrated map materials resolve locally without adding geographic sources or markers (352.3138ms)
+✔ readable theme fonts retain POI caption zoom gates in both coverages (83.1276ms)
+✔ new offline styles retain the bundled sources, road topology and all semantic filters (215.0547ms)
+✔ all seven themes build day and night world maps with identical real geography and category semantics (55.7752ms)
+✔ new theme sprites cover every category, subtype and traffic direction with visible standalone authored artwork (206.172ms)
+Prepared 126 navigation choices (1 original game raster) and 252 transparent PNGs across 7 themes.
+✔ navigation generator emits all seven skins while retaining saved and vehicle preference IDs (1134.6554ms)
+✔ world styles load the existing dense local building tiles within their declared coverage (81.7182ms)
+✔ world building coverage replaces real polygons in Goiânia and retains buildings beyond every edge (6.4341ms)
+✔ world local building source resolves the dense university tile without stacking world footprints (12.3751ms)
+✔ world oneway arrows follow real directions and never infer missing road restrictions (4.6439ms)
+✔ GTA navigation names use readable sizes and light outlines without decorative letter spacing (4.6905ms)
+✔ world subtype icons retain nine visibility groups while distinguishing actual place subtypes (27.2829ms)
+✔ world builder produces fourteen valid variants using the production planet service (134.0743ms)
+✔ world POI filters classify nine independent categories across all themes (60.6391ms)
+✔ hiding world categories preserves park fills, buildings and geographic labels (62.2292ms)
+✔ world roads preserve tunnels, ground roads and bridges without casing cuts at intersections (5.6941ms)
+✔ world themes keep their palettes and global font coverage without changing geometry (46.7391ms)
+✔ prepared asset manifest declares online world and the separate bundled offline map (2.4012ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2200.0483

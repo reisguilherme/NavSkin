@@ -17,6 +17,29 @@ class GeoapifyProviderTest {
     private val origin = GeoPoint(-16.68, -49.25)
     private val destination = Destination("saved:1", "Destino", GeoPoint(-16.679, -49.248), "Goiânia")
 
+    @Test fun intermediateStopIsRequestedBeforeFinalDestinationAndMappedToItsLegBoundary() {
+        val stop = Destination("stop", "Café", GeoPoint(-16.679, -49.249))
+        val responses = Responses(HttpResponse(200, MULTI_LEG))
+        val route = GeoapifyProvider({ "key" }, responses).route(origin, destination, listOf(stop))
+        val query = URLDecoder.decode(responses.urls.single(), "UTF-8")
+        assertTrue(query.contains("waypoints=-16.68,-49.25|-16.679,-49.249|-16.679,-49.248"))
+        assertTrue(query.contains("intermediate_waypoint_mode=stopover"))
+        assertTrue(query.contains("optimize_stops=false"))
+        assertEquals(destination, route.destination)
+        assertEquals(stop, route.intermediateStops.single().destination)
+        assertEquals(2, route.intermediateStops.single().geometryIndex)
+        assertEquals(217.7, route.intermediateStops.single().alongRouteMeters, 1.0)
+        assertEquals(1, route.steps.count { it.kind == ManeuverKind.ARRIVE })
+    }
+
+    @Test fun missingIntermediateLegCannotSilentlySkipARequestedStop() {
+        val stops = listOf(Destination("one", "Um", GeoPoint(-16.679, -49.249)),
+            Destination("two", "Dois", GeoPoint(-16.679, -49.2485)))
+        expect(ProviderErrorKind.INVALID_RESPONSE) {
+            provider(HttpResponse(200, MULTI_LEG)).route(origin, destination, stops)
+        }
+    }
+
     @Test fun routeKeepsSecondsAndConvertsLegLocalIndicesAfterSharedEndpointDeduplication() {
         val transport = Responses(HttpResponse(200, MULTI_LEG))
         val route = GeoapifyProvider({ "private-test-key" }, transport, { 1234L }).route(origin, destination)

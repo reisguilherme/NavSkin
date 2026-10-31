@@ -1,8 +1,16 @@
-# NavSkin para iPhone · 0.8.0
+# NavSkin para iPhone · 0.12.0
 
-A 0.8.0 acrescenta câmera adaptativa, rotação, novo painel de manobras e ETA, e trânsito TomTom opcional com chave separada no Keychain. O projeto ainda precisa ser compilado e testado no Mac. [Configuração e limites](../docs/navigation-v0.8.md).
+A **0.12.0** prepara os mesmos oito marcadores 3D do Android, ativados durante navegação e Vibing, com perspectiva relativa à câmera, carga assíncrona e cache limitado. Os recursos já estão em `NavSkin/Resources/navigation-3d/`. [Uso e modelos](../docs/navigation-avatars-v0.12.md) · [Validação atual](docs/VALIDATION-v0.12.md). A compilação UIKit/MapLibre e o teste no iPhone ainda precisam de um Mac.
 
-Aplicativo nativo em SwiftUI e MapLibre Native/Metal 6.31.0 para iPhone e iPad com iOS 17 ou posterior. A versão 0.8.0 usa **mapa mundial online por padrão**, mantém **Goiânia offline** como opção e preserva GPS, busca, rotas, manobras visuais, ETA, velocidade, recálculo, favoritos, Casa/Trabalho e recentes. Acrescenta nove filtros e as fontes Pricedown, Hapna e RDR Lino conforme o tema.
+O catálogo atual reúne **GTA SA, Rosa Pop, RDR2, Super Mario World, Cyberpunk 2077, Pip-Boy, Hollow Knight e Crossy Road**, com dia/noite e catálogos de locais/veículos. Todos oferecem **Mapa 3D** no menu **⋯**: exploração começa em 2D e navegação em 3D, com escolhas salvas separadamente. A prévia da rota permanece plana até iniciar a viagem. [Uso e validação de 2D/3D](docs/MAP-DIMENSIONS.md).
+
+A **0.10.0** adicionou Super Mario World e Cyberpunk 2077. Minecraft e GTA V foram retirados; uma preferência antiga por esses temas usa o fallback GTA SA. GTA SA usa Bank Gothic para ruas e POIs mais legíveis, preservando Pricedown nos nomes maiores. [Temas e procedência](../docs/maps-v0.10.md).
+
+A **0.9.0** aplica o visual Vidro com material nativo, menu **⋯**, controles circulares iguais, ETA de três valores e **Parar / Adicionar parada**. Paradas reais mantêm o destino final, entram na rota em ordem e são preservadas para nova tentativa quando o cálculo falha. A interface usa tipografia do sistema; as fontes e os ícones temáticos continuam nos mapas. [Uso e limites](../docs/navigation-v0.9.md).
+
+A 0.8.0 acrescentou câmera adaptativa, rotação, novo painel de manobras e ETA, e trânsito TomTom opcional com chave separada no Keychain. O projeto ainda precisa ser compilado e testado no Mac. [Configuração e limites](../docs/navigation-v0.8.md).
+
+Aplicativo nativo em SwiftUI e MapLibre Native/Metal 6.31.0 para iPhone e iPad com iOS 17 ou posterior. A versão 0.12.0 usa **mapa mundial online por padrão**, mantém **Goiânia offline** como opção e preserva GPS, busca, rotas, manobras visuais, ETA, velocidade, recálculo, favoritos, Casa/Trabalho e recentes. Inclui nove filtros, fontes temáticas locais e fallback de sistema/Noto.
 
 O repositório é [reisguilherme/NavSkin](https://github.com/reisguilherme/NavSkin). O projeto está preparado para um amigo compilar no Mac e enviar o IPA ao Guilherme, que fará a assinatura pessoal no Windows. A compilação Apple e os testes no iPhone ainda precisam ser executados; consulte o [relatório de validação](docs/VALIDATION.md).
 
@@ -12,7 +20,7 @@ Na 0.7, Temas/Filtros ficam no topo ao lado de NavSkin, e salvos/opções/crédi
 
 Você precisa de um **Mac com Xcode completo**, SDK compatível e um simulador de iPhone com iOS 17 ou posterior instalado. O projeto usa Swift 5 mode. O Swift Package Manager baixa o **MapLibre 6.31.0** pela internet; `NavSkinCore` é local. O empacotador usa `python3` no Terminal. Confira os [requisitos do Xcode](https://developer.apple.com/xcode/system-requirements/).
 
-1. Obtenha o repositório completo com o pacote local de recursos ou extraia `NavSkin-ios-0.8.0-source.zip`. Preserve as pastas `ios`, `scripts` e `tests` juntas.
+1. Clone a branch `main` de `https://github.com/reisguilherme/NavSkin.git`. O projeto 0.12.0 inclui os recursos preparados dos oito temas e avatares 3D. Preserve as pastas `ios`, `scripts` e `tests` juntas.
 2. Abra **`ios/NavSkin.xcodeproj`** no Xcode e aguarde a resolução dos pacotes.
 3. Selecione o esquema **NavSkin** e um **simulador de iPhone com iOS 17+** como destino.
 4. Clique em **Run**. Os recursos em `ios/NavSkin/Resources` já estão preparados; o mapa mundial precisa de internet durante o uso.
@@ -51,7 +59,7 @@ Envie esses dois arquivos ao Guilherme. O IPA será assinado e instalado no Wind
 
 Para rodar em um iPhone físico com iOS 17+, o responsável pela instalação precisa configurar sua própria Apple Account, Team e perfis de provisionamento em **Signing & Capabilities**. A [Personal Team](https://developer.apple.com/help/account/basics/about-your-developer-account) tem validade e limites de teste. Isso é opcional para o amigo: gerar o IPA unsigned pelo comando acima não exige essa assinatura.
 
-O identificador padrão é `br.com.navskin.ios`, versão 0.8.0, build 1. Para assinatura própria, copie `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e configure Team ID e bundle próprio; esse arquivo é ignorado pelo Git. Para criar um archive assinado no Mac:
+O identificador padrão é `br.com.navskin.ios`, versão 0.12.0, build 12. Para assinatura própria, copie `Config/Local.xcconfig.example` para `Config/Local.xcconfig` e configure Team ID e bundle próprio; esse arquivo é ignorado pelo Git. Para criar um archive assinado no Mac:
 
 ```bash
 bash scripts/build-ios.sh archive YOUR_APPLE_TEAM_ID
@@ -63,16 +71,18 @@ O [workflow GitHub Actions](../.github/workflows/ios-cloud.yml) permanece como a
 
 ## Mapa, temas e navegação
 
-Em **Temas → Cobertura do mapa**, no topo, escolha:
+Em **⋯ → Configurações → Opções do mapa → Cobertura do mapa**, escolha:
 
 | Modo | Cobertura | Conexão |
 |---|---|---|
 | Mapa mundial (online) | Cidades e estradas ao redor do mundo; padrão da instalação | Tiles e blocos adicionais de caracteres do OpenFreeMap exigem internet |
 | Goiânia offline | Recorte incluído: longitude −49,325 a −49,205; latitude −16,755 a −16,640 | Cartografia, fontes e ícones locais |
 
-Os temas GTA SA, Rosa Pop e RDR2 têm variantes dia/noite nos dois modos. Alterar tema ou cobertura conserva a câmera e a sessão de navegação. Os filtros de lugares, favoritos e o marcador do veículo continuam disponíveis. O serviço público do [OpenFreeMap](https://openfreemap.org/) dispensa chave para exibir o mapa; os créditos OpenFreeMap, OpenMapTiles e OpenStreetMap acompanham a cobertura mundial. O recorte offline mantém os créditos OSM/Overture em `NavSkin/Resources/maps/credits`.
+Os oito temas têm variantes dia/noite nos dois modos: **32 estilos** ao todo e **oito prévias**. Alterar tema ou cobertura conserva a câmera, a dimensão escolhida e a sessão de navegação. Os filtros de lugares, favoritos e o marcador do veículo continuam disponíveis. O serviço público do [OpenFreeMap](https://openfreemap.org/) dispensa chave para exibir o mapa; os créditos OpenFreeMap, OpenMapTiles e OpenStreetMap acompanham a cobertura mundial. O recorte offline mantém os créditos OSM/Overture em `NavSkin/Resources/maps/credits`.
 
-Os nove filtros abrangem parques; combustível; restaurantes, cafés e bares; estacionamento; saúde; mercados e conveniências; escolas e universidades; museus, teatros e cultura; locais de culto. As fontes locais selecionadas são Pricedown para GTA SA, Hapna Slab Serif DemiBold para a interface RDR2 e RDR Lino para seus rótulos de mapa. RDR Lino é uma família extraída do jogo; seu uso aqui não comprova que era a fonte geográfica exata do mapa original. Noto supre os caracteres ausentes. Sprites originais aparecem nos subtipos equivalentes; os demais símbolos são adaptações próprias NavSkin. Consulte [origem, hashes e avisos](../docs/game-assets-provenance.md).
+Os nove filtros abrangem parques; combustível; restaurantes, cafés e bares; estacionamento; saúde; mercados e conveniências; escolas e universidades; museus, teatros e cultura; locais de culto. As fontes incluem Pricedown e Bank Gothic para GTA SA, Hapna Slab Serif DemiBold e RDR Lino para RDR2, SMW Whole-Pixel Spacing e Blender Pro Bold. Pip-Boy reutiliza Blender; Hollow Knight reutiliza Hapna; Crossy Road usa Noto no mapa. Essas adaptações não são fontes extraídas desses três jogos. SMW é uma reconstrução de Eric Kaiser/wye; Blender veio do site oficial Cyberpunk, convertido de WOFF para TTF. O pack RDR2 descreve extração/conversão do jogo, sem verificação binária contra os arquivos distribuídos. Essas escolhas não comprovam equivalência às fontes cartográficas originais. Noto supre caracteres ausentes. Sprites originais GTA SA/RDR2 aparecem nos subtipos equivalentes; os demais símbolos, incluindo os conjuntos SMW/Cyberpunk, são adaptações próprias NavSkin. Consulte [origem, hashes e avisos](../docs/game-assets-provenance.md).
+
+O catálogo de salvos e veículos mantém 18 IDs semânticos em cada tema: 12 locais e seis veículos. São **144 combinações tema/escolha**, com **288 PNGs finais** nas resoluções de mapa e seletor. Trocar de tema mantém o ID escolhido. As prévias ajudam a comparar os estilos compartilhados; a renderização iOS ainda precisa ser conferida no Mac e no iPhone.
 
 Se a câmera estiver fora de Goiânia ao escolher o modo offline, toque em **Ver região offline** no seletor ou no aviso do mapa para enquadrar o recorte. Essa ação muda apenas a câmera: o GPS e a viagem continuam ativos. **Centralizar no GPS** volta à sua posição atual; fora do recorte, escolha o mapa mundial para carregar detalhes da região.
 
@@ -98,7 +108,7 @@ npm ci
 node scripts/prepare-ios.mjs
 ```
 
-Os assets Android são a fonte compartilhada dos mapas, fontes e catálogos. Para reconstruir a importação original a partir dos arquivos locais e gerar os PBFs, siga o [pipeline dos assets dos jogos](../docs/game-assets-provenance.md#reproduzir-a-importação-local) antes de preparar o iOS. `node scripts/prepare-ios.mjs --project-only` atualiza apenas as referências do projeto após adicionar ou remover fontes. O pacote-fonte iOS preparado inclui os recursos necessários para abrir no Xcode; o pacote original local mantém seus próprios avisos e é separado da licença do código.
+Os assets Android são a fonte compartilhada dos mapas, fontes e catálogos. Para reconstruir a importação original a partir dos arquivos locais e gerar os PBFs, siga o [pipeline dos assets dos jogos](../docs/game-assets-provenance.md#reproduzir-a-importação-local) antes de preparar o iOS. `node scripts/prepare-ios.mjs --project-only` atualiza apenas as referências do projeto após adicionar ou remover fontes. O pacote-fonte iOS preparado inclui os recursos necessários para abrir no Xcode; os arquivos originais versionados mantêm seus próprios avisos e são separados da licença do código.
 
 ## Verificação no aparelho
 
@@ -108,4 +118,4 @@ Antes de usar em viagem, confira no iPhone os dois modos de mapa, temas dia/noit
 
 A arte própria NavSkin e os sprites dos jogos têm origens distintas, registradas na [procedência dos assets](../docs/game-assets-provenance.md). Os copyrights de Rockstar e dos autores das fontes foram preservados. O projeto é independente, sem vínculo com a Rockstar. O manifesto de privacidade declara UserDefaults para preferências do aplicativo. Fontes, avisos e registros de origem acompanham os recursos preparados.
 
-O pacote local `NavSkin-game-assets-0.7.0.zip` contém a árvore de recursos preparada: extraia seu conteúdo na raiz do clone, mantendo as pastas `android` e `ios`. O ZIP iOS completo já está preparado para abrir no Mac e dispensa essa etapa. Os arquivos de assinatura pessoal continuam excluídos.
+O clone atual já contém os recursos dos oito temas e os avatares 3D. Pacotes-fonte antigos podem conter somente os cinco temas da 0.10.0. Os arquivos de assinatura pessoal continuam excluídos.

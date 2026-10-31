@@ -1,14 +1,8 @@
 {
   "format": 1,
-  "kind": "Native map captures; not Android Auto or DHU screenshots",
-  "renderer": "MapLibre Native OpenGL 13.7.1, Android 16/API 36 x86_64, GPU host",
-  "camera": {
-    "longitude": -46.6333,
-    "latitude": -23.5505,
-    "zoom": 16.8,
-    "bearing": 0,
-    "tilt": 0
-  },
+  "kind": "Actual map captures; per-image Native/browser renderer provenance; not Android Auto or DHU screenshots",
+  "renderer": "See each preview renderer field",
+  "camera": "Per-image camera; approved production drawings and collection views in Goiânia",
   "categories": "All nine enabled; day variants",
   "attribution": "OpenFreeMap · © OpenMapTiles · © OpenStreetMap contributors; game symbols/fonts retain their own notices.",
   "previews": [
@@ -17,39 +11,224 @@
       "file": "gta.webp",
       "width": 800,
       "height": 480,
-      "captureWidth": 1080,
-      "captureHeight": 1920,
-      "bytes": 39040,
-      "sha256": "79fa2349cc59563f4760addc13e711a31c2143a7ae5b0bbdfa7969eca6219f02",
-      "captureSource": "android/screenshots/v0.6/world-sao-paulo-gta.png",
-      "captureSha256": "f34302bfd852bf00e228e1db244ef19be4336ba486ded04f84939308c66f419e",
-      "styleSha256": "c169871692807efffbc00779db1938b53643d70edd3df96041772837b57b87fe"
+      "captureWidth": 1116,
+      "captureHeight": 1098,
+      "bytes": 114274,
+      "sha256": "df6cfc4f286e16f60a4d4b701edf000f3e101787cf62bbfbd5eeba6242e206e7",
+      "captureSource": "android/maps/previews/captures/gta.png",
+      "captureSha256": "65f9731095899ee7e4c0f3e4851afc2e2836dbc2b1ecebd689131ff134ba31ea",
+      "styleSha256": "e1b031bb0264153946a50a8fcd8e6393b41442721141cfbc53f7910848476cd4",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Production offline style rendered in browser, real Goiânia crop"
+      },
+      "captureStyle": "android/app/src/main/assets/maps/styles/gta.json",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "4769d2885e9e4bb55c7c323c388575ba206436e70c15740bcb7775c12f5a1802",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
     },
     {
       "theme": "rosa",
       "file": "rosa.webp",
       "width": 800,
       "height": 480,
-      "captureWidth": 1080,
-      "captureHeight": 1920,
-      "bytes": 53536,
-      "sha256": "f18b0f40b3ae3b87a93d1637123d4006bb9d4f83237095206c2a8c8023bc4da4",
-      "captureSource": "android/screenshots/v0.6/world-sao-paulo-rosa.png",
-      "captureSha256": "07690db9189b1d6d3308079140b4206b39dc7dc10af717bd3defe0da717b957a",
-      "styleSha256": "c127ef55e98b5dc828291ee6db69d4b365e84370fa35d62f8523435e97ecc465"
+      "captureWidth": 1116,
+      "captureHeight": 1098,
+      "bytes": 104776,
+      "sha256": "85a3a6a10c7eeaba610c8715df47aa62264fca15fdda70590cbeb5e17af17a4f",
+      "captureSource": "android/maps/previews/captures/rosa.png",
+      "captureSha256": "cc6c8964d9e2d9b433ea7438824dbcb08c7f8cbe3d2a4fc0072beede905d80be",
+      "styleSha256": "4eccf2a52ae347055de92449a367193eae2f02714cd1353b88298e04847ca01a",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Production offline style rendered in browser, real Goiânia crop"
+      },
+      "captureStyle": "android/app/src/main/assets/maps/styles/rosa.json",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "4769d2885e9e4bb55c7c323c388575ba206436e70c15740bcb7775c12f5a1802",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
     },
     {
       "theme": "rdr2",
       "file": "rdr2.webp",
       "width": 800,
       "height": 480,
-      "captureWidth": 1080,
-      "captureHeight": 1920,
-      "bytes": 38406,
-      "sha256": "c5e45d0e0f6ee0edf9ee0918b8d3bdf3f45f1f560446a2fa100bcb9eb1f7cd57",
-      "captureSource": "android/screenshots/v0.6/world-sao-paulo-rdr2.png",
-      "captureSha256": "b433907542bc48f1988866a82dfb8813312e310d5e6e13a3b579525b1c52b4ba",
-      "styleSha256": "624ef8a0318e9010244e3f7fa7c8093c67277903b24234722e61f856abc1f60b"
+      "captureWidth": 1116,
+      "captureHeight": 1098,
+      "bytes": 113118,
+      "sha256": "8d0f40c6ab72f69dd2d1db4eb88fae3d8e875acf2d5d8e9d0f1e9ef8f2bd1acb",
+      "captureSource": "android/maps/previews/captures/rdr2.png",
+      "captureSha256": "f97b811a25c89cb7d8dac293edc17c2b887299c73e6321d5a6af99c865077e53",
+      "styleSha256": "36499dde1d3d72b537bea22f76d7cefff85d0ed45b2f8db71feddcbf11f5bf9f",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Production offline style rendered in browser, real Goiânia crop"
+      },
+      "captureStyle": "android/app/src/main/assets/maps/styles/rdr2.json",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "4769d2885e9e4bb55c7c323c388575ba206436e70c15740bcb7775c12f5a1802",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
+    },
+    {
+      "theme": "smw",
+      "file": "smw.webp",
+      "width": 800,
+      "height": 480,
+      "captureWidth": 1116,
+      "captureHeight": 1098,
+      "bytes": 129616,
+      "sha256": "013b6ed51ce3aef59e1b02513e666abd5ca643ae28b3b9a12e275033542d0f86",
+      "captureSource": "android/maps/previews/captures/smw.png",
+      "captureSha256": "471570870ee4e7482a0325b15e0763bf10024f6869ed36d5bb354e1744407447",
+      "styleSha256": "473fd8797a6cb981925567e56b928ba1994ff3784c680eb6775ed5c16275e7b3",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Production offline style rendered in browser, real Goiânia crop"
+      },
+      "captureStyle": "android/app/src/main/assets/maps/styles/smw.json",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "4769d2885e9e4bb55c7c323c388575ba206436e70c15740bcb7775c12f5a1802",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
+    },
+    {
+      "theme": "cyberpunk",
+      "file": "cyberpunk.webp",
+      "width": 800,
+      "height": 480,
+      "captureWidth": 1116,
+      "captureHeight": 1098,
+      "bytes": 117956,
+      "sha256": "763c40c1e741811853d7cdd96d3d34e585d9058064df3ac041f73a11d18cf940",
+      "captureSource": "android/maps/previews/captures/cyberpunk.png",
+      "captureSha256": "c5b5d00e3ad971652d952078649cd57c6c07cdf0ee57061e67986a453a656b9e",
+      "styleSha256": "d4863bf7ea9b9b2227a4ff3e1c0d552101025560834c8ee41547bec0ac7773fb",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Production offline style rendered in browser, real Goiânia crop"
+      },
+      "captureStyle": "android/app/src/main/assets/maps/styles/cyberpunk.json",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "4769d2885e9e4bb55c7c323c388575ba206436e70c15740bcb7775c12f5a1802",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
+    },
+    {
+      "theme": "pipboy",
+      "file": "pipboy.webp",
+      "width": 800,
+      "height": 480,
+      "captureWidth": 1126,
+      "captureHeight": 641,
+      "bytes": 86762,
+      "sha256": "31cd8abb13c9c45b6253f9bb45ae0a7a16804071988af598237a66c230cdf5a9",
+      "captureSource": "android/maps/previews/captures/pipboy.png",
+      "captureSha256": "b41f932120d1770d7df17b6fd4ba31c3d0e02fc0bd6cfb29350ac59338a2b32c",
+      "styleSha256": "eeb0059bac58d39538d3d862ce5c5863eda8c558e57231d9a4c7ac3da0ae16c5",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Approved browser panel, real Goiânia crop"
+      },
+      "captureStyle": "prototypes/navskin-map-lab/collection/pipboy.js",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "12de814f507da1161640e512976452cc62158aef4521f270b73c776c386e5c07",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
+    },
+    {
+      "theme": "hollow",
+      "file": "hollow.webp",
+      "width": 800,
+      "height": 480,
+      "captureWidth": 1126,
+      "captureHeight": 641,
+      "bytes": 102976,
+      "sha256": "0adc7dcc7d298e8e8de9e4c0c3b98463f7956a7267ebcad760d13ac578d06363",
+      "captureSource": "android/maps/previews/captures/hollow.png",
+      "captureSha256": "4244abcd59b37dc0b5028dbca965d49c0d21a3f769d24b97a0808a1d36af4b8d",
+      "styleSha256": "deb85210f92e414c14a7c52e85d935be4be61141eed8c8730d23788c22224ac6",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 0,
+        "bearing": 0,
+        "source": "Approved browser panel, real Goiânia crop"
+      },
+      "captureStyle": "prototypes/navskin-map-lab/collection/hollow.js",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "f04cf0b834625edec4b4c48d42f0d022e2020105597a9323b783454c6ed84cca",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
+    },
+    {
+      "theme": "crossy",
+      "file": "crossy.webp",
+      "width": 800,
+      "height": 480,
+      "captureWidth": 1126,
+      "captureHeight": 641,
+      "bytes": 134286,
+      "sha256": "6a25d4c9144f9f9f03041af3c7a5c385b75a430530c231e1ebfe96e4a4632310",
+      "captureSource": "android/maps/previews/captures/crossy.png",
+      "captureSha256": "5a44f2f1b06a6ae7d6c129495d98bd57dd2df01c151d4d99fe39fc2249d76a1f",
+      "styleSha256": "e32c864f70b5484a91e928d4db891e4234d00872c6f9950f6d5b03785031e90b",
+      "renderer": "MapLibre GL JS browser; approved collection artwork, not a native validation screenshot",
+      "camera": {
+        "center": [
+          -49.2618,
+          -16.684
+        ],
+        "zoom": 16.4,
+        "pitch": 51.99999999999999,
+        "bearing": -25,
+        "source": "Approved browser panel, real Goiânia crop"
+      },
+      "captureStyle": "prototypes/navskin-map-lab/collection/crossy.js",
+      "coverage": "Goiânia",
+      "sourceArtSha256": "dc60c3e5610025ecb3731f18584552dca293cb2695a720fc2603e42059d95f4c",
+      "note": "Preview depicts the approved source artwork. Runtime style hash identifies the matching promoted pack; the capture does not establish Native rendering parity."
     }
   ]
 }

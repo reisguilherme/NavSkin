@@ -1,0 +1,26 @@
+{
+  "family": "Hapna Slab Serif DemiBold",
+  "postscriptName": "HapnaSlabSerif-DemiBold",
+  "copyright": "Copyright (c) 2013 by Mariya Pigoulevskaya. All rights reserved.",
+  "manufacturer": "The Northern Block Ltd.",
+  "designer": "Mariya V. Pigoulevskaya",
+  "version": "Version 1.10",
+  "conversionAuthor": "Peter1501 (attributed by public source)",
+  "sourceCatalog": "https://www.worldofmods.com/rdr-2/tools/56923-rdr-2-font-russian-cyrillic-latin.html",
+  "sourceArchive": "rdr2-fonts-peter1501.zip",
+  "sourceArchiveSha256": "311790b203504048947174d63732713f48650e7760e6b303ffd144e6c74a3608",
+  "originality": "The public pack and its bundled README claim conversion from RDR2. These are extracted/conversion files, not verified byte-for-byte original game binaries. No redesign is described in the source. Metadata agrees with original commercial/Rockstar font families.",
+  "licenseStatus": "No license granting outside-game redistribution is included or verified. Keep this local package and all generated derivatives Git-ignored. fsType=0 is technical metadata, not a copyright permission.",
+  "files": [
+    {
+      "path": "TTF/HapnaSlabSerif-DemiBold.ttf",
+      "bytes": 84644,
+      "sha256": "468a87efc589dc45ab1142b28083d8a109192d53af619a7598921e861157ff64"
+    },
+    {
+      "path": "OTF/HapnaSlabSerif-DemiBold.otf",
+      "bytes": 80260,
+      "sha256": "7d9538b910b86af5122c8afa334d306818adb49634463c7d49cb696b53731d7a"
+    }
+  ]
+}

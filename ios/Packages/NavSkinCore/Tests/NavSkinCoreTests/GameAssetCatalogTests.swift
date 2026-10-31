@@ -20,6 +20,46 @@ final class GameAssetCatalogTests: XCTestCase {
         XCTAssertThrowsError(try GameAssetCatalog(data: Data(##"{"schemaVersion":2,"themes":{}}"##.utf8)))
     }
 
+    func testNewThemeFontStacksAreRoutedWithoutBorrowingAnotherThemeFont() throws {
+        let value = try GameAssetCatalog(data: Data(##"{"schemaVersion":1,"themes":{"smw":{"map":{"road":"NavSkinSmwRoad","place":"NavSkinSmwDisplay"}},"cyberpunk":{"ui":{"file":"game-assets/cyberpunk/fonts/display.otf"},"map":{"poi":"NavSkinCyberpunkDisplay"}}}}"##.utf8))
+        XCTAssertEqual(value.fontStacks, ["NavSkinSmwRoad", "NavSkinSmwDisplay", "NavSkinCyberpunkDisplay"])
+        XCTAssertNil(value.themes["smw"]?.ui)
+        XCTAssertEqual(value.themes["cyberpunk"]?.ui?.file, "game-assets/cyberpunk/fonts/display.otf")
+        let local = URL(fileURLWithPath: "/resources/maps/glyphs/NavSkinSmwRoad/0-255.pbf")
+        let router = GameGlyphRouter(stacks: value.fontStacks) { $0 == "maps/glyphs/NavSkinSmwRoad/0-255.pbf" ? local : nil }
+        XCTAssertEqual(router.transformGlyphURL(URL(string: "https://tiles.openfreemap.org/fonts/NavSkinSmwRoad/0-255.pbf")!), local)
+    }
+
+    func testEveryNewThemeRejectsUnsafeFontsAndGlyphAliases() {
+        for theme in ["smw", "cyberpunk", "pipboy", "hollow", "crossy"] {
+            for file in ["../../font.ttf", "game-assets/\(theme)/fonts/../font.ttf", "game-assets/gta/fonts/pricedow.ttf"] {
+                XCTAssertThrowsError(try GameAssetCatalog(data: Data("{\"schemaVersion\":1,\"themes\":{\"\(theme)\":{\"ui\":{\"file\":\"\(file)\"}}}}".utf8)), theme)
+            }
+            XCTAssertThrowsError(try GameAssetCatalog(data: Data("{\"schemaVersion\":1,\"themes\":{\"\(theme)\":{\"map\":{\"road\":\"../outside\"}}}}".utf8)), theme)
+        }
+    }
+
+    func testPipboyHollowAndCrossyProfilesExposeDeclaredGlyphsAndOptionalFonts() throws {
+        let value = try GameAssetCatalog(data: Data(##"{"schemaVersion":1,"themes":{"pipboy":{"ui":{"file":"game-assets/pipboy/fonts/BlenderPro-Bold.ttf"},"map":{"road":"NavSkinCyberpunk"}},"hollow":{"ui":{"file":"game-assets/hollow/fonts/HapnaSlabSerif-DemiBold.ttf"},"map":{"road":"NavSkinRdrMap"}},"crossy":{"map":{"road":"GameMapSans"}}}}"##.utf8))
+        XCTAssertEqual(value.fontStacks, ["NavSkinCyberpunk", "NavSkinRdrMap", "GameMapSans"])
+        XCTAssertEqual(value.themes["pipboy"]?.ui?.file, "game-assets/pipboy/fonts/BlenderPro-Bold.ttf")
+        XCTAssertEqual(value.themes["hollow"]?.ui?.file, "game-assets/hollow/fonts/HapnaSlabSerif-DemiBold.ttf")
+        XCTAssertNil(value.themes["crossy"]?.ui)
+        let local = URL(fileURLWithPath: "/resources/maps/glyphs/GameMapSans/0-255.pbf")
+        let router = GameGlyphRouter(stacks: value.fontStacks) { $0 == "maps/glyphs/GameMapSans/0-255.pbf" ? local : nil }
+        XCTAssertEqual(router.transformGlyphURL(URL(string: "https://tiles.openfreemap.org/fonts/GameMapSans/0-255.pbf")!), local)
+    }
+
+    func testRemovedThemeProfilesDoNotRegisterGlyphRoutes() throws {
+        let value = try GameAssetCatalog(data: Data(##"{"schemaVersion":1,"themes":{"minecraft":{"map":{"road":"NavSkinMinecraft"}},"gta5":{"map":{"place":"NavSkinGta5"}}}}"##.utf8))
+        XCTAssertTrue(value.fontStacks.isEmpty)
+        let router = GameGlyphRouter(stacks: value.fontStacks) { _ in XCTFail("Removed theme glyphs must not load local assets"); return nil }
+        for stack in ["NavSkinMinecraft", "NavSkinGta5"] {
+            let url = URL(string: "https://tiles.openfreemap.org/fonts/\(stack)/0-255.pbf")!
+            XCTAssertEqual(router.transformGlyphURL(url), url)
+        }
+    }
+
     func testBundledFontBlockUsesLocalResourceAndMissingBlockUsesGlobalNoto() {
         let local = URL(fileURLWithPath: "/resources/gta/0-255.pbf")
         let router = GameGlyphRouter(stacks: [alias]) { $0 == "maps/glyphs/\(self.alias)/0-255.pbf" ? local : nil }

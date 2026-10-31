@@ -6,10 +6,16 @@ import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
 import tokens from '../android/maps/theme-tokens.json' with { type: 'json' };
 import buildingMetadata from '../public/data/buildings-metadata.json' with { type: 'json' };
 import { applyGameTypography } from './game-asset-typography.mjs';
+import { applyGameMapArtDirection } from './game-map-art-direction.mjs';
+import { applyCollectionArt } from './collection-art.mjs';
+import { applyMapVolumes } from './map-volumes.mjs';
+import { applyApprovedMapArt } from './approved-map-art.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = path.join(root, 'android/app/src/main/assets/maps');
-const themes = { gta: 'GTA SA', rosa: 'Rosa Pop', rdr2: 'RDR2' };
+export const MAP_THEMES = { gta: 'GTA SA', rosa: 'Rosa Pop', rdr2: 'RDR2',
+  smw: 'Super Mario World', cyberpunk: 'Cyberpunk 2077', pipboy: 'Pip-Boy', hollow: 'Hollow Knight', crossy: 'Crossy Road' };
+const themes = MAP_THEMES;
 export const WORLD_VARIANTS = Object.keys(themes).flatMap(theme => [theme, `${theme}-night`]);
 export const WORLD_BOUNDS = [-180, -85.05113, 180, 85.05113];
 export const WORLD_ATTRIBUTION = '<a href="https://openfreemap.org/">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/">© OpenMapTiles</a> · Data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
@@ -198,6 +204,10 @@ export function buildWorldStyle(mode) {
     layers, transition: { duration: 0, delay: 0 },
   };
   applyGameTypography(style, theme, false);
+  applyGameMapArtDirection(style, theme, night, p);
+  applyCollectionArt(style, theme, night);
+  applyApprovedMapArt(style, theme, night);
+  applyMapVolumes(style, theme, night, p);
   const errors = validateStyleMin(style);
   if (errors.length) throw new Error(errors.map(error => error.message).join('\n'));
   return style;

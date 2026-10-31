@@ -3,6 +3,64 @@ import SwiftUI
 import UIKit
 import NavSkinCore
 
+/// System materials provide one composited blur; no map readback or display-link work.
+private struct GlassSurface: ViewModifier {
+    let radius: CGFloat
+    let palette: ThemePalette
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    func body(content: Content) -> some View {
+        content
+            .background {
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: radius, style: .continuous)
+                            .fill(palette.surface.opacity(reduceTransparency ? 1 : 0.58))
+                    }
+            }
+            .overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(.white.opacity(0.85), lineWidth: 1))
+            .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+    }
+}
+
+extension View {
+    func glassSurface(radius: CGFloat = 24, palette: ThemePalette) -> some View {
+        modifier(GlassSurface(radius: radius, palette: palette))
+    }
+    func interfaceFont(_ style: Font.TextStyle, weight: Font.Weight? = nil) -> some View {
+        font(weight.map { Font.system(style, design: .default).weight($0) } ?? Font.system(style, design: .default))
+    }
+    func interfaceFont(size: CGFloat, weight: Font.Weight = .regular) -> some View {
+        font(.system(size: size, weight: weight))
+    }
+}
+
+extension MapTheme {
+    var glassPalette: ThemePalette {
+        switch self {
+        case .gta: return ThemePalette(surface: 0xF7FAF8, text: 0x16222B, muted: 0x53635B, accent: 0x008EDF, soft: 0xE4F5FF, border: 0xDCE5E0)
+        case .rosa: return ThemePalette(surface: 0xFFF8FC, text: 0x4B213D, muted: 0x79546B, accent: 0xDF258B, soft: 0xFFE7F3, border: 0xEFD7E4)
+        case .rdr2: return ThemePalette(surface: 0xFBF8F0, text: 0x31291F, muted: 0x73614E, accent: 0x9B3D2C, soft: 0xF5E7D8, border: 0xE3D9CC)
+        case .smw: return ThemePalette(surface: 0xF9FAF8, text: 0x16222B, muted: 0x53635B, accent: 0xBE3A2C, soft: 0xF6E8E5, border: 0xDCE5E0)
+        case .cyberpunk: return ThemePalette(surface: 0xF8FAFB, text: 0x16222B, muted: 0x53616B, accent: 0x007B90, soft: 0xE2F3F6, border: 0xDCE3E7)
+        case .pipboy: return ThemePalette(surface: 0xF4FAEF, text: 0x1F3721, muted: 0x536E50, accent: 0x397D2F, soft: 0xDFEFD5, border: 0xC9DEC0)
+        case .hollow: return ThemePalette(surface: 0xF5F7FC, text: 0x202D44, muted: 0x5B6B85, accent: 0x486DA9, soft: 0xE4EAF8, border: 0xD1DBEC)
+        case .crossy: return ThemePalette(surface: 0xFAFBF2, text: 0x2C3C35, muted: 0x657660, accent: 0xBC5425, soft: 0xF6E6D8, border: 0xD7E2CA)
+        }
+    }
+}
+
+@MainActor
+struct MapDimensionToggle: View {
+    @ObservedObject var store: AppStore
+    var body: some View {
+        Toggle("Mapa 3D", isOn: Binding(get: { store.map3D }, set: { store.setMap3D($0) }))
+            .interfaceFont(.subheadline)
+            .frame(minHeight: 44)
+            .accessibilityHint(store.snapshot.navigationActive ? "Preferência para suas viagens" : "Preferência ao explorar o mapa")
+    }
+}
+
 @MainActor
 struct CatalogBitmap: View {
     let url: URL?
@@ -53,8 +111,8 @@ struct SheetHeading: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(title).gameFont(.title2, weight: .bold).foregroundStyle(palette.text)
-            Text(subtitle).gameFont(.subheadline).foregroundStyle(palette.muted)
+            Text(title).interfaceFont(.title2, weight: .bold).foregroundStyle(palette.text)
+            Text(subtitle).interfaceFont(.subheadline).foregroundStyle(palette.muted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -68,7 +126,7 @@ struct MessageCard: View {
 
     var body: some View {
         Label(text, systemImage: symbol)
-            .gameFont(.footnote).fixedSize(horizontal: false, vertical: true)
+            .interfaceFont(.footnote).fixedSize(horizontal: false, vertical: true)
             .foregroundStyle(palette.text).padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(palette.soft, in: RoundedRectangle(cornerRadius: 14))
@@ -114,11 +172,11 @@ struct ThemePreviewCard: View {
             }
             VStack(alignment: .leading, spacing: 3) {
                 HStack {
-                    Text(theme.title).gameFont(.headline)
+                    Text(theme.title).gameFont(.headline).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                     Spacer()
                     if store.theme == theme { Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.palette.accent) }
                 }
-                Text(theme.subtitle).gameFont(.caption).foregroundStyle(theme.palette.muted).lineLimit(1)
+                Text(theme.subtitle).interfaceFont(.caption).foregroundStyle(theme.palette.muted).lineLimit(1)
             }
             .foregroundStyle(theme.palette.text).padding(12)
         }

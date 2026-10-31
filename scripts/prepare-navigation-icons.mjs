@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { MAP_THEMES } from './prepare-world-maps.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -12,9 +13,9 @@ export async function prepareNavigationIcons({
   outputRoot = path.join(root, 'android/app/src/main/assets/navigation-icons'),
 } = {}) {
   const catalog = JSON.parse(await readFile(path.join(sourceRoot, 'catalog.json'), 'utf8'));
-  const expectedThemes = ['gta', 'rosa', 'rdr2'];
+  const expectedThemes = Object.keys(MAP_THEMES);
   if (catalog.schemaVersion !== 1 || JSON.stringify(catalog.themes) !== JSON.stringify(expectedThemes)) {
-    throw new Error('Navigation catalog must declare schema 1 and gta, rosa, rdr2 themes');
+    throw new Error(`Navigation catalog must declare schema 1 and ${expectedThemes.join(', ')} themes`);
   }
   if (catalog.vehicleHeading !== 'north' || JSON.stringify(catalog.vehicleAnchor) !== '[0.5,0.5]') {
     throw new Error('Vehicle artwork must point north around the center anchor');
@@ -29,6 +30,9 @@ export async function prepareNavigationIcons({
     if (!entries.some(item => item.id === fallback)) throw new Error(`Missing ${kind} fallback`);
     for (const item of entries) {
       if (!/^[a-z][a-z0-9-]*$/.test(item.id) || !item.label?.trim()) throw new Error(`Invalid ${kind} semantic choice`);
+      if (Object.keys(item.themeAssets ?? {}).some(theme => !expectedThemes.includes(theme))) {
+        throw new Error(`Navigation ${kind}/${item.id} contains inactive theme mappings`);
+      }
       for (const theme of expectedThemes) {
         const asset = item.themeAssets?.[theme];
         const basename = `${theme}/${kind}/${item.id}`;
@@ -94,9 +98,14 @@ export async function prepareNavigationIcons({
     distribution: 'Local private pack only. Original game artwork and its derivatives are excluded from CC0.',
   }));
   await writeFile(path.join(outputRoot, 'catalog.json'), `${JSON.stringify(catalog, null, 2)}\n`);
-  await writeFile(path.join(outputRoot, 'provenance.json'), `${JSON.stringify({ schemaVersion: 1, importedSprites }, null, 2)}\n`);
+  const authoredThemes = expectedThemes.filter(theme => prepared.filter(item => item.theme === theme)
+    .every(item => item.asset.origin === 'navskin-authored'));
+  await writeFile(path.join(outputRoot, 'provenance.json'), `${JSON.stringify({ schemaVersion: 1, importedSprites,
+    authoredThemes, authoredArtwork: 'NavSkin-authored SVG adaptations; CC0-1.0 except character adaptations. Theme names indicate visual inspiration, not original game artwork.',
+    characterAdaptations: prepared.filter(item => item.asset.origin === 'navskin-authored-character-adaptation').map(({theme,kind,id,asset}) => ({theme,kind,id,source:asset.source,license:asset.license})),
+  }, null, 2)}\n`);
   await writeFile(path.join(outputRoot, 'LICENSE.txt'), license);
-  console.log(`Prepared ${prepared.length} navigation choices (${importedSprites.length} original game raster) and ${prepared.length * 2} transparent PNGs across 3 themes.`);
+  console.log(`Prepared ${prepared.length} navigation choices (${importedSprites.length} original game raster) and ${prepared.length * 2} transparent PNGs across ${expectedThemes.length} themes.`);
   return catalog;
 }
 

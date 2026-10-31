@@ -31,6 +31,19 @@ class LocalPlacesStoreTest {
 
     private fun store() = LocalPlacesStore(context, clock = { time }, file = file)
 
+    @Test fun resumeItineraryRoundTripsInOrderAndClearsTogetherWithTheFinalDestination() {
+        val places = store()
+        val final = Destination("final", "Final", GeoPoint(-16.7, -49.2))
+        val stops = listOf(Destination("one", "One", GeoPoint(-16.68, -49.2)),
+            Destination("two", "Two", GeoPoint(-16.69, -49.2)))
+        places.setResumeDestination(final, stops)
+        assertEquals(final, store().snapshot().resumeDestination)
+        assertEquals(stops, store().snapshot().resumeIntermediateStops)
+        places.setResumeDestination(null)
+        assertNull(store().snapshot().resumeDestination)
+        assertTrue(store().snapshot().resumeIntermediateStops.isEmpty())
+    }
+
     @Test fun editsKeepStableIdentityAndCreationDateAndDeleteClearsShortcuts() {
         val places = store()
         val created = places.savePlace("Minha casa", GeoPoint(-16.67, -49.25), "Rua Um", "personal", "home")
@@ -110,7 +123,7 @@ class LocalPlacesStoreTest {
         assertEquals(GeoPoint(-16.67, -49.25), restored.point)
         assertEquals("unavailable-old-theme-icon", restored.iconId)
         places.setWork(restored.id)
-        assertEquals(1, JSONObject(file.readText()).getInt("schemaVersion"))
+        assertEquals(2, JSONObject(file.readText()).getInt("schemaVersion"))
         assertEquals("legacy-home", store().snapshot().homeId)
         assertEquals("legacy-home", store().snapshot().workId)
     }

@@ -39,6 +39,7 @@ data class LocalPlacesState(
     val workId: String? = null,
     val resumeDestination: Destination? = null,
     val loadError: String? = null,
+    val resumeIntermediateStops: List<Destination> = emptyList(),
 )
 
 class LocalPlacesStorageException(message: String, cause: Throwable? = null) : IllegalStateException(message, cause)
@@ -117,9 +118,13 @@ class LocalPlacesStore(
         }
     }
 
-    fun setResumeDestination(destination: Destination?) {
+    fun setResumeDestination(destination: Destination?, intermediateStops: List<Destination> = emptyList()) {
         destination?.let(::validateDestination)
-        update { it.copy(resumeDestination = destination) }
+        require(destination != null || intermediateStops.isEmpty()) { "Paradas precisam de um destino final" }
+        intermediateStops.forEach(::validateDestination)
+        require(intermediateStops.map { it.id }.distinct().size == intermediateStops.size &&
+            intermediateStops.none { it.id == destination?.id }) { "Paradas repetidas" }
+        update { it.copy(resumeDestination = destination, resumeIntermediateStops = intermediateStops.toList()) }
     }
 
     fun addListener(listener: (LocalPlacesState) -> Unit): () -> Unit {
@@ -168,10 +173,16 @@ class LocalPlacesStore(
             val workId = source.nullableString("workId")
             require(homeId == null || places.any { it.id == homeId })
             require(workId == null || places.any { it.id == workId })
+            val resumeDestination = if (!source.has("resumeDestination") || source.isNull("resumeDestination")) null
+                else parseDestination(source.getJSONObject("resumeDestination"))
+            val resumeStops = if (version < 2) emptyList() else
+                source.getJSONArray("resumeIntermediateStops").objects().map(::parseDestination)
+            require(resumeDestination != null || resumeStops.isEmpty())
+            require(resumeStops.map { it.id }.distinct().size == resumeStops.size &&
+                resumeStops.none { it.id == resumeDestination?.id })
             LocalPlacesState(
-                places, recents, homeId, workId,
-                if (!source.has("resumeDestination") || source.isNull("resumeDestination")) null
-                    else parseDestination(source.getJSONObject("resumeDestination")),
+                places, recents, homeId, workId, resumeDestination,
+                resumeIntermediateStops = resumeStops,
             )
         } catch (_: Exception) {
             // The source is deliberately retained untouched. Every mutation is blocked,
@@ -192,6 +203,9 @@ class LocalPlacesStore(
                 value.recents.forEach { array.put(JSONObject().put("destination", destinationJson(it.destination)).put("usedAtMs", it.usedAtMs)) }
             }).put("homeId", value.homeId ?: JSONObject.NULL).put("workId", value.workId ?: JSONObject.NULL)
             .put("resumeDestination", value.resumeDestination?.let(::destinationJson) ?: JSONObject.NULL)
+            .put("resumeIntermediateStops", JSONArray().also { array ->
+                value.resumeIntermediateStops.forEach { array.put(destinationJson(it)) }
+            })
         var stream: java.io.FileOutputStream? = null
         val encoded = source.toString().toByteArray(Charsets.UTF_8)
         try {
@@ -237,7 +251,7 @@ class LocalPlacesStore(
     }
 
     companion object {
-        const val SCHEMA_VERSION = 1
+        const val SCHEMA_VERSION = 2
         const val MAX_RECENTS = 20
     }
 }

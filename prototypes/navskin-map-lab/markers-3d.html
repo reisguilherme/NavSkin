@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NavSkin · Garagem 3D</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./markers-3d.css">
+</head>
+<body>
+  <header><a class="brand" href="./index.html">NavSkin <span>GARAGEM</span></a><a href="./navegacao.html">Experimentar no mapa ↗</a></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">SEU MUNDO. SEU CAMINHO.</p><h1>Escolha sua companhia.</h1><p>Oito universos, vistos de todos os lados.<br>Os mesmos marcadores usados na navegação e no Vibing.</p></div><span class="edition">COLEÇÃO <strong>01 — 08</strong></span></section>
+    <section class="controls" aria-label="Câmera dos marcadores">
+      <label>Girar a câmera <input id="yaw" type="range" min="0" max="360" value="315" step="1"><output id="yaw-value">315°</output></label>
+      <div class="pitches" role="group" aria-label="Inclinação"><button data-pitch="0" aria-pressed="false">De cima</button><button data-pitch="40" aria-pressed="false">Inclinado</button><button data-pitch="55" aria-pressed="true">Navegação 3D</button></div>
+      <button id="orbit" aria-pressed="false">Girar automaticamente</button>
+    </section>
+    <p id="status" role="status">Carregando a coleção…</p>
+    <section id="collection" class="collection" aria-label="Coleção de marcadores"></section>
+    <footer>Modelos criados para o NavSkin, inspirados nos personagens e veículos dos jogos. Arraste o controle para inspecionar cada ângulo.<br>Malhas editáveis: <code>scripts/navigation-3d/</code> · No app, a orientação acompanha o GPS e a câmera.</footer>
+  </main>
+  <script type="module" src="./markers-3d.js"></script>
+</body>
+</html>

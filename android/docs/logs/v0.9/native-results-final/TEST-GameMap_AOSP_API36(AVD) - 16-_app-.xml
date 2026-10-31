@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="br.com.gamemap.render.NativeCameraRaceTest" tests="2" failures="0" errors="0" skipped="0" time="30.045" timestamp="2026-10-29T17:15:47" hostname="localhost">
+  <properties>
+    <property name="device" value="GameMap_AOSP_API36(AVD) - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="cameraMovedWhileThemeLoadsKeepsTheLatestNativePosition" classname="br.com.gamemap.render.NativeCameraRaceTest" time="4.559" />
+  <testcase name="saoPauloRendersThreeOnlineThemesAndKeepsCameraAndSavedOverlayAcrossCoverageChanges" classname="br.com.gamemap.render.NativeWorldMapTest" time="24.749" />
+</testsuite>
